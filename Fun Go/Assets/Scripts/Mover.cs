@@ -17,6 +17,7 @@ public class Mover : MonoBehaviour {
     void Update()
     {
         baseObject.position = this.gameObject.transform.position;
+        baseObject.rotation = this.gameObject.transform.rotation;
     }
 
     // Update is called once per frame
