@@ -7,6 +7,7 @@ public class Mover : MonoBehaviour {
     public Transform baseObject; // To move along with the objects
     public float speed;
     public float rotation;
+    private GameObject currentObject;
 
 	// Use this for initialization
 	void Start () {
@@ -22,7 +23,7 @@ public class Mover : MonoBehaviour {
         // Move for each components
         foreach (Rigidbody child in rb)
         {
-            child.velocity = movement * speed;
+            child.AddForce(movement * speed);
         }
         baseObject.position = this.gameObject.transform.position;
     }
