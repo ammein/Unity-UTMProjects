@@ -14,6 +14,11 @@ public class Mover : MonoBehaviour {
         rb = GetComponentsInChildren<Rigidbody>();
     }
 
+    void Update()
+    {
+        baseObject.position = this.gameObject.transform.position;
+    }
+
     // Update is called once per frame
     void FixedUpdate () {
         float x = Input.GetAxis("Horizontal");
@@ -25,6 +30,5 @@ public class Mover : MonoBehaviour {
         {
             child.AddForce(movement * speed);
         }
-        baseObject.position = this.gameObject.transform.position;
     }
 }
