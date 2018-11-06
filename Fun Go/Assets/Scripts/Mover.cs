@@ -11,7 +11,7 @@ public class Boundary
 [System.Serializable]
 public class RotationBoundary
 {
-    public float xMin , xMax, yMin , yMax, zMin , zMax;
+    public float yMin, yMax;
 }
 
 public class Mover : MonoBehaviour {
@@ -22,6 +22,7 @@ public class Mover : MonoBehaviour {
     private GameObject currentObject;
     public Boundary boundary; // Call the class
     public RotationBoundary rotationBoundary;
+    private float currentRotation;
 
 	// Use this for initialization
 	void Start () {
@@ -64,11 +65,10 @@ public class Mover : MonoBehaviour {
 
     void rotationControl(Rigidbody child)
     {
-        if(transform.position.y >= 0)
+        currentRotation = Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax);
+        if (transform.position.y >= 0)
         {
-            //Debug.Log("Running Rotation Control");
-            Quaternion target = Quaternion.Euler(rotationBoundary.xMax , rotationBoundary.yMax , rotationBoundary.zMax);
-            transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * 0.5f);
+            transform.rotation = Quaternion.identity * Quaternion.AngleAxis(currentRotation, transform.right);
         }
 
         //Debug.Log("Current Rotation : " + transform.rotation);
