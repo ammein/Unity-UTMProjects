@@ -5,7 +5,13 @@ using UnityEngine;
 [System.Serializable] // Make it enable on unity to serialize
 public class Boundary
 {
-    public float xMin , xMax , yMin , yMax , zMin , zMax;
+    public float xMin, xMax, yMin, yMax;
+}
+
+[System.Serializable]
+public class RotationBoundary
+{
+    public float zMin , zMax;
 }
 
 public class Mover : MonoBehaviour {
@@ -15,6 +21,7 @@ public class Mover : MonoBehaviour {
     public float rotation;
     private GameObject currentObject;
     public Boundary boundary; // Call the class
+    public RotationBoundary rotationBoundary;
 
 	// Use this for initialization
 	void Start () {
@@ -45,6 +52,13 @@ public class Mover : MonoBehaviour {
                 Mathf.Clamp(child.position.y, boundary.yMin, boundary.yMax),
                 0.0f
                 );
+
+            child.rotation = Quaternion.Euler(
+                0.0f,
+                0.0f,
+                Mathf.Clamp(child.rotation.z , rotationBoundary.zMin , rotationBoundary.zMax)
+                );
+
             child.AddForce(movement * speed);
         }
     }
