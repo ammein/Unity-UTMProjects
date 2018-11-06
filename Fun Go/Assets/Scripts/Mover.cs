@@ -11,7 +11,7 @@ public class Boundary
 [System.Serializable]
 public class RotationBoundary
 {
-    public float zMin , zMax;
+    public float xMin , xMax, yMin , yMax, zMin , zMax;
 }
 
 public class Mover : MonoBehaviour {
@@ -53,13 +53,26 @@ public class Mover : MonoBehaviour {
                 0.0f
                 );
 
-            child.rotation = Quaternion.Euler(
-                0.0f,
-                0.0f,
-                Mathf.Clamp(child.rotation.z , rotationBoundary.zMin , rotationBoundary.zMax)
-                );
+            rotationControl(child);
+
+            //Debug.Log("Child Rotation" + child.rotation.z);
 
             child.AddForce(movement * speed);
         }
+    }
+
+    void rotationControl(Rigidbody child)
+    {
+        if(transform.position.y >= 0)
+        {
+            //Debug.Log("Running Rotation Control");
+            //transform.rotation = Quaternion.Euler(
+            //    Mathf.Clamp(transform.rotation.x, rotationBoundary.xMin, rotationBoundary.xMax),
+            //    Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax),
+            //    Mathf.Clamp(transform.rotation.z, rotationBoundary.zMin, rotationBoundary.zMax)
+            //    );
+        }
+
+        Debug.Log("Current Position : " + transform);
     }
 }
