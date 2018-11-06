@@ -22,7 +22,6 @@ public class Mover : MonoBehaviour {
     private GameObject currentObject;
     public Boundary boundary; // Call the class
     public RotationBoundary rotationBoundary;
-    private WheelCollider wheel;
 
 	// Use this for initialization
 	void Start () {
@@ -57,9 +56,9 @@ public class Mover : MonoBehaviour {
             rotationControl(child);
 
             child.AddForce(movement * speed);
-            if (Input.GetKeyDown("space") && wheel.isGrounded)
+            if (Input.GetKeyDown("space"))
             {
-                child.AddForce(0, 500, 0, ForceMode.Impulse);
+                transform.Translate(Vector3.up * 260 * Time.deltaTime, Space.World);
             }
         }
     }
