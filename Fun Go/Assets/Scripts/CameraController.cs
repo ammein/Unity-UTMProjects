@@ -49,18 +49,18 @@ public class CameraController : MonoBehaviour {
 
     // Update is called once per frame
     void LateUpdate () {
-        playerPosition = player.transform.position.x;
-        playerSpeed = playerRigid.velocity.x;
-        cameraSpeed = Camera.main.velocity.x;
+        playerPosition = player.transform.position.z;
+        playerSpeed = playerRigid.velocity.z;
+        cameraSpeed = Camera.main.velocity.z;
         moveCam += playerSpeed * cameraSettings.easing;
         moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
         orthoMove += cameraSpeed * 0.1f;
         orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
-        if (playerSpeed >= 5)
+        if (playerRigid.velocity.z >= 5)
         {
             flagCamera = true;
         }
-        else if (playerSpeed <= 5)
+        else if (playerRigid.velocity.z <= 5)
         {
             flagCamera = false;
         }
@@ -73,13 +73,13 @@ public class CameraController : MonoBehaviour {
         if (flagCamera)
         {
             Camera.main.orthographicSize = orthoMove;
-            transform.position = player.transform.position + new Vector3(moveCam, 0.0f, 0.0f) + offset;
+            transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Enable Flag Camera");
         }
         else
         {
             Camera.main.orthographicSize = orthoMove;
-            transform.position = player.transform.position + new Vector3(moveCam, 0.0f, 0.0f) + offset;
+            transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Disable Flag Camera");
         }
 

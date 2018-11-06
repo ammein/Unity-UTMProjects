@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable] // Make it enable on unity to serialize
 public class Boundary
 {
-    public float xMin, xMax, yMin, yMax;
+    public float zMin, zMax, yMin, yMax;
 }
 
 [System.Serializable]
@@ -36,9 +36,8 @@ public class Mover : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate () {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(x, 0.0f, z);
+        float z = Input.GetAxis("Horizontal");
+        Vector3 movement = new Vector3(0.0f, 0.0f, z);
         moving(movement , rb , speed);
     }
 
@@ -48,9 +47,9 @@ public class Mover : MonoBehaviour {
         foreach (Rigidbody child in rb)
         {
             child.position = new Vector3(
-                Mathf.Clamp(child.position.x, boundary.xMin, boundary.xMax),
+                0.0f,
                 Mathf.Clamp(child.position.y, boundary.yMin, boundary.yMax),
-                0.0f
+                Mathf.Clamp(child.position.z, boundary.zMin, boundary.zMax)
                 );
 
             rotationControl(child);
@@ -68,11 +67,7 @@ public class Mover : MonoBehaviour {
         if(transform.position.y >= 0)
         {
             //Debug.Log("Running Rotation Control");
-            Quaternion target = Quaternion.Euler(
-                Mathf.Clamp(transform.rotation.x, rotationBoundary.xMin, rotationBoundary.xMax),
-                Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax),
-                Mathf.Clamp(transform.rotation.z, rotationBoundary.zMin, rotationBoundary.zMax)
-                );
+            Quaternion target = Quaternion.Euler(rotationBoundary.xMax , rotationBoundary.yMax , rotationBoundary.zMax);
             transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * 0.5f);
         }
 
