@@ -22,6 +22,7 @@ public class Mover : MonoBehaviour {
     private GameObject currentObject;
     public Boundary boundary; // Call the class
     public RotationBoundary rotationBoundary;
+    private WheelCollider wheel;
 
 	// Use this for initialization
 	void Start () {
@@ -55,9 +56,11 @@ public class Mover : MonoBehaviour {
 
             rotationControl(child);
 
-            //Debug.Log("Child Rotation" + child.rotation.z);
-
             child.AddForce(movement * speed);
+            if (Input.GetKeyDown("space") && wheel.isGrounded)
+            {
+                child.AddForce(0, 500, 0, ForceMode.Impulse);
+            }
         }
     }
 
@@ -66,13 +69,14 @@ public class Mover : MonoBehaviour {
         if(transform.position.y >= 0)
         {
             //Debug.Log("Running Rotation Control");
-            //transform.rotation = Quaternion.Euler(
-            //    Mathf.Clamp(transform.rotation.x, rotationBoundary.xMin, rotationBoundary.xMax),
-            //    Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax),
-            //    Mathf.Clamp(transform.rotation.z, rotationBoundary.zMin, rotationBoundary.zMax)
-            //    );
+            Quaternion target = Quaternion.Euler(
+                Mathf.Clamp(transform.rotation.x, rotationBoundary.xMin, rotationBoundary.xMax),
+                Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax),
+                Mathf.Clamp(transform.rotation.z, rotationBoundary.zMin, rotationBoundary.zMax)
+                );
+            transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * 0.5f);
         }
 
-        Debug.Log("Current Position : " + transform);
+        //Debug.Log("Current Rotation : " + transform.rotation);
     }
 }

@@ -12,6 +12,7 @@ public class CameraSettings
 public class CameraController : MonoBehaviour {
     private Vector3 offset;
     public GameObject player;
+    public Rigidbody playerRigid;
     private bool flags;
     public Vector3 distance;
     public float minFov;
@@ -49,32 +50,22 @@ public class CameraController : MonoBehaviour {
     // Update is called once per frame
     void LateUpdate () {
         playerPosition = player.transform.position.x;
-        playerSpeed = player.GetComponent<Rigidbody>().velocity.x;
+        playerSpeed = playerRigid.velocity.x;
         cameraSpeed = Camera.main.velocity.x;
-        moveCam += playerPosition * cameraSettings.easing;
+        moveCam += playerSpeed * cameraSettings.easing;
         moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
         orthoMove += cameraSpeed * 0.1f;
         orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
-        //transform.position = player.transform.position + offset;
-        //if(playerSpeed > 1)
-        //{
-        //    transform.position = (player.transform.position + new Vector3(moveCam, 0.0f, 0.0f)) + offset;
-        //}
-        //else if(playerSpeed <= 0)
-        //{
-        //    transform.position = (player.transform.position + new Vector3(moveCam, 0.0f, 0.0f)) + offset;
-        //}
-        if (playerSpeed >= moveCam)
+        if (playerSpeed >= 5)
         {
             flagCamera = true;
         }
-        else if (playerSpeed <= moveCam)
+        else if (playerSpeed <= 5)
         {
             flagCamera = false;
         }
         onMove();
-        //Debug.Log("MoveCamera Value : " + moveCam);
-        //Debug.Log("Test" + (Camera.main.transform.position.x + Camera.main.velocity.x));
+        Debug.Log("Speed Value : " + moveCam);
     }
 
     void onMove()
@@ -88,8 +79,26 @@ public class CameraController : MonoBehaviour {
         else
         {
             Camera.main.orthographicSize = orthoMove;
-            transform.position = player.transform.position + new Vector3(moveCam - moveCam, 0.0f, 0.0f) + offset;
+            transform.position = player.transform.position + new Vector3(moveCam, 0.0f, 0.0f) + offset;
             //Debug.Log("Disable Flag Camera");
+        }
+
+        if (Input.GetKeyDown("space"))
+        {
+            Camera.main.orthographicSize = orthoMove++;
+        }
+    }
+
+    void perspectiveMove()
+    {
+        transform.position = player.transform.position + offset;
+        if (playerSpeed > 1)
+        {
+            transform.position = (player.transform.position + new Vector3(moveCam, 0.0f, 0.0f)) + offset;
+        }
+        else if (playerSpeed <= 0)
+        {
+            transform.position = (player.transform.position + new Vector3(moveCam, 0.0f, 0.0f)) + offset;
         }
     }
 }
