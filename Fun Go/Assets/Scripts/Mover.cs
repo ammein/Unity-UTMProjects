@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable] // Make it enable on unity to serialize
-public class Boundary
-{
-    public float zMin, zMax, yMin, yMax;
-}
+//[System.Serializable] // Make it enable on unity to serialize
+//public class Boundary
+//{
+//    public float zMin, zMax, yMin, yMax;
+//}
 
-[System.Serializable]
-public class RotationBoundary
-{
-    public float yMin, yMax;
-}
+//[System.Serializable]
+//public class RotationBoundary
+//{
+//    public float yMin, yMax;
+//}
 
 public class Mover : MonoBehaviour {
     private Rigidbody[] rb;
