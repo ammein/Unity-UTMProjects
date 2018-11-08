@@ -65,7 +65,7 @@ public class CameraController : MonoBehaviour {
             flagCamera = false;
         }
         onMove();
-        Debug.Log("Speed Value : " + moveCam);
+        //Debug.Log("Speed Value : " + moveCam);
     }
 
     void onMove()
