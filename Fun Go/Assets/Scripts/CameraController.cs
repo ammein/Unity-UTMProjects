@@ -56,11 +56,11 @@ public class CameraController : MonoBehaviour {
         moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
         orthoMove += cameraSpeed * 0.1f;
         orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
-        if (playerRigid.velocity.z >= 5)
+        if (playerRigid.velocity.z > 1)
         {
             flagCamera = true;
         }
-        else if (playerRigid.velocity.z <= 5)
+        else if (playerRigid.velocity.z <= 1)
         {
             flagCamera = false;
         }
