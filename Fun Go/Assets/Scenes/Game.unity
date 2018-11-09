@@ -378,7 +378,7 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: speed
-      value: 100
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
@@ -437,7 +437,7 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: rotationBoundary.yMin
-      value: -20
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
@@ -447,12 +447,22 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: rotationBoundary.zMin
-      value: -20
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: rotationBoundary.zMax
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: wheel
+      value: 
+      objectReference: {fileID: 1929693008}
+    - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: boundary.yMin
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
@@ -760,6 +770,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: -27.07, y: 0, z: 0}
+--- !u!135 &1929693008 stripped
+SphereCollider:
+  m_CorrespondingSourceObject: {fileID: 135918677942827242, guid: e983a764a84c2044b9951744f07f2539,
+    type: 2}
+  m_PrefabInternal: {fileID: 1156843174}
 --- !u!54 &1940740505 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 54963944776589488, guid: e983a764a84c2044b9951744f07f2539,
