@@ -11,22 +11,26 @@ public class Boundary
 [System.Serializable]
 public class RotationBoundary
 {
-    public float yMin, yMax;
+    public float xMin, xMax , yMin , yMax , zMin , zMax;
 }
 
 public class Mover : MonoBehaviour {
-    private Rigidbody[] rb;
+    private Rigidbody rb;
+    public bool pauseGame;
     public Transform baseObject; // To move along with the objects
     public float speed;
     public float rotation;
-    private GameObject currentObject;
     public Boundary boundary; // Call the class
     public RotationBoundary rotationBoundary;
-    private float currentRotation;
+    private float timeCount = 0.0f;
+    public float speedAccelerate;
+    private float distGround;
+    public Collider wheel;
 
-	// Use this for initialization
-	void Start () {
-        rb = GetComponentsInChildren<Rigidbody>();
+    // Use this for initialization
+    void Start () {
+        rb = GetComponent<Rigidbody>();
+        distGround = wheel.bounds.extents.y;
     }
 
     void Update()
@@ -38,39 +42,67 @@ public class Mover : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate () {
         float z = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(0.0f, 0.0f, z);
-        moving(movement , rb , speed);
-    }
-
-    public void moving(Vector3 movement , Rigidbody[] rb , float speed)
-    {
-        // Move for each components
-        foreach (Rigidbody child in rb)
+        Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
+        Quaternion clampRotate = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+        if (!pauseGame)
         {
-            child.position = new Vector3(
-                0.0f,
-                Mathf.Clamp(child.position.y, boundary.yMin, boundary.yMax),
-                Mathf.Clamp(child.position.z, boundary.zMin, boundary.zMax)
-                );
-
-            rotationControl(child);
-
-            child.AddForce(movement * speed);
-            if (Input.GetKeyDown("space"))
+            if (transform.rotation.y > 0 && transform.rotation.z > 0 && !isGrounded())
             {
-                transform.Translate(Vector3.up * 260 * Time.deltaTime, Space.World);
+                // Reset Transform Rotation to origin while in air
+                rb.transform.rotation = Quaternion.Slerp(Quaternion.identity, clampRotate, Time.deltaTime);
+                timeCount = timeCount + Time.deltaTime;
+                // To Stop moving when on air
+                moving(Vector3.zero, rb, speed , true);
+                rb.angularVelocity = Vector3.zero;
+                rb.velocity = Vector3.zero;
+            }
+            else
+            {
+                moving(movement, rb, speed , false);
             }
         }
+        else
+        {
+            rb.AddForce(Vector3.zero);
+        }
+        Debug.Log("Rotation Read : " + rb.transform.localRotation);
+        Debug.Log("Velocity Read : " + rb.velocity);
     }
 
-    void rotationControl(Rigidbody child)
+    private bool isGrounded()
     {
-        currentRotation = Mathf.Clamp(transform.rotation.y, rotationBoundary.yMin, rotationBoundary.yMax);
-        if (transform.position.y >= 0)
+        return Physics.Raycast(transform.position, -Vector3.up, distGround + 0.1f);
+    }
+
+    public void moving(Vector3 movement , Rigidbody rb , float speed , bool stopForce)
+    {
+        float tiltUp = Input.GetAxis("Jump");
+        Debug.Log("Running Moving function");
+        // Move for each components
+        rb.position = new Vector3(
+            0.0f,
+            Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
+            Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
+            );
+
+        //rb.transform.rotation = Quaternion.Euler(
+        //    Mathf.Clamp(transform.eulerAngles.x, rotationBoundary.xMin, rotationBoundary.xMax),
+        //    Mathf.Clamp(transform.eulerAngles.y, rotationBoundary.yMin, rotationBoundary.yMax),
+        //    Mathf.Clamp(transform.eulerAngles.z, rotationBoundary.zMin, rotationBoundary.zMax)
+        //    );
+
+        if (!stopForce)
         {
-            transform.rotation = Quaternion.identity * Quaternion.AngleAxis(currentRotation, transform.right);
+            rb.AddForce(movement * speed, ForceMode.Acceleration);
+        }
+        else
+        {
+            rb.AddForce(movement * speed, ForceMode.Impulse);
         }
 
-        //Debug.Log("Current Rotation : " + transform.rotation);
+        if (Input.GetKeyDown("space"))
+        {
+            rb.AddForce(Vector3.up * 20f);
+        }
     }
 }
