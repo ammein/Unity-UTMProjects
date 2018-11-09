@@ -11,17 +11,17 @@ public class AxleInfo
     public bool steering;
 }
 
-[System.Serializable] // Make it enable on unity to serialize
-public class Boundary
-{
-    public float zMin, zMax, yMin, yMax;
-}
+//[System.Serializable] // Make it enable on unity to serialize
+//public class Boundary
+//{
+//    public float zMin, zMax, yMin, yMax;
+//}
 
-[System.Serializable]
-public class RotationBoundary
-{
-    public float yMin, yMax;
-}
+//[System.Serializable]
+//public class RotationBoundary
+//{
+//    public float yMin, yMax;
+//}
 
 public class CarController : MonoBehaviour
 {
@@ -69,6 +69,7 @@ public class CarController : MonoBehaviour
             {
                 axleInfo.leftWheel.steerAngle = steering;
                 axleInfo.rightWheel.steerAngle = steering;
+
             }
             if (axleInfo.motor)
             {
