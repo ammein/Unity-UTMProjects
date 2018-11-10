@@ -11,13 +11,13 @@ public class Boundary
 [System.Serializable]
 public class RotationUpBoundary
 {
-    public float xMin, xMax , yMin , yMax , zMin , zMax;
+    public float yPositiveAxis;
 }
 
 [System.Serializable]
 public class RotationDownBoundary
 {
-    public float xMin, xMax , yMin , yMax , zMin , zMax;
+    public float yNegativeAxis;
 }
 
 public class Mover : MonoBehaviour {
@@ -25,14 +25,19 @@ public class Mover : MonoBehaviour {
     public bool pauseGame;
     public Transform baseObject; // To move along with the objects
     public float speed;
-    public float rotation;
     public Boundary boundary; // Call the class
     public RotationUpBoundary rotationUpBoundary;
     public RotationDownBoundary rotationDownBoundary;
     public float speedAccelerate;
-    private bool isGrounded;
+    private bool isGrounded = true;
     public Transform targetObject;
-    private Vector3 relativePos;
+    private Vector3 the_return;
+    private Quaternion clampRotate = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+    public float timeHoldForRotation;
+    public float turnRate;
+    private Vector3 desiredDirection;
+    private bool ranOnce = false;
+    public float jumpForce;
 
     // Use this for initialization
     void Start () {
@@ -43,50 +48,35 @@ public class Mover : MonoBehaviour {
     {
         baseObject.position = this.gameObject.transform.position;
         baseObject.rotation = this.gameObject.transform.rotation;
-        relativePos = targetObject.position - rb.transform.position;
-        isGrounded = true;
+        desiredDirection = transform.position - targetObject.position;
+        the_return = Vector3.RotateTowards(transform.position, desiredDirection,turnRate * Time.deltaTime, 1);
     }
 
     // Update is called once per frame
     void FixedUpdate () {
-        //float z = Input.GetAxis("Horizontal");
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        Quaternion clampRotate = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
         if (!pauseGame)
         {
             if (!isGrounded)
             {
-                // Reset Transform Rotation to origin while in air
-                rb.transform.rotation = Quaternion.Slerp(Quaternion.identity, clampRotate, Time.deltaTime * 3.0f);
-                // To Stop moving when on air
                 Moving(Vector3.zero, rb, speed , true);
-                rb.angularVelocity = Vector3.zero;
-                rb.velocity = Vector3.zero;
-            }
-            else if (isGrounded && transform.rotation.y >= 0.2)
-            {
-                Debug.Log("Running at Rotation : " + transform.rotation + " ,And it should apply the clampRotate");
-                rb.transform.rotation = Quaternion.Slerp(Quaternion.identity, clampRotate, Time.deltaTime * 3.0f);
             }
             else
             {
-                Moving(movement, rb, speed , false);
+                Moving(movement, rb, speed, false);
             }
         }
         else
         {
             rb.AddForce(Vector3.zero);
+            rb.angularVelocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
+
         }
-        //Debug.Log("Rotation Read : " + rb.transform.eulerAngles);
-        //Debug.Log("Rotation Quaternion Read : " + Quaternion.identity);
-        //Debug.Log("Velocity Read : " + rb.velocity);
     }
 
-    public void Moving(Vector3 movement , Rigidbody rb , float speed , bool stopForce)
+    public void Moving(Vector3 movement, Rigidbody rb, float speed, bool stopForce)
     {
-        //float tiltUp = Input.GetAxis("Jump");
-        //Debug.Log("Running Moving function");
-        // Move for each components
         rb.position = new Vector3(
             0.0f,
             Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
@@ -97,40 +87,56 @@ public class Mover : MonoBehaviour {
         {
             rb.AddForce(movement * speed, ForceMode.Acceleration);
         }
-        else
+        if (!isGrounded)
         {
-            rb.AddForce(Vector3.zero ,ForceMode.Impulse);
+            rb.AddForce(movement * 0.0f, ForceMode.Impulse);
+            StartCoroutine(RotationControl());
+        }
+        else if(stopForce)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.Sleep();
         }
 
         if (Input.GetKeyDown("space"))
         {
-            rb.AddForce(Vector3.up * speed * Input.GetAxis("Jump"));
+            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump") , ForceMode.Impulse);
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
-        if(collision.gameObject.name == "Plane")
+        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Hill"))
         {
             isGrounded = true;
+            //print("On the ground");
         }
-    }
-
-    public static float ClampAngle(float angle, float min, float max)
-    {
-        if (angle < -360F)
-            angle += 360F;
-        if (angle > 360F)
-            angle -= 360F;
-        Debug.Log(angle);
-        return Mathf.Clamp(angle, min, max);
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.name == "Plane")
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Hill"))
         {
             isGrounded = false;
+            //print("In the air");
         }
+    }
+
+    IEnumerator RotationControl()
+    {
+        if (!ranOnce)
+        {
+            ranOnce = true;
+            yield return new WaitForSeconds(timeHoldForRotation);
+            //Debug.Log("Ground ? = " + isGrounded);
+            Quaternion lookAt = Quaternion.LookRotation(the_return);
+            if (!(rb.transform.rotation == lookAt))
+                rb.transform.rotation = lookAt;
+            else
+                rb.transform.rotation = Quaternion.identity;
+            rb.WakeUp();
+        }
+        ranOnce = false;
     }
 }
