@@ -22,6 +22,7 @@ public class RotationDownBoundary
 
 public class Mover : MonoBehaviour {
     private Rigidbody rb;
+    [Header("Car Controls : ", order = 0)]
     [Tooltip("This is for stop vehicle")]
     public bool pauseGame;
     [Tooltip("Only for a car base object")]
@@ -40,7 +41,7 @@ public class Mover : MonoBehaviour {
     public RotationUpBoundary rotationUpBoundary;
     public RotationDownBoundary rotationDownBoundary;
     [Space(20, order = 0)]
-    [Header("Rotation Controls : ")]
+    [Header("Rotation Controls : " , order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
