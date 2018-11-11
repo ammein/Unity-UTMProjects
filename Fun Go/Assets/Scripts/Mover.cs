@@ -22,26 +22,45 @@ public class RotationDownBoundary
 
 public class Mover : MonoBehaviour {
     private Rigidbody rb;
+    [Tooltip("This is for stop vehicle")]
     public bool pauseGame;
+    [Tooltip("Only for a car base object")]
     public Transform baseObject; // To move along with the objects
+    [Tooltip("For End Position. End Game Position")]
+    public Transform targetObject;
+    [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
     public float speed;
+    [Tooltip("For accelerate num (Float Applicable) : 0.5 ...")]
+    public float speedAccelerate;
+    [Tooltip("This is for number of JumpForce. Try hit space")]
+    public float jumpForce;
+    [Header("Boundaries : ", order = 1)]
+    [Space(20, order = 0)]
     public Boundary boundary; // Call the class
     public RotationUpBoundary rotationUpBoundary;
     public RotationDownBoundary rotationDownBoundary;
-    public float speedAccelerate;
-    private bool isGrounded = true;
-    public Transform targetObject;
+    [Space(20, order = 0)]
+    [Header("Rotation Controls : ")]
+    [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
+    public float timeHoldForRotation;
+    [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
+    public float turnRate;
     private Vector3 the_return;
     private Quaternion clampRotate = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
-    public float timeHoldForRotation;
-    public float turnRate;
     private Vector3 desiredDirection;
     private bool ranOnce = false;
-    public float jumpForce;
+
+    // Get Detect Ground Script
+    private DetectGround detectGround;
+    private bool isGrounded; // To assign a local bool from DetectGround
 
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
+        // Initialize and get current gameObject DetectGround script
+        detectGround = rb.gameObject.GetComponent<DetectGround>();
+        // Assign to private bool
+        isGrounded = detectGround.isGrounded;
     }
 
     void Update()
@@ -75,6 +94,7 @@ public class Mover : MonoBehaviour {
         }
     }
 
+
     public void Moving(Vector3 movement, Rigidbody rb, float speed, bool stopForce)
     {
         rb.position = new Vector3(
@@ -92,7 +112,7 @@ public class Mover : MonoBehaviour {
             rb.AddForce(movement * 0.0f, ForceMode.Impulse);
             StartCoroutine(RotationControl());
         }
-        else if(stopForce)
+        else if (stopForce)
         {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
@@ -101,25 +121,7 @@ public class Mover : MonoBehaviour {
 
         if (Input.GetKeyDown("space"))
         {
-            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump") , ForceMode.Impulse);
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Hill"))
-        {
-            isGrounded = true;
-            //print("On the ground");
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Hill"))
-        {
-            isGrounded = false;
-            //print("In the air");
+            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
         }
     }
 

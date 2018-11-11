@@ -703,6 +703,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &1427550935 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1142727868187152, guid: e983a764a84c2044b9951744f07f2539,
+    type: 2}
+  m_PrefabInternal: {fileID: 1156843174}
+--- !u!114 &1427550938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1427550935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6bb10dc65387a844b305fe25600febd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundTagName:
+  - Ground
+  - Hill
+  isGrounded: 0
 --- !u!1 &1586092559
 GameObject:
   m_ObjectHideFlags: 0
