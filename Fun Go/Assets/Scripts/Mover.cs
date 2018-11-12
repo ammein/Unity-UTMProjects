@@ -50,10 +50,16 @@ public class Mover : MonoBehaviour {
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
+    [Header("Respawn Configs :")]
+    [Tooltip("For Wait until next respawn")]
+    public int respawnWait;
+    [Tooltip("For Respawn Blink Position")]
+    public float numRespawnBlink;
     private Vector3 the_return;
-    private Quaternion clampRotate = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
     private Vector3 desiredDirection;
     private bool ranOnce = false;
+    private Quaternion reset;
+    private GameObject currentGameObject;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -61,6 +67,7 @@ public class Mover : MonoBehaviour {
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
+        currentGameObject = GetComponent<GameObject>();
     }
 
     void Update()
@@ -72,6 +79,7 @@ public class Mover : MonoBehaviour {
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
         isGrounded = rb.gameObject.GetComponent<DetectGround>().isGrounded;
+        reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
     }
 
     // Update is called once per frame
@@ -100,6 +108,7 @@ public class Mover : MonoBehaviour {
 
         // For Max Speed
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        RotationControlCheck();
         print("Grounded ? " + isGrounded);
         if (isGrounded)
         {
@@ -111,7 +120,7 @@ public class Mover : MonoBehaviour {
         {
             rb.mass = jumpWeight;
             rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
-            StartCoroutine(RotationControl());
+            //StartCoroutine(RotationControl());
             return;
         }
 
@@ -121,19 +130,36 @@ public class Mover : MonoBehaviour {
         }
     }
 
-    IEnumerator RotationControl()
+    //IEnumerator RotationControl()
+    //{
+    //    if (!ranOnce)
+    //    {
+    //        ranOnce = true;
+    //        yield return new WaitForSeconds(timeHoldForRotation);
+    //        //Debug.Log("Ground ? = " + isGrounded);
+    //        Quaternion lookAt = Quaternion.LookRotation(the_return);
+    //        if (rb.transform.rotation == lookAt)
+    //            yield return null;
+    //        rb.transform.rotation = lookAt;
+    //        rb.WakeUp();
+    //    }
+    //    ranOnce = false;
+    //}
+
+    void RotationControlCheck()
     {
-        if (!ranOnce)
+        Debug.Log("RB Rotation" + rb.rotation);
+        Debug.Log("Transform Rotation" + rb.transform.rotation);
+        if (rb.rotation != reset)
         {
-            ranOnce = true;
-            yield return new WaitForSeconds(timeHoldForRotation);
-            //Debug.Log("Ground ? = " + isGrounded);
-            Quaternion lookAt = Quaternion.LookRotation(the_return);
-            if (rb.transform.rotation == lookAt)
-                yield return null;
-            rb.transform.rotation = lookAt;
-            rb.WakeUp();
+            rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
         }
-        ranOnce = false;
+        if(rb.rotation.y < 0.5f)
+        {
+            rb.AddForce(Vector3.zero, ForceMode.Impulse);
+            rb.angularVelocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
+            Vector3 getPosition = rb.transform.position;
+        }
     }
 }

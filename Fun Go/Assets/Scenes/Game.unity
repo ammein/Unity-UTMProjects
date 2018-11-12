@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45105314, g: 0.5008835, b: 0.5741803, a: 1}
+  m_IndirectSpecularColor: {r: 0.45105356, g: 0.5008839, b: 0.5741815, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -144,11 +144,6 @@ Transform:
 --- !u!1 &331555895 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1309363285141528, guid: e983a764a84c2044b9951744f07f2539,
-    type: 2}
-  m_PrefabInternal: {fileID: 1156843174}
---- !u!54 &331555898 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 54222362470230954, guid: e983a764a84c2044b9951744f07f2539,
     type: 2}
   m_PrefabInternal: {fileID: 1156843174}
 --- !u!1 &407139157
@@ -354,7 +349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e50ae27170a2e39438e7393c3a29f194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  car: {fileID: 331555898}
+  car: {fileID: 1940740505}
   speedText: {fileID: 407139158}
 --- !u!4 &792172724
 Transform:
@@ -592,7 +587,7 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: speed
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
@@ -761,12 +756,12 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: timeHoldForRotation
-      value: 0.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: turnRate
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4672493056206500, guid: e983a764a84c2044b9951744f07f2539, type: 2}
       propertyPath: m_LocalPosition.z
@@ -805,7 +800,17 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: jumpWeight
-      value: 200
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: numRespawnBlink
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: respawnWait
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
