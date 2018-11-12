@@ -24,6 +24,9 @@ public class UIController : MonoBehaviour {
 
     void UpdateSpeed()
     {
-        speedText.text = "Speed : " + speed;
+        if (speed >= 0)
+            speedText.text = "Speed : " + speed;
+        else
+            speedText.text = "Speed : " + 0;
     }
 }
