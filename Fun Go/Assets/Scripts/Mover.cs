@@ -24,7 +24,7 @@ public class Mover : MonoBehaviour {
     private Rigidbody rb;
     [Header("Car Controls : ", order = 0)]
     [Tooltip("This is for stop vehicle")]
-    public bool pauseGame;
+    public bool pauseCar;
     [Tooltip("Only for a car base object")]
     public Transform baseObject; // To move along with the objects
     [Tooltip("For End Position. End Game Position")]
@@ -35,6 +35,10 @@ public class Mover : MonoBehaviour {
     public float speedAccelerate;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
+    [Tooltip("Max Speed Limit (Integer)")]
+    public int maxSpeed;
+    [Tooltip("For on Jump , make realistic fall (Integer)")]
+    public int jumpWeight;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
@@ -51,17 +55,12 @@ public class Mover : MonoBehaviour {
     private Vector3 desiredDirection;
     private bool ranOnce = false;
 
-    // Get Detect Ground Script
-    private DetectGround detectGround;
+    // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
-        // Initialize and get current gameObject DetectGround script
-        detectGround = rb.gameObject.GetComponent<DetectGround>();
-        // Assign to private bool
-        isGrounded = detectGround.isGrounded;
     }
 
     void Update()
@@ -69,34 +68,29 @@ public class Mover : MonoBehaviour {
         baseObject.position = this.gameObject.transform.position;
         baseObject.rotation = this.gameObject.transform.rotation;
         desiredDirection = transform.position - targetObject.position;
-        the_return = Vector3.RotateTowards(transform.position, desiredDirection,turnRate * Time.deltaTime, 1);
+        the_return = Vector3.RotateTowards(transform.forward, desiredDirection,turnRate * Time.deltaTime, 1);
+        // Initialize and get current gameObject DetectGround script 
+        // (Must onUpdate because it triggers on collision)
+        isGrounded = rb.gameObject.GetComponent<DetectGround>().isGrounded;
     }
 
     // Update is called once per frame
     void FixedUpdate () {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        if (!pauseGame)
+        if (!pauseCar)
         {
-            if (!isGrounded)
-            {
-                Moving(Vector3.zero, rb, speed , true);
-            }
-            else
-            {
-                Moving(movement, rb, speed, false);
-            }
+            Moving(movement, rb, speed);
         }
         else
         {
-            rb.AddForce(Vector3.zero);
+            rb.AddForce(Vector3.zero , ForceMode.Impulse);
             rb.angularVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
-
         }
     }
 
 
-    public void Moving(Vector3 movement, Rigidbody rb, float speed, bool stopForce)
+    public void Moving(Vector3 movement, Rigidbody rb, float speed)
     {
         rb.position = new Vector3(
             0.0f,
@@ -104,20 +98,21 @@ public class Mover : MonoBehaviour {
             Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
             );
 
-        if (!stopForce && isGrounded)
+        // For Max Speed
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        print("Grounded ? " + isGrounded);
+        if (isGrounded)
         {
             rb.AddForce(movement * speed, ForceMode.Acceleration);
+            rb.mass = 1;
+            return;
         }
-        if (!isGrounded)
+        else if (!isGrounded)
         {
-            rb.AddForce(movement * 0.0f, ForceMode.Impulse);
+            rb.mass = jumpWeight;
+            rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
             StartCoroutine(RotationControl());
-        }
-        else if (stopForce)
-        {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.Sleep();
+            return;
         }
 
         if (Input.GetKeyDown("space"))
@@ -134,10 +129,9 @@ public class Mover : MonoBehaviour {
             yield return new WaitForSeconds(timeHoldForRotation);
             //Debug.Log("Ground ? = " + isGrounded);
             Quaternion lookAt = Quaternion.LookRotation(the_return);
-            if (!(rb.transform.rotation == lookAt))
-                rb.transform.rotation = lookAt;
-            else
-                rb.transform.rotation = Quaternion.identity;
+            if (rb.transform.rotation == lookAt)
+                yield return null;
+            rb.transform.rotation = lookAt;
             rb.WakeUp();
         }
         ranOnce = false;

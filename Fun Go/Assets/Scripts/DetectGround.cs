@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DetectGround : MonoBehaviour {
-
+    [Header("Name Your Ground for Collision Detect (On Ground/In The Air)")]
     [Tooltip("Assign name of Tag for detect ground")]
     public string[] groundTagName;
-    [Tooltip("DON'T TICK THIS. Only tick it if you want it to be in debug mode")]
+    [HideInInspector] // Hides var belows
     public bool isGrounded;
 
     void Start()
@@ -14,14 +14,14 @@ public class DetectGround : MonoBehaviour {
         isGrounded = true;
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         foreach(string groundName in groundTagName)
         {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = true;
-                print("On the ground");
+                print("On the ground : " + groundName);
                 return;
             }
         }
@@ -34,7 +34,7 @@ public class DetectGround : MonoBehaviour {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = false;
-                print("In the air");
+                print("In the air : " + groundName);
                 return;
             }
         }
