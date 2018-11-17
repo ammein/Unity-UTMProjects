@@ -19,7 +19,7 @@ public class RotationDownBoundary
 {
     public float yNegativeAxis;
 }
-
+[RequireComponent(typeof(DetectGround))]
 public class Mover : MonoBehaviour {
     private Rigidbody rb;
     [Header("Car Controls : ", order = 0)]
@@ -50,16 +50,15 @@ public class Mover : MonoBehaviour {
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
-    [Header("Respawn Configs :")]
-    [Tooltip("For Wait until next respawn")]
-    public int respawnWait;
-    [Tooltip("For Respawn Blink Position")]
-    public float numRespawnBlink;
+    [Tooltip("To get the Detect Ground Script")]
+    public DetectGround detectGround;
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
-    public ResetAnimation animationScript;
     private GameObject tyreObject;
+    private Rigidbody rigidBase;
+    [HideInInspector]
+    public double Speed;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -68,7 +67,8 @@ public class Mover : MonoBehaviour {
     void Start () {
         tyreObject = GameObject.FindGameObjectWithTag("tyre");
         rb = tyreObject.GetComponent<Rigidbody>();
-        Debug.Log("Is the gameObject Active ?");
+        rigidBase = GameObject.Find("Base").GetComponent<Rigidbody>();
+        Speed = 0;
     }
 
     void Update()
@@ -79,7 +79,8 @@ public class Mover : MonoBehaviour {
         the_return = Vector3.RotateTowards(transform.forward, desiredDirection, turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
-        isGrounded = this.gameObject.GetComponent<DetectGround>().isGrounded;
+        isGrounded = detectGround.isGrounded;
+
         reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
         if (!tyreObject.activeSelf)
@@ -90,11 +91,7 @@ public class Mover : MonoBehaviour {
         {
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
-            Debug.DebugBreak();
-            Debug.Log("The object is true");
         }
-
-        Debug.Log("Base Object Active ?" + tyreObject.activeSelf);
     }
 
     // Update is called once per frame
@@ -110,6 +107,7 @@ public class Mover : MonoBehaviour {
             rb.angularVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
         }
+        Speed = rb.velocity.magnitude * 3.6;
     }
 
 
@@ -124,18 +122,16 @@ public class Mover : MonoBehaviour {
         // For Max Speed
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
         RotationControlCheck();
-        print("Grounded ? " + isGrounded);
         if (isGrounded)
         {
             rb.AddForce(movement * speed, ForceMode.Acceleration);
-            rb.mass = 1;
+            rigidBase.mass = 1;
             return;
         }
         else if (!isGrounded)
         {
-            rb.mass = jumpWeight;
+            rigidBase.mass = jumpWeight;
             rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
-            //StartCoroutine(RotationControl());
             return;
         }
 
@@ -163,8 +159,8 @@ public class Mover : MonoBehaviour {
 
     void RotationControlCheck()
     {
-        Debug.Log("RB Rotation" + rb.rotation);
-        Debug.Log("Transform Rotation" + rb.transform.rotation);
+        //Debug.Log("RB Rotation" + rb.rotation);
+        //Debug.Log("Transform Rotation" + rb.transform.rotation);
         if (rb.rotation != reset)
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);

@@ -154,28 +154,13 @@ GameObject:
   - component: {fileID: 331555899}
   - component: {fileID: 331555898}
   - component: {fileID: 331555897}
-  - component: {fileID: 331555896}
   m_Layer: 0
   m_Name: Base
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &331555896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 331555895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5359b2214ecbff741bc779eb91fee399, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blinkGap: 0
-  blinkMax: 0
-  blinkDuration: 0
 --- !u!65 &331555897
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -466,7 +451,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e50ae27170a2e39438e7393c3a29f194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  car: {fileID: 1940740505}
   speedText: {fileID: 407139158}
 --- !u!4 &792172724
 Transform:
@@ -848,7 +832,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1427550937}
   - component: {fileID: 1940740505}
-  - component: {fileID: 1427550938}
   - component: {fileID: 1427550936}
   m_Layer: 0
   m_Name: wheels
@@ -890,39 +873,6 @@ Transform:
   m_Father: {fileID: 1987809456}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &1427550938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1427550935}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7132654c6cc70d4298afbb50119e595, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pauseCar: 0
-  baseObject: {fileID: 331555895}
-  targetObject: {fileID: 127162103}
-  speed: 50
-  speedAccelerate: 2
-  jumpForce: 20
-  maxSpeed: 50
-  jumpWeight: 50
-  boundary:
-    zMin: 0
-    zMax: 500
-    yMin: 0
-    yMax: 50
-  rotationUpBoundary:
-    yPositiveAxis: 10
-  rotationDownBoundary:
-    yNegativeAxis: -10
-  timeHoldForRotation: 2
-  turnRate: 10
-  respawnWait: 2
-  numRespawnBlink: 3
-  animationScript: {fileID: 0}
 --- !u!1 &1464546413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1400,9 +1350,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1987809456}
+  - component: {fileID: 1987809458}
+  - component: {fileID: 1987809457}
   m_Layer: 0
   m_Name: car_root_normal
-  m_TagString: Untagged
+  m_TagString: ParentPlayer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1423,6 +1375,53 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1987809457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1987809455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5359b2214ecbff741bc779eb91fee399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blinkGap: 2
+  blinkMax: 5
+--- !u!114 &1987809458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1987809455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7132654c6cc70d4298afbb50119e595, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseCar: 0
+  baseObject: {fileID: 331555895}
+  targetObject: {fileID: 127162103}
+  speed: 80
+  speedAccelerate: 5
+  jumpForce: 20
+  maxSpeed: 50
+  jumpWeight: 200
+  boundary:
+    zMin: 0
+    zMax: 500
+    yMin: 0
+    yMax: 50
+  rotationUpBoundary:
+    yPositiveAxis: 10
+  rotationDownBoundary:
+    yNegativeAxis: -10
+  timeHoldForRotation: 2
+  turnRate: 10
+  respawnWait: 2
+  numRespawnBlink: 3
+  detectGround: {fileID: 1427550936}
+  Speed: 0
 --- !u!1 &2015181725
 GameObject:
   m_ObjectHideFlags: 0

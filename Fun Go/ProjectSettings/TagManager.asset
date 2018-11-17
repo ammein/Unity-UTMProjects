@@ -7,6 +7,7 @@ TagManager:
   - tyre
   - Hill
   - Ground
+  - ParentPlayer
   layers:
   - Default
   - TransparentFX

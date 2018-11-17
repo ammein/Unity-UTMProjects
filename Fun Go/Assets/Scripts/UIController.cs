@@ -5,28 +5,18 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
 
-    public Rigidbody car;
-    private float speed;
+    private double speedInit;
     public Text speedText;
 
 	// Use this for initialization
 	void Start () {
-        car = car.GetComponent<Rigidbody>();
-        speed = 0;
-        speedText.text = "Speed : " + speed.ToString();
+        speedInit = 0;
+        speedText.text = "Speed : " + speedInit;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        speed = car.velocity.z;
-        UpdateSpeed();
-	}
-
-    void UpdateSpeed()
-    {
-        if (speed >= 0)
-            speedText.text = "Speed : " + speed;
-        else
-            speedText.text = "Speed : " + 0;
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().Speed;
+        speedText.text = "Speed : " + speedInit;
     }
 }
