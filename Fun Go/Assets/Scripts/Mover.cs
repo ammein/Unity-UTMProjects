@@ -26,7 +26,7 @@ public class Mover : MonoBehaviour {
     [Tooltip("This is for stop vehicle")]
     public bool pauseCar;
     [Tooltip("Only for a car base object")]
-    public Transform baseObject; // To move along with the objects
+    public GameObject baseObject; // To move along with the objects
     [Tooltip("For End Position. End Game Position")]
     public Transform targetObject;
     [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
@@ -57,9 +57,9 @@ public class Mover : MonoBehaviour {
     public float numRespawnBlink;
     private Vector3 the_return;
     private Vector3 desiredDirection;
-    private bool ranOnce = false;
     private Quaternion reset;
     private GameObject currentGameObject;
+    public ResetAnimation animationScript;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -68,18 +68,33 @@ public class Mover : MonoBehaviour {
     void Start () {
         rb = GetComponent<Rigidbody>();
         currentGameObject = GetComponent<GameObject>();
+        Debug.Log("Is the gameObject Active ?");
     }
 
     void Update()
     {
-        baseObject.position = this.gameObject.transform.position;
-        baseObject.rotation = this.gameObject.transform.rotation;
+        baseObject.transform.position = this.gameObject.transform.position;
+        baseObject.transform.rotation = this.gameObject.transform.rotation;
         desiredDirection = transform.position - targetObject.position;
-        the_return = Vector3.RotateTowards(transform.forward, desiredDirection,turnRate * Time.deltaTime, 1);
+        the_return = Vector3.RotateTowards(transform.forward, desiredDirection, turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
         isGrounded = rb.gameObject.GetComponent<DetectGround>().isGrounded;
         reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+
+        if (!currentGameObject.activeInHierarchy)
+        {
+            baseObject.SetActive(false);
+        }
+        else if(rb.gameObject.activeSelf)
+        {
+            baseObject.SetActive(true);
+            rb.gameObject.SetActive(true);
+            Debug.DebugBreak();
+            Debug.Log("The object is true");
+        }
+
+        Debug.Log("Base Object Active ?" + rb.gameObject.activeSelf);
     }
 
     // Update is called once per frame

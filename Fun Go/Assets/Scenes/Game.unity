@@ -146,6 +146,20 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1309363285141528, guid: e983a764a84c2044b9951744f07f2539,
     type: 2}
   m_PrefabInternal: {fileID: 1156843174}
+--- !u!114 &331555896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 331555895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5359b2214ecbff741bc779eb91fee399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blinkGap: 0
+  blinkMax: 0
+  blinkDuration: 0
 --- !u!1 &407139157
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,7 +601,7 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: speed
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
@@ -800,7 +814,7 @@ Prefab:
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: jumpWeight
-      value: 2
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
@@ -812,6 +826,11 @@ Prefab:
       propertyPath: respawnWait
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114623877733635590, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: baseObject
+      value: 
+      objectReference: {fileID: 331555895}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
   m_IsPrefabAsset: 0
