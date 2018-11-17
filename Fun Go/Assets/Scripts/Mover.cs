@@ -58,43 +58,43 @@ public class Mover : MonoBehaviour {
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
-    private GameObject currentGameObject;
     public ResetAnimation animationScript;
+    private GameObject tyreObject;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
     // Use this for initialization
     void Start () {
-        rb = GetComponent<Rigidbody>();
-        currentGameObject = GetComponent<GameObject>();
+        tyreObject = GameObject.FindGameObjectWithTag("tyre");
+        rb = tyreObject.GetComponent<Rigidbody>();
         Debug.Log("Is the gameObject Active ?");
     }
 
     void Update()
     {
-        baseObject.transform.position = this.gameObject.transform.position;
-        baseObject.transform.rotation = this.gameObject.transform.rotation;
+        baseObject.transform.position = tyreObject.transform.position;
+        baseObject.transform.rotation = tyreObject.transform.rotation;
         desiredDirection = transform.position - targetObject.position;
         the_return = Vector3.RotateTowards(transform.forward, desiredDirection, turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
-        isGrounded = rb.gameObject.GetComponent<DetectGround>().isGrounded;
+        isGrounded = this.gameObject.GetComponent<DetectGround>().isGrounded;
         reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
-        if (!currentGameObject.activeInHierarchy)
+        if (!tyreObject.activeSelf)
         {
             baseObject.SetActive(false);
         }
-        else if(rb.gameObject.activeSelf)
+        else if(tyreObject.activeSelf)
         {
             baseObject.SetActive(true);
-            rb.gameObject.SetActive(true);
+            tyreObject.SetActive(true);
             Debug.DebugBreak();
             Debug.Log("The object is true");
         }
 
-        Debug.Log("Base Object Active ?" + rb.gameObject.activeSelf);
+        Debug.Log("Base Object Active ?" + tyreObject.activeSelf);
     }
 
     // Update is called once per frame
