@@ -65,6 +65,7 @@ public class Mover : MonoBehaviour
     public double Speed;
     private bool _isJumping;
     private ResetAnimation resetScript;
+    private bool ranOnce;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -94,6 +95,7 @@ public class Mover : MonoBehaviour
         Speed = 0;
         // Coroutine Cannot be on Update()
         StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
+        StartCoroutine(Jump());
     }
 
     void Update()
@@ -117,12 +119,29 @@ public class Mover : MonoBehaviour
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
         }
+        if (baseObject.transform.position.z == boundary.zMax)
+        {
+            resetScript.gameRunning = false;
+        }
+        if (!resetScript.gameRunning)
+        {
+            RestartCoroutine();
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
+        if(baseObject.transform.position.z > 50)
+        {
+            // Update Condition
+            resetScript.conditionPos = true;
+        }
+        if(baseObject.transform.position.z >= 300)
+        {
+            resetScript.conditionPos = true;
+        }
         if (!pauseCar)
         {
             Moving(movement, rb, speedForce);
@@ -134,10 +153,16 @@ public class Mover : MonoBehaviour
             rb.velocity = Vector3.zero;
         }
         Speed = rb.velocity.magnitude * 3.6;
-        if (Input.GetKeyDown("space") && !_isJumping)
+    }
+
+    void RestartCoroutine()
+    {
+        if (!ranOnce)
         {
-            StartCoroutine(Jump());
+            ranOnce = true;
+            StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
         }
+        ranOnce = false;
     }
 
 
@@ -168,10 +193,18 @@ public class Mover : MonoBehaviour
 
     IEnumerator Jump()
     {
-        _isJumping = true;
-        JumpCode();
-        yield return new WaitForSeconds(delayInputPressed);
-        _isJumping = false;
+        while (true)
+        {
+            _isJumping = false;
+            if (Input.GetKeyDown("space") && !_isJumping)
+            {
+                _isJumping = true;
+                JumpCode();
+                yield return new WaitForSeconds(delayInputPressed);
+                _isJumping = false;
+            }
+            yield return null;
+        }
     }
 
     private void JumpCode()
