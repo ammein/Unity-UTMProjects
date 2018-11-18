@@ -26,7 +26,7 @@ public class ResetAnimation : MonoBehaviour {
         gameRunning = true;
         while (gameRunning)
         {
-            resetRot = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+            resetRot = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
             exitLoop = false;
             if (conditionPos)
             {
