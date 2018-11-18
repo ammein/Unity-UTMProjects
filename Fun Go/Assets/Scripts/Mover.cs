@@ -52,7 +52,7 @@ public class Mover : MonoBehaviour
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
     [Tooltip("To get the Detect Ground Script")]
-    public DetectGround detectGround;
+    private DetectGround detectGround;
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
@@ -70,15 +70,21 @@ public class Mover : MonoBehaviour
         if (baseObject == null)
         {
             baseObject = gameObject.transform.Find("Base").gameObject;
-        }else if(gameObject.GetComponent<Mover>() == null && baseObject == null)
-        {
-            gameObject.AddComponent<Mover>();
-            baseObject = gameObject.transform.Find("Base").gameObject;
         }
         tyreObject = gameObject.transform.Find("wheels").gameObject;
         rb = tyreObject.GetComponent<Rigidbody>();
         rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
         targetObject = GameObject.Find("/EndPosition").transform;
+        detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
+        if (detectGround)
+        {
+            Debug.Log("Assigning Detect Ground Script");
+        }
+        else
+        {
+            Debug.LogWarning("You did not attach Detect Ground Script in your wheels object. Please Assign now !");
+            Debug.Break();
+        }
         Speed = 0;
     }
 
