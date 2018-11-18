@@ -19,7 +19,7 @@ public class RotationDownBoundary
 {
     public float yNegativeAxis;
 }
-[RequireComponent(typeof(DetectGround))]
+[RequireComponent(typeof(ResetAnimation))]
 public class Mover : MonoBehaviour
 {
     private Rigidbody rb;
@@ -64,6 +64,7 @@ public class Mover : MonoBehaviour
     [HideInInspector]
     public double Speed;
     private bool _isJumping;
+    private ResetAnimation resetScript;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -80,6 +81,7 @@ public class Mover : MonoBehaviour
         rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
         targetObject = GameObject.Find("/EndPosition").transform;
         detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
+        resetScript = gameObject.GetComponent<ResetAnimation>();
         if (detectGround)
         {
             Debug.Log("Assigning Detect Ground Script");
@@ -112,6 +114,14 @@ public class Mover : MonoBehaviour
         {
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
+        }
+        if (baseObject.transform.position.z > 50 && baseObject.transform.position.z < 200)
+        {
+            StartCoroutine(resetScript.UpdatePosAnimation(tyreObject));
+            if(resetScript.blinkCount == resetScript.blinkMax)
+            {
+                return;
+            }
         }
     }
 
@@ -170,7 +180,7 @@ public class Mover : MonoBehaviour
         _isJumping = false;
     }
 
-    void JumpCode()
+    private void JumpCode()
     {
         rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
     }
