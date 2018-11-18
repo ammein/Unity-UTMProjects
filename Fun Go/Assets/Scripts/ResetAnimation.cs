@@ -9,22 +9,35 @@ public class ResetAnimation : MonoBehaviour {
     public int blinkMax;
     [HideInInspector]
     public int blinkCount;
+    private bool exitLoop;
 
-    public IEnumerator UpdatePosAnimation(GameObject rb)
+    public IEnumerator UpdatePosAnimation(GameObject rb , GameObject baseObject)
     {
-        yield return new WaitForSeconds(0);
-        while (blinkCount <= blinkMax)
+        while (true)
         {
-            rb.SetActive(!rb.activeInHierarchy);
-            blinkCount += 1;
-            yield return new WaitForSeconds(blinkGap);
-            if (blinkCount == blinkMax)
+            exitLoop = false;
+            if (baseObject.transform.position.z > 50 && baseObject.transform.position.z < 200)
             {
-                blinkCount = 0;
+                for (int i = 0; i <= blinkMax; i++)
+                {
+                    rb.SetActive(!rb.activeInHierarchy);
+                    blinkCount++;
+                    yield return new WaitForSeconds(blinkGap);
+                    if(blinkCount == blinkMax)
+                    {
+                        exitLoop = true;
+                        yield break;
+                    }
+                }
+            }
+            if (exitLoop)
+            {
                 break;
+            }
+            else
+            {
+                yield return null;
             }
         }
     }
-
-    
 }

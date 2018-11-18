@@ -92,6 +92,8 @@ public class Mover : MonoBehaviour
             Debug.Break();
         }
         Speed = 0;
+        // Coroutine Cannot be on Update()
+        StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
     }
 
     void Update()
@@ -114,14 +116,6 @@ public class Mover : MonoBehaviour
         {
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
-        }
-        if (baseObject.transform.position.z > 50 && baseObject.transform.position.z < 200)
-        {
-            StartCoroutine(resetScript.UpdatePosAnimation(tyreObject));
-            if(resetScript.blinkCount == resetScript.blinkMax)
-            {
-                return;
-            }
         }
     }
 
