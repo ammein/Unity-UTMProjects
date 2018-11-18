@@ -42,6 +42,7 @@ public class Mover : MonoBehaviour
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
+    public float delayInputPressed;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
@@ -62,6 +63,7 @@ public class Mover : MonoBehaviour
     private Rigidbody rigidBase;
     [HideInInspector]
     public double Speed;
+    private bool _isJumping;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -128,6 +130,10 @@ public class Mover : MonoBehaviour
             rb.velocity = Vector3.zero;
         }
         Speed = rb.velocity.magnitude * 3.6;
+        if (Input.GetKeyDown("space") && !_isJumping)
+        {
+            StartCoroutine(Jump());
+        }
     }
 
 
@@ -154,11 +160,19 @@ public class Mover : MonoBehaviour
             rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
             return;
         }
+    }
 
-        if (Input.GetKeyDown("space"))
-        {
-            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
-        }
+    IEnumerator Jump()
+    {
+        _isJumping = true;
+        JumpCode();
+        yield return new WaitForSeconds(delayInputPressed);
+        _isJumping = false;
+    }
+
+    void JumpCode()
+    {
+        rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
     }
 
     //IEnumerator RotationControl()

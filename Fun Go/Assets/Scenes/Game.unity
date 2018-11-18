@@ -569,7 +569,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1285399443
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -670,7 +670,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1586092560
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -792,6 +792,26 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114958817928769122, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: jumpForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114958817928769122, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: jumpWeight
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114958817928769122, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: speedForce
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 114958817928769122, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: delayInputPressed
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
   m_IsPrefabAsset: 0
@@ -813,7 +833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1822971019
 BoxCollider:
   m_ObjectHideFlags: 0
