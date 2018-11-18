@@ -18,6 +18,7 @@ public class ResetAnimation : MonoBehaviour {
     private Quaternion resetRot;
     [HideInInspector]
     public bool conditionPos;
+    [HideInInspector]
     public bool gameRunning;
 
     public IEnumerator UpdatePosAnimation(GameObject rb , GameObject baseObject)
