@@ -8,6 +8,8 @@ TagManager:
   - Hill
   - Ground
   - ParentPlayer
+  - Canvas
+  - EndPos
   layers:
   - Default
   - TransparentFX

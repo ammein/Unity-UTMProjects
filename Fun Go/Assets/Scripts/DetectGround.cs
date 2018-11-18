@@ -21,7 +21,7 @@ public class DetectGround : MonoBehaviour {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = true;
-                print("On the ground : " + groundName);
+                //print("On the ground : " + groundName);
                 return;
             }
         }
@@ -34,7 +34,7 @@ public class DetectGround : MonoBehaviour {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = false;
-                print("In the air : " + groundName);
+                //print("In the air : " + groundName);
                 return;
             }
         }

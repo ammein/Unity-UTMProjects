@@ -20,15 +20,16 @@ public class RotationDownBoundary
     public float yNegativeAxis;
 }
 [RequireComponent(typeof(DetectGround))]
-public class Mover : MonoBehaviour {
+public class Mover : MonoBehaviour
+{
     private Rigidbody rb;
     [Header("Car Controls : ", order = 0)]
     [Tooltip("This is for stop vehicle")]
     public bool pauseCar;
     [Tooltip("Only for a car base object")]
-    public GameObject baseObject; // To move along with the objects
+    private GameObject baseObject; // To move along with the objects
     [Tooltip("For End Position. End Game Position")]
-    public Transform targetObject;
+    private Transform targetObject;
     [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
     public float speed;
     [Tooltip("For accelerate num (Float Applicable) : 0.5 ...")]
@@ -45,7 +46,7 @@ public class Mover : MonoBehaviour {
     public RotationUpBoundary rotationUpBoundary;
     public RotationDownBoundary rotationDownBoundary;
     [Space(20, order = 0)]
-    [Header("Rotation Controls : " , order = 3)]
+    [Header("Rotation Controls : ", order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
@@ -64,10 +65,20 @@ public class Mover : MonoBehaviour {
     private bool isGrounded; // To assign a local bool from DetectGround
 
     // Use this for initialization
-    void Start () {
-        tyreObject = GameObject.FindGameObjectWithTag("tyre");
+    void Start()
+    {
+        if (baseObject == null)
+        {
+            baseObject = gameObject.transform.Find("Base").gameObject;
+        }else if(gameObject.GetComponent<Mover>() == null && baseObject == null)
+        {
+            gameObject.AddComponent<Mover>();
+            baseObject = gameObject.transform.Find("Base").gameObject;
+        }
+        tyreObject = gameObject.transform.Find("wheels").gameObject;
         rb = tyreObject.GetComponent<Rigidbody>();
-        rigidBase = GameObject.Find("Base").GetComponent<Rigidbody>();
+        rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
+        targetObject = GameObject.Find("/EndPosition").transform;
         Speed = 0;
     }
 
@@ -87,7 +98,7 @@ public class Mover : MonoBehaviour {
         {
             baseObject.SetActive(false);
         }
-        else if(tyreObject.activeSelf)
+        else if (tyreObject.activeSelf)
         {
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
@@ -95,7 +106,8 @@ public class Mover : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void FixedUpdate () {
+    void FixedUpdate()
+    {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
         if (!pauseCar)
         {
@@ -103,7 +115,7 @@ public class Mover : MonoBehaviour {
         }
         else
         {
-            rb.AddForce(Vector3.zero , ForceMode.Impulse);
+            rb.AddForce(Vector3.zero, ForceMode.Impulse);
             rb.angularVelocity = Vector3.zero;
             rb.velocity = Vector3.zero;
         }
@@ -165,7 +177,7 @@ public class Mover : MonoBehaviour {
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
         }
-        if(rb.rotation.y < 0.5f)
+        if (rb.rotation.y < 0.5f)
         {
             rb.AddForce(Vector3.zero, ForceMode.Impulse);
             rb.angularVelocity = Vector3.zero;
