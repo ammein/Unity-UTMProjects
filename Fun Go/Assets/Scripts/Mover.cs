@@ -30,16 +30,18 @@ public class Mover : MonoBehaviour
     private GameObject baseObject; // To move along with the objects
     [Tooltip("For End Position. End Game Position")]
     private Transform targetObject;
+    [Header("Speed in Km/Hr :")]
     [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
-    public float speed;
+    public float speedForce;
     [Tooltip("For accelerate num (Float Applicable) : 0.5 ...")]
     public float speedAccelerate;
-    [Tooltip("This is for number of JumpForce. Try hit space")]
-    public float jumpForce;
     [Tooltip("Max Speed Limit (Integer)")]
     public int maxSpeed;
+    [Header("Jump Configuration")]
     [Tooltip("For on Jump , make realistic fall (Integer)")]
     public int jumpWeight;
+    [Tooltip("This is for number of JumpForce. Try hit space")]
+    public float jumpForce;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
@@ -117,7 +119,7 @@ public class Mover : MonoBehaviour
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
         if (!pauseCar)
         {
-            Moving(movement, rb, speed);
+            Moving(movement, rb, speedForce);
         }
         else
         {
@@ -138,7 +140,7 @@ public class Mover : MonoBehaviour
             );
 
         // For Max Speed
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
         RotationControlCheck();
         if (isGrounded)
         {
