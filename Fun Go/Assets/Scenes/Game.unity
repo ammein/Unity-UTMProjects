@@ -792,6 +792,26 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114689191579040734, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: duration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114689191579040734, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: blinkDelay
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114689191579040734, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: blinkGap
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114689191579040734, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: blinkMax
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
   m_IsPrefabAsset: 0

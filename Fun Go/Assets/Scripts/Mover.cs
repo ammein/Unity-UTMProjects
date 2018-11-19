@@ -70,6 +70,8 @@ public class Mover : MonoBehaviour
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
+    public Coroutine UpdatePos;
+
     // Use this for initialization
     void Start()
     {
@@ -93,8 +95,7 @@ public class Mover : MonoBehaviour
             Debug.Break();
         }
         Speed = 0;
-        // Coroutine Cannot be on Update()
-        StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
+        UpdatePos = null;
         StartCoroutine(Jump());
     }
 
@@ -119,28 +120,19 @@ public class Mover : MonoBehaviour
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
         }
-        if (baseObject.transform.position.z == boundary.zMax)
-        {
-            resetScript.gameRunning = false;
-        }
-        if (!resetScript.gameRunning)
-        {
-            RestartCoroutine();
-        }
+        //if (baseObject.transform.position.z == boundary.zMax)
+        //{
+        //    resetScript.gameRunning = false;
+        //}
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        if(baseObject.transform.position.z > 50)
+        if(baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
         {
-            // Update Condition
-            resetScript.conditionPos = true;
-        }
-        if(baseObject.transform.position.z >= 300)
-        {
-            resetScript.conditionPos = true;
+            RunPosAnimation();
         }
         if (!pauseCar)
         {
@@ -155,14 +147,10 @@ public class Mover : MonoBehaviour
         Speed = rb.velocity.magnitude * 3.6;
     }
 
-    void RestartCoroutine()
+    void RunPosAnimation()
     {
-        if (!ranOnce)
-        {
-            ranOnce = true;
-            StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
-        }
-        ranOnce = false;
+        if (UpdatePos == null)
+            UpdatePos = StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
     }
 
 
@@ -236,12 +224,9 @@ public class Mover : MonoBehaviour
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
         }
-        if (rb.rotation.y < 0.5f)
+        if (rb.transform.eulerAngles.x < -50.0f)
         {
-            rb.AddForce(Vector3.zero, ForceMode.Impulse);
-            rb.angularVelocity = Vector3.zero;
-            rb.velocity = Vector3.zero;
-            Vector3 getPosition = rb.transform.position;
+            RunPosAnimation();
         }
     }
 }

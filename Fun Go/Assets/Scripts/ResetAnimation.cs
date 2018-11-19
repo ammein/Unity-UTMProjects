@@ -23,37 +23,28 @@ public class ResetAnimation : MonoBehaviour {
 
     public IEnumerator UpdatePosAnimation(GameObject rb , GameObject baseObject)
     {
-        gameRunning = true;
-        while (gameRunning)
+        while (true)
         {
             resetRot = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
-            exitLoop = false;
-            if (conditionPos)
+            currentPos = rb.transform.position;
+            rb.GetComponent<Rigidbody>().AddForce(Vector3.zero, ForceMode.Impulse);
+            rb.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            rb.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            if (currentPos != null)
             {
-                currentPos = rb.transform.position;
-                rb.GetComponent<Rigidbody>().AddForce(Vector3.zero, ForceMode.Impulse);
-                rb.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                rb.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                if (currentPos != null)
-                {
-                    rb.transform.position = currentPos;
-                    rb.transform.rotation = resetRot;
-                }
-                yield return new WaitForSeconds(blinkDelay);
-                for (int i = 0; i <= blinkMax; i++)
-                {
-                    rb.SetActive(!rb.activeInHierarchy);
-                    blinkCount++;
-                    yield return new WaitForSeconds(blinkGap);
-                    if (blinkCount == blinkMax)
-                    {
-                        exitLoop = true;
-                        gameRunning = false;
-                        yield break;
-                    }
-                }
+                rb.transform.position = currentPos;
+                rb.transform.rotation = resetRot;
             }
-            yield return null;
+            yield return new WaitForSeconds(blinkDelay);
+            for (int i = 0; i <= blinkMax; i++)
+            {
+                rb.SetActive(!rb.activeInHierarchy);
+                blinkCount++;
+                yield return new WaitForSeconds(blinkGap);
+            }
+            blinkCount = 0;
+            gameObject.GetComponent<Mover>().UpdatePos = null;
+            yield break;
         }
     }
 }
