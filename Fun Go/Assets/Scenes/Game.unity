@@ -792,6 +792,54 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: speedAccelerate
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: speedForce
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 54706601209807528, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54781895708819460, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4466054814662958, guid: e983a764a84c2044b9951744f07f2539, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4466054814662958, guid: e983a764a84c2044b9951744f07f2539, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: eulerAnglesX
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: eulerAnglesY
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: blinkGap
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: blinkMax
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
   m_IsPrefabAsset: 0

@@ -20,31 +20,28 @@ public class ResetAnimation : MonoBehaviour {
     public bool conditionPos;
     [HideInInspector]
     public bool gameRunning;
+    private StateCondition state;
 
     public IEnumerator UpdatePosAnimation(GameObject rb , GameObject baseObject)
     {
-        while (true)
+        while (gameRunning)
         {
             resetRot = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
             currentPos = rb.transform.position;
-            rb.GetComponent<Rigidbody>().AddForce(Vector3.zero, ForceMode.Impulse);
-            rb.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-            rb.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            if (currentPos != null)
+            switch (state)
             {
-                rb.transform.position = currentPos;
-                rb.transform.rotation = resetRot;
+                case StateCondition.UPDATEPOS:
+                    for(int i =0; i <= blinkMax; i++)
+                    {
+                        rb.transform.position = currentPos;
+                        rb.transform.rotation = resetRot;
+                        rb.GetComponent<Rigidbody>().AddForce(Vector3.zero, ForceMode.Impulse);
+                        rb.SetActive(!rb.activeInHierarchy);
+                        yield return new WaitForSeconds(blinkGap);
+                    }
+                    break;
             }
-            yield return new WaitForSeconds(blinkDelay);
-            for (int i = 0; i <= blinkMax; i++)
-            {
-                rb.SetActive(!rb.activeInHierarchy);
-                blinkCount++;
-                yield return new WaitForSeconds(blinkGap);
-            }
-            blinkCount = 0;
-            gameObject.GetComponent<Mover>().UpdatePos = null;
-            yield break;
+            yield return null;
         }
     }
 }

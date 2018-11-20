@@ -19,7 +19,14 @@ public class RotationDownBoundary
 {
     public float yNegativeAxis;
 }
+
+public enum StateCondition
+{
+    UPDATEPOS
+}
+
 [RequireComponent(typeof(ResetAnimation))]
+[ExecuteInEditMode]
 public class Mover : MonoBehaviour
 {
     private Rigidbody rb;
@@ -54,7 +61,13 @@ public class Mover : MonoBehaviour
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
-    [Tooltip("To get the Detect Ground Script")]
+    [Header("Euler Angles Values(Read Only) :")]
+    [SerializeField]
+    private float eulerAnglesX;
+    [SerializeField]
+    private float eulerAnglesY;
+    [SerializeField]
+    private float eulerAnglesZ;
     private DetectGround detectGround;
     private Vector3 the_return;
     private Vector3 desiredDirection;
@@ -70,7 +83,7 @@ public class Mover : MonoBehaviour
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
-    public Coroutine UpdatePos;
+    StateCondition state;
 
     // Use this for initialization
     void Start()
@@ -95,8 +108,9 @@ public class Mover : MonoBehaviour
             Debug.Break();
         }
         Speed = 0;
-        UpdatePos = null;
         StartCoroutine(Jump());
+        resetScript.gameRunning = true;
+        StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
     }
 
     void Update()
@@ -109,6 +123,11 @@ public class Mover : MonoBehaviour
         // (Must onUpdate because it triggers on collision)
         isGrounded = detectGround.isGrounded;
 
+        // To See Rotation Values
+        eulerAnglesX = WrapAngle(rb.rotation.eulerAngles.x);
+        eulerAnglesY = WrapAngle(rb.rotation.eulerAngles.y);
+        eulerAnglesZ = WrapAngle(rb.rotation.eulerAngles.z);
+
         reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
 
         if (!tyreObject.activeSelf)
@@ -120,10 +139,35 @@ public class Mover : MonoBehaviour
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
         }
-        //if (baseObject.transform.position.z == boundary.zMax)
-        //{
-        //    resetScript.gameRunning = false;
-        //}
+        if (baseObject.transform.position.z > boundary.zMax)
+        {
+            resetScript.gameRunning = false;
+        }
+        else
+        {
+            resetScript.gameRunning = true;
+        }
+    }
+
+    // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
+    public static float WrapAngle(float angle)
+    {
+        angle %= 360;
+        if (angle > 180)
+            return angle - 360;
+
+        return angle;
+    }
+
+    // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
+    public static float UnwrapAngle(float angle)
+    {
+        if (angle >= 0)
+            return angle;
+
+        angle = -angle % 360;
+
+        return 360 - angle;
     }
 
     // Update is called once per frame
@@ -132,7 +176,8 @@ public class Mover : MonoBehaviour
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
         if(baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
         {
-            RunPosAnimation();
+            Debug.Log("Running After Transform Position");
+            state = StateCondition.UPDATEPOS;
         }
         if (!pauseCar)
         {
@@ -147,13 +192,6 @@ public class Mover : MonoBehaviour
         Speed = rb.velocity.magnitude * 3.6;
     }
 
-    void RunPosAnimation()
-    {
-        if (UpdatePos == null)
-            UpdatePos = StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
-    }
-
-
     public void Moving(Vector3 movement, Rigidbody rb, float speed)
     {
         rb.position = new Vector3(
@@ -162,7 +200,7 @@ public class Mover : MonoBehaviour
             Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
             );
 
-        // For Max Speed
+        // For Max Speed in Km/Hr
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
         RotationControlCheck();
         if (isGrounded)
@@ -224,9 +262,10 @@ public class Mover : MonoBehaviour
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
         }
-        if (rb.transform.eulerAngles.x < -50.0f)
+        if (WrapAngle(rb.transform.eulerAngles.x) >= -30.0f)
         {
-            RunPosAnimation();
+            Debug.Log("Running Rotation Reset Animation");
+            state = StateCondition.UPDATEPOS;
         }
     }
 }
