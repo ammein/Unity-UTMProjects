@@ -20,11 +20,6 @@ public class RotationDownBoundary
     public float yNegativeAxis;
 }
 
-public enum StateCondition
-{
-    UPDATEPOS
-}
-
 [RequireComponent(typeof(ResetAnimation))]
 [ExecuteInEditMode]
 public class Mover : MonoBehaviour
@@ -83,7 +78,6 @@ public class Mover : MonoBehaviour
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
-    StateCondition state;
 
     // Use this for initialization
     void Start()
@@ -111,6 +105,7 @@ public class Mover : MonoBehaviour
         StartCoroutine(Jump());
         resetScript.gameRunning = true;
         StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
+
     }
 
     void Update()
@@ -174,11 +169,6 @@ public class Mover : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        if(baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
-        {
-            Debug.Log("Running After Transform Position");
-            state = StateCondition.UPDATEPOS;
-        }
         if (!pauseCar)
         {
             Moving(movement, rb, speedForce);
@@ -233,26 +223,10 @@ public class Mover : MonoBehaviour
         }
     }
 
-    private void JumpCode()
+    public void JumpCode()
     {
         rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
     }
-
-    //IEnumerator RotationControl()
-    //{
-    //    if (!ranOnce)
-    //    {
-    //        ranOnce = true;
-    //        yield return new WaitForSeconds(timeHoldForRotation);
-    //        //Debug.Log("Ground ? = " + isGrounded);
-    //        Quaternion lookAt = Quaternion.LookRotation(the_return);
-    //        if (rb.transform.rotation == lookAt)
-    //            yield return null;
-    //        rb.transform.rotation = lookAt;
-    //        rb.WakeUp();
-    //    }
-    //    ranOnce = false;
-    //}
 
     void RotationControlCheck()
     {
@@ -261,11 +235,6 @@ public class Mover : MonoBehaviour
         if (rb.rotation != reset)
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
-        }
-        if (WrapAngle(rb.transform.eulerAngles.x) >= -30.0f)
-        {
-            Debug.Log("Running Rotation Reset Animation");
-            state = StateCondition.UPDATEPOS;
         }
     }
 }
