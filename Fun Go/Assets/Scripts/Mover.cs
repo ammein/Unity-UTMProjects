@@ -73,7 +73,9 @@ public class Mover : MonoBehaviour
     public double Speed;
     private bool _isJumping;
     private ResetAnimation resetScript;
+    private IEnumerator resetAnimationCoroutine;
     private bool ranOnce;
+    private StateCondition state;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
@@ -104,8 +106,13 @@ public class Mover : MonoBehaviour
         Speed = 0;
         StartCoroutine(Jump());
         resetScript.gameRunning = true;
-        StartCoroutine(resetScript.UpdatePosAnimation(tyreObject, baseObject));
+        StartCoroutineAnimation();
+    }
 
+    private void StartCoroutineAnimation()
+    {
+        resetAnimationCoroutine = resetScript.UpdatePosAnimation();
+        StartCoroutine(resetAnimationCoroutine);
     }
 
     void Update()
