@@ -20,83 +20,174 @@ public class RotationDownBoundary
     public float yNegativeAxis;
 }
 
-public class Mover : MonoBehaviour {
+[RequireComponent(typeof(ResetAnimation))]
+[ExecuteInEditMode]
+public class Mover : MonoBehaviour
+{
     private Rigidbody rb;
     [Header("Car Controls : ", order = 0)]
     [Tooltip("This is for stop vehicle")]
     public bool pauseCar;
     [Tooltip("Only for a car base object")]
-    public Transform baseObject; // To move along with the objects
+    private GameObject baseObject; // To move along with the objects
     [Tooltip("For End Position. End Game Position")]
-    public Transform targetObject;
+    private Transform targetObject;
+    [Header("Speed in Km/Hr :")]
     [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
-    public float speed;
+    public float speedForce;
     [Tooltip("For accelerate num (Float Applicable) : 0.5 ...")]
     public float speedAccelerate;
-    [Tooltip("This is for number of JumpForce. Try hit space")]
-    public float jumpForce;
     [Tooltip("Max Speed Limit (Integer)")]
     public int maxSpeed;
+    [Header("Jump Configuration")]
     [Tooltip("For on Jump , make realistic fall (Integer)")]
     public int jumpWeight;
+    [Tooltip("This is for number of JumpForce. Try hit space")]
+    public float jumpForce;
+    public float delayInputPressed;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
     public RotationUpBoundary rotationUpBoundary;
     public RotationDownBoundary rotationDownBoundary;
     [Space(20, order = 0)]
-    [Header("Rotation Controls : " , order = 3)]
+    [Header("Rotation Controls : ", order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
-    [Header("Respawn Configs :")]
-    [Tooltip("For Wait until next respawn")]
-    public int respawnWait;
-    [Tooltip("For Respawn Blink Position")]
-    public float numRespawnBlink;
+    [Header("Euler Angles Values(Read Only) :")]
+    [SerializeField]
+    private float eulerAnglesX;
+    [SerializeField]
+    private float eulerAnglesY;
+    [SerializeField]
+    private float eulerAnglesZ;
+    private DetectGround detectGround;
     private Vector3 the_return;
     private Vector3 desiredDirection;
-    private bool ranOnce = false;
     private Quaternion reset;
-    private GameObject currentGameObject;
+    private GameObject tyreObject;
+    private Rigidbody rigidBase;
+    [HideInInspector]
+    public double Speed;
+    private bool _isJumping;
+    private ResetAnimation resetScript;
+    private IEnumerator resetAnimationCoroutine;
+    private bool ranOnce;
+    private StateCondition state;
 
     // For Another Script Access
     private bool isGrounded; // To assign a local bool from DetectGround
 
+
     // Use this for initialization
-    void Start () {
-        rb = GetComponent<Rigidbody>();
-        currentGameObject = GetComponent<GameObject>();
+    void Start()
+    {
+        if (baseObject == null)
+        {
+            baseObject = gameObject.transform.Find("Base").gameObject;
+        }
+        tyreObject = gameObject.transform.Find("wheels").gameObject;
+        rb = tyreObject.GetComponent<Rigidbody>();
+        rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
+        targetObject = GameObject.Find("/EndPosition").transform;
+        detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
+        resetScript = gameObject.GetComponent<ResetAnimation>();
+        if (detectGround)
+        {
+            Debug.Log("Assigning Detect Ground Script");
+        }
+        else
+        {
+            Debug.LogWarning("You did not attach Detect Ground Script in your wheels object. Please Assign now !");
+            Debug.Break();
+        }
+        Speed = 0;
+        StartCoroutine(Jump());
+        resetScript.gameRunning = true;
+        StartCoroutineAnimation();
+    }
+
+    private void StartCoroutineAnimation()
+    {
+        resetAnimationCoroutine = resetScript.UpdatePosAnimation();
+        StartCoroutine(resetAnimationCoroutine);
     }
 
     void Update()
     {
-        baseObject.position = this.gameObject.transform.position;
-        baseObject.rotation = this.gameObject.transform.rotation;
+        baseObject.transform.position = tyreObject.transform.position;
+        baseObject.transform.rotation = tyreObject.transform.rotation;
         desiredDirection = transform.position - targetObject.position;
-        the_return = Vector3.RotateTowards(transform.forward, desiredDirection,turnRate * Time.deltaTime, 1);
+        the_return = Vector3.RotateTowards(transform.forward, desiredDirection, turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
-        isGrounded = rb.gameObject.GetComponent<DetectGround>().isGrounded;
-        reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
-    }
+        isGrounded = detectGround.isGrounded;
 
-    // Update is called once per frame
-    void FixedUpdate () {
-        Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        if (!pauseCar)
+        // To See Rotation Values
+        eulerAnglesX = WrapAngle(rb.rotation.eulerAngles.x);
+        eulerAnglesY = WrapAngle(rb.rotation.eulerAngles.y);
+        eulerAnglesZ = WrapAngle(rb.rotation.eulerAngles.z);
+
+        reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
+
+        if (!tyreObject.activeSelf)
         {
-            Moving(movement, rb, speed);
+            baseObject.SetActive(false);
+        }
+        else if (tyreObject.activeSelf)
+        {
+            baseObject.SetActive(true);
+            tyreObject.SetActive(true);
+        }
+        if (baseObject.transform.position.z > boundary.zMax)
+        {
+            resetScript.gameRunning = false;
         }
         else
         {
-            rb.AddForce(Vector3.zero , ForceMode.Impulse);
-            rb.angularVelocity = Vector3.zero;
-            rb.velocity = Vector3.zero;
+            resetScript.gameRunning = true;
         }
     }
 
+    // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
+    public static float WrapAngle(float angle)
+    {
+        angle %= 360;
+        if (angle > 180)
+            return angle - 360;
+
+        return angle;
+    }
+
+    // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
+    public static float UnwrapAngle(float angle)
+    {
+        if (angle >= 0)
+            return angle;
+
+        angle = -angle % 360;
+
+        return 360 - angle;
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
+        if (!pauseCar)
+        {
+            Moving(movement, rb, speedForce);
+        }
+        else
+        {
+            rb.AddForce(Vector3.zero, ForceMode.Impulse);
+            rb.angularVelocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
+        }
+        Speed = rb.velocity.magnitude * 3.6;
+    }
 
     public void Moving(Vector3 movement, Rigidbody rb, float speed)
     {
@@ -106,60 +197,51 @@ public class Mover : MonoBehaviour {
             Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
             );
 
-        // For Max Speed
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        // For Max Speed in Km/Hr
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
         RotationControlCheck();
-        print("Grounded ? " + isGrounded);
         if (isGrounded)
         {
             rb.AddForce(movement * speed, ForceMode.Acceleration);
-            rb.mass = 1;
+            rigidBase.mass = 1;
             return;
         }
         else if (!isGrounded)
         {
-            rb.mass = jumpWeight;
+            rigidBase.mass = jumpWeight;
             rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
-            //StartCoroutine(RotationControl());
             return;
-        }
-
-        if (Input.GetKeyDown("space"))
-        {
-            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
         }
     }
 
-    //IEnumerator RotationControl()
-    //{
-    //    if (!ranOnce)
-    //    {
-    //        ranOnce = true;
-    //        yield return new WaitForSeconds(timeHoldForRotation);
-    //        //Debug.Log("Ground ? = " + isGrounded);
-    //        Quaternion lookAt = Quaternion.LookRotation(the_return);
-    //        if (rb.transform.rotation == lookAt)
-    //            yield return null;
-    //        rb.transform.rotation = lookAt;
-    //        rb.WakeUp();
-    //    }
-    //    ranOnce = false;
-    //}
+    IEnumerator Jump()
+    {
+        while (true)
+        {
+            _isJumping = false;
+            if (Input.GetKeyDown("space") && !_isJumping)
+            {
+                _isJumping = true;
+                JumpCode();
+                yield return new WaitForSeconds(delayInputPressed);
+                _isJumping = false;
+            }
+            yield return null;
+        }
+    }
+
+    public void JumpCode()
+    {
+        rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
+    }
 
     void RotationControlCheck()
     {
-        Debug.Log("RB Rotation" + rb.rotation);
-        Debug.Log("Transform Rotation" + rb.transform.rotation);
+        //Debug.Log("RB Rotation" + rb.rotation);
+        //Debug.Log("Transform Rotation" + rb.transform.rotation);
         if (rb.rotation != reset)
         {
             rb.rotation = Quaternion.Lerp(rb.rotation, reset, Time.deltaTime * turnRate);
-        }
-        if(rb.rotation.y < 0.5f)
-        {
-            rb.AddForce(Vector3.zero, ForceMode.Impulse);
-            rb.angularVelocity = Vector3.zero;
-            rb.velocity = Vector3.zero;
-            Vector3 getPosition = rb.transform.position;
         }
     }
 }

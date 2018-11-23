@@ -7,6 +7,9 @@ TagManager:
   - tyre
   - Hill
   - Ground
+  - ParentPlayer
+  - Canvas
+  - EndPos
   layers:
   - Default
   - TransparentFX

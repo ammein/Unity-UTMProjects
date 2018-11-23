@@ -3,30 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIController : MonoBehaviour {
+public class UIController : MonoBehaviour
+{
 
-    public Rigidbody car;
-    private float speed;
-    public Text speedText;
+    private double speedInit;
+    private Rect displayPosition;
+    [Header("Make Your UI Settings Here :")]
+    public GUIStyle GUISettings;
+    private float width;
+    private float height;
 
-	// Use this for initialization
-	void Start () {
-        car = car.GetComponent<Rigidbody>();
-        speed = 0;
-        speedText.text = "Speed : " + speed.ToString();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        speed = car.velocity.z;
-        UpdateSpeed();
-	}
-
-    void UpdateSpeed()
+    // Use this for initialization
+    void Start()
     {
-        if (speed >= 0)
-            speedText.text = "Speed : " + speed;
-        else
-            speedText.text = "Speed : " + 0;
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().Speed;
+        // Get Current UI W & H
+        width = Screen.width;
+        height = Screen.height;
+        GUISettings.fixedWidth = width;
+        GUISettings.fixedHeight = height;
+    }
+
+    void Update()
+    {
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().Speed;
+    }
+
+    private void OnGUI()
+    {
+        displayPosition = new Rect(0 + GUISettings.contentOffset.x, 0 + GUISettings.contentOffset.y , 100 , 50);
+        GUI.TextArea(displayPosition, speedInit.ToString("F2") + " km/hr", GUISettings);
     }
 }
