@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1730d0b8751ac9e44b6303c6b7703fa7, type: 3}
+  m_Name: Coin_Animation
+  m_EditorClassIdentifier: 
+  rootClip: {fileID: 0}
+  m_EnableSequenceCaching: 0
+  m_AssetVersion: 4
+  m_AudioResourcesDirectory: 
+  m_AssetData: 434147000509e908000078da8d94bb4ac44014864ff6e2267bbfdf6f606f6db76bf208da8a582c6bc0cd8a2c76421a5b0b1b2d2c452c156c6c4404452c2dac2d7c0fdd64322767d8304c60c82ef9f29d9933ff4403ef72475a7037c058de9b7fcb0b34d072f0acfb4fa0c800930db0d8705fbda165e1783e5fecd8b3c9a1ed4c74388905564fab95c19adbcede9663cff617f6dcd93872a6de53a604978df1980d77c4f5fecb2040292b847e4d0ec560c5e4811ef481505c84b6ad10ba4728b16272cf02e80aa1a400b94f644e2e426ba2696a85a6038452a2e981409b08e922f4492040c810a137b2bad09416a18bc83965c489af13285c5d56846ecda83ee5c47297911dcf8ba66f336aef0a22741a99023f4e69b8097e0e31b425cc5119c352c1445471db6bb8b775dcc006ee5213b7a285fd6e63533bd8b92eb6a7873de8e34207b89a2cec26d90c59ce83a497805f7ec74720fef7cf5fcc7f21487d59fac2393fb0a1973f5af5c6a9b722f55e736f59ea65e513d45b957aefb8b722f5b2f249eaad49bd8fdc5b957a59f935eaad4bbd2fdc5b937a59f914f536a4de77eead4bbdacbc4ebd4da9f78b7b1b522f2b6f506f4beafde1dea6d4cbcaa7a9b7ad36df96d4cbca67a8b7a3d6dfb6c27cb3d4db55cb4347a1bf39eaeda9e5b7ab90873cf5f6d5ce5b4f21bf05ea1da87d1ffa0ae7ad48bd43b5efd940e1fb40897f01e5d7da
+  m_GUID: 1555989a0ba354acd9232dfb67bee636
+  m_Path: 
+  m_IsExternalDataCollected: 1
+  m_ExternalData:
+  - m_TimelineID: 0
+    m_ObjectTypeFlags: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  m_HasNesting: 0
+  m_KeyFrames: []
+  m_AudioResources: []
