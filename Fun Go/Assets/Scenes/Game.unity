@@ -879,6 +879,11 @@ Prefab:
       propertyPath: blinkDelay
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114290325845527172, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: enableReset
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
   m_IsPrefabAsset: 0

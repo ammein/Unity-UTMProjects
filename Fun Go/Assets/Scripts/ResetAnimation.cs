@@ -70,6 +70,8 @@ public static class CoroutineExtensions
 public class ResetAnimation : MonoBehaviour {
 
     [Header("Blink Timing Animations Config :" , order = 0)]
+    [Tooltip("Enable / Disable Reset Animation")]
+    public bool enableReset = true;
     [Tooltip("Time Between Blinks (Float)")]
     public float blinkGap;
     [Tooltip("Number of Blink Maximum (Integer)")]
@@ -97,7 +99,7 @@ public class ResetAnimation : MonoBehaviour {
 
     public IEnumerator UpdatePosAnimation()
     {
-        while (gameRunning)
+        while (gameRunning && enableReset)
         {
             rb = gameObject.transform.Find("wheels").gameObject;
             baseObject = gameObject.transform.Find("Base").gameObject;
