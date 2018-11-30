@@ -1295,6 +1295,7 @@ Prefab:
       propertyPath: blinkDelay
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< HEAD
     - target: {fileID: 114290325845527172, guid: e983a764a84c2044b9951744f07f2539,
         type: 2}
       propertyPath: enableReset
@@ -1304,6 +1305,37 @@ Prefab:
         type: 2}
       propertyPath: jumpWeight
       value: 1000
+=======
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.speedForce
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.speedAccelerate
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.maxSpeed
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.jumpWeight
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.jumpForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114504489737478322, guid: e983a764a84c2044b9951744f07f2539,
+        type: 2}
+      propertyPath: carConfig.delayInputPressed
+      value: 1
+>>>>>>> development
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e983a764a84c2044b9951744f07f2539, type: 2}
