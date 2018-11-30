@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StateCondition
-{
-    UPDATEPOS,
-    NORMAL
-}
 public static class CoroutineExtensions
 {
     /// <summary>
@@ -68,62 +63,23 @@ public static class CoroutineExtensions
 }
 
 public class ResetAnimation : MonoBehaviour {
+    private float timer = 0;
 
-    [Header("Blink Timing Animations Config :" , order = 0)]
-    [Tooltip("Time Between Blinks (Float)")]
-    public float blinkGap;
-    [Tooltip("Number of Blink Maximum (Integer)")]
-    public int blinkMax;
-    [Tooltip("To delay before trigger blink (Float)")]
-    public float blinkDelay;
-    [HideInInspector]
-    public int blinkCount;
-    private Vector3 currentPos;
-    private Quaternion resetRot;
-    [HideInInspector]
-    public bool conditionPos;
-    [HideInInspector]
-    public bool gameRunning;
-    private Coroutine myCoroutine;
-    private GameObject rb;
-    private GameObject baseObject;
-
-    StateCondition state;
-
-    private void Start()
+    public void blinkingAnimate(GameObject gameObject , float gapBlink , float blinkMax)
     {
-        state = StateCondition.NORMAL;
-    }
-
-    public IEnumerator UpdatePosAnimation()
-    {
-        while (gameRunning)
+        float beginBlink = blinkMax - gapBlink;
+        timer += Time.deltaTime;
+        if (timer >= beginBlink)
         {
-            rb = gameObject.transform.Find("wheels").gameObject;
-            baseObject = gameObject.transform.Find("Base").gameObject;
-            state = StateCondition.NORMAL;
-            yield return new WaitForSeconds(blinkDelay);
-            if (baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
-            {
-                Debug.Log("Running After Transform Position");
-                InvokeRepeating("BlinkNow", blinkDelay, blinkMax);
-            }
-            if(baseObject.transform.rotation.x < Mover.WrapAngle(-50.0f) && !(baseObject.transform.rotation.x < Mover.WrapAngle(0.0f)))
-            {
-                Debug.Log("Running Rotation Position");
-                InvokeRepeating("BlinkNow", blinkDelay, blinkMax);
-            }
-            resetRot = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
-            currentPos = rb.transform.position;
-            yield return null;
+            gameObject.SetActive(false);
         }
-    }
 
-    private void BlinkNow()
-    {
-        rb.transform.position = currentPos;
-        rb.transform.rotation = resetRot;
-        rb.SetActive(!rb.activeInHierarchy);
+        if (timer >= blinkMax)
+        {
+            gameObject.SetActive(true);
+            timer = 0;
+        }
+        Debug.Log("Time Delta : " + timer);
     }
 
 }

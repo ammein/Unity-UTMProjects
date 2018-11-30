@@ -26,7 +26,7 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().Speed;
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
     }
 
     private void OnGUI()
