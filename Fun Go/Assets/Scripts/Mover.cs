@@ -22,14 +22,11 @@ public class RotationDownBoundary
 [System.Serializable]
 public class CarConfigurations
 {
-    [Tooltip("This is for stop vehicle")]
-    public bool pauseCar;
-    [Tooltip("Only for a car base object")]
-    private GameObject baseObject; // To move along with the objects
     [Header("Speed in Km/Hr :")]
     [Tooltip("Speed that can be bigger than float number. Ex : 1 - 100")]
     public float speedForce;
     [Tooltip("For accelerate num (Float Applicable) : 0.5 ...")]
+    [Range(0.0f , 5.0f)]
     public float speedAccelerate;
     [Tooltip("Max Speed Limit (Integer)")]
     public int maxSpeed;
@@ -39,6 +36,7 @@ public class CarConfigurations
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
+    [Range(1.0f , 5.0f)]
     public float delayInputPressed;
     [Space(20 , order = 1)]
     [Header("Rotation Controls : ", order = 3)]
@@ -53,9 +51,10 @@ public class CarConfigurations
 [ExecuteInEditMode]
 public class Mover : MonoBehaviour
 {
+    [Tooltip("This is for stop vehicle")]
+    public bool pauseCar;
     [Header("Car Controls : ", order = 0)]
     public CarConfigurations carConfig;
-    private Rigidbody rb;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
@@ -74,20 +73,18 @@ public class Mover : MonoBehaviour
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
-    private GameObject tyreObject;
-    private Rigidbody rigidBase;
     [HideInInspector]
     public double Speed;
     private bool _isJumping;
     private ResetAnimation resetScript;
     private bool ranOnce;
-    public Car myCar;
+    public Car myCar = null;
 
 
     // Use this for initialization
     void Start()
     {
-        myCar = new Car(gameObject , carConfig);
+        myCar = new Car(gameObject, carConfig);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
         if (myCar.detectGround)
@@ -106,11 +103,14 @@ public class Mover : MonoBehaviour
     void Update()
     {
         myCar.StickBase();
-        desiredDirection = transform.position - targetObject.position;
-        the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
+        //desiredDirection = transform.position - targetObject.position;
+        //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
         myCar.DetectGround();
+        eulerAnglesX = WrapAngle(myCar.rotX);
+        eulerAnglesY = WrapAngle(myCar.rotY);
+        eulerAnglesZ = WrapAngle(myCar.rotZ);
     }
 
     // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
@@ -137,15 +137,13 @@ public class Mover : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!carConfig.pauseCar)
+        if (!pauseCar)
         {
             myCar.Moving(boundary);
         }
         else
         {
-            rb.AddForce(Vector3.zero, ForceMode.Impulse);
-            rb.angularVelocity = Vector3.zero;
-            rb.velocity = Vector3.zero;
+            myCar.Stop();
         }
     }
 

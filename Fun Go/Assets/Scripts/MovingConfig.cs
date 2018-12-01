@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Car
 {
-    public float speed , maxSpeed , speedAccelerate , jumpWeight , turnRate , jumpForce;
+    public float speed , maxSpeed , speedAccelerate , jumpWeight , turnRate , jumpForce , rotX , rotY , rotZ;
     public GameObject gameObject , baseObject , tyreObject;
     private Rigidbody rb , rigidBase;
     private double Speed;
     public ResetAnimation resetScript;
-    bool animateNow = false;
     public bool isGrounded;
     public DetectGround detectGround;
     private float timer = 0;
     private float countdown = 0;
+    public RunCoroutine runCoroutine;
 
     public Car(GameObject myGameObject ,CarConfigurations carConfig)
     {
@@ -39,7 +39,7 @@ public class Car
         rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
         resetScript = gameObject.GetComponent<ResetAnimation>();
         detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
-        StickBase();
+        ReadAngles();
     }
 
     /// <summary>
@@ -49,11 +49,12 @@ public class Car
     {
         baseObject.transform.position = tyreObject.transform.position;
         baseObject.transform.rotation = tyreObject.transform.rotation;
-        if (!tyreObject.activeSelf)
+        if (!tyreObject.activeSelf || !baseObject.activeSelf)
         {
+            tyreObject.SetActive(false);
             baseObject.SetActive(false);
         }
-        else if (tyreObject.activeSelf)
+        else if (tyreObject.activeSelf || baseObject.activeSelf)
         {
             baseObject.SetActive(true);
             tyreObject.SetActive(true);
@@ -70,14 +71,29 @@ public class Car
 
 
     /// <summary>
+    /// For Read Rigidbody Angles
+    /// </summary>
+    /// <param name="X"></param>
+    /// <param name="Y"></param>
+    /// <param name="Z"></param>
+    public void ReadAngles()
+    {
+        rotX = rb.rotation.eulerAngles.x;
+        rotY = rb.rotation.eulerAngles.y;
+        rotZ = rb.rotation.eulerAngles.z;
+        return;
+    }
+
+
+    /// <summary>
     /// Make a Moving Car on FixedUpdate() - Runs Physics Force
     /// </summary>
     /// <param name="boundary"></param>
     public void Moving(Boundary boundary)
     {
+        ReadAngles();
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
         isGrounded = detectGround.isGrounded;
-        Speed = rb.velocity.magnitude * 3.6;
 
         rb.position = new Vector3(
             0.0f,
@@ -87,6 +103,7 @@ public class Car
         RotationControlCheck();
         ListenEvent();
         // For Max Speed in Km/Hr
+        Speed = rb.velocity.magnitude * 3.6f;
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
         if (isGrounded)
         {
@@ -102,30 +119,23 @@ public class Car
         }
     }
 
+    public void Stop()
+    {
+        rb.AddForce(Vector3.zero, ForceMode.Impulse);
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+    }
+
     void ListenEvent()
     {
-        if (baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
+        if (Mover.WrapAngle(rotX) >= -50.0f && Mover.WrapAngle(rotX) <= -10.0f)
         {
-            BlinkNow(2.0f);
+            Debug.Log("Running Rotation X Event");
+            BlinkNow();
         }
         if (baseObject.transform.position.z > 490)
         {
-            BlinkNow(2.0f);
-        }
-    }
-
-    bool CountDown(float limit)
-    {
-        countdown += Time.deltaTime;
-        Debug.Log("Countdown : " + countdown.ToString("F0"));
-        if(limit < countdown)
-        {
-            countdown = 0;
-            return false;
-        }
-        else
-        {
-            return true;
+            BlinkNow();
         }
     }
 
@@ -138,10 +148,9 @@ public class Car
         return Speed;
     }
 
-    void RotationControlCheck()
+    public void RotationControlCheck()
     {
-        //Debug.Log("RB Rotation" + rb.rotation);
-        //Debug.Log("Transform Rotation" + rb.transform.rotation);
+        Debug.LogWarning("Running Rotation : " + Mover.WrapAngle(rotX).ToString("F0"));
         Quaternion reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         if (rb.rotation != reset)
         {
@@ -152,17 +161,9 @@ public class Car
     /// <summary>
     /// This is for enable blinking effects
     /// </summary>
-    void BlinkNow(float limitDuration)
+    void BlinkNow()
     {
-        if (CountDown(limitDuration))
-        {
-            resetScript.blinkingAnimate(tyreObject, 0.5f, 1.0f);
-            return;
-        }
-        else
-        {
-            return;
-        }
+        resetScript.blinkingAnimate(this, 0.5f, 1.0f);
     }
 
     /// <summary>

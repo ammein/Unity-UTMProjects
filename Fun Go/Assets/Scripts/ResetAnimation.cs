@@ -65,18 +65,21 @@ public static class CoroutineExtensions
 public class ResetAnimation : MonoBehaviour {
     private float timer = 0;
 
-    public void blinkingAnimate(GameObject gameObject , float gapBlink , float blinkMax)
+    public void blinkingAnimate(Car car , float gapBlink , float blinkMax)
     {
         float beginBlink = blinkMax - gapBlink;
-        timer += Time.deltaTime;
+        timer += 0.1f;
         if (timer >= beginBlink)
         {
-            gameObject.SetActive(false);
+            car.tyreObject.SetActive(false);
+            timer += 0.1f;
         }
 
         if (timer >= blinkMax)
         {
-            gameObject.SetActive(true);
+            car.RotationControlCheck();
+            car.tyreObject.SetActive(true);
+            car.checkActive();
             timer = 0;
         }
     }

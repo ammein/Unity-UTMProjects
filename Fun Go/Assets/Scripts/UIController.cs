@@ -32,6 +32,6 @@ public class UIController : MonoBehaviour
     private void OnGUI()
     {
         displayPosition = new Rect(0 + GUISettings.contentOffset.x, 0 + GUISettings.contentOffset.y , 100 , 50);
-        GUI.TextArea(displayPosition, speedInit.ToString("F2") + " km/hr", GUISettings);
+        GUI.TextArea(displayPosition, speedInit.ToString("F0") + " km/hr", GUISettings);
     }
 }
