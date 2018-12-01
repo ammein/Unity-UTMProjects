@@ -83,9 +83,6 @@ public class Mover : MonoBehaviour
     private bool ranOnce;
     public Car myCar;
 
-    // For Another Script Access
-    private bool isGrounded; // To assign a local bool from DetectGround
-
 
     // Use this for initialization
     void Start()
@@ -160,7 +157,7 @@ public class Mover : MonoBehaviour
             if (Input.GetKeyDown("space") && !_isJumping)
             {
                 _isJumping = true;
-                myCar.jumpCode();
+                myCar.JumpNow();
                 yield return new WaitForSeconds(carConfig.delayInputPressed);
                 _isJumping = false;
             }

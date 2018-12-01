@@ -79,7 +79,6 @@ public class ResetAnimation : MonoBehaviour {
             gameObject.SetActive(true);
             timer = 0;
         }
-        Debug.Log("Time Delta : " + timer);
     }
 
 }

@@ -13,6 +13,7 @@ public class Car
     public bool isGrounded;
     public DetectGround detectGround;
     private float timer = 0;
+    private float countdown = 0;
 
     public Car(GameObject myGameObject ,CarConfigurations carConfig)
     {
@@ -26,6 +27,10 @@ public class Car
         Speed = 0;
     }
 
+
+    /// <summary>
+    /// Init this Car on Start()
+    /// </summary>
     public void InitStart()
     {
         baseObject = gameObject.transform.Find("Base").gameObject;
@@ -37,6 +42,9 @@ public class Car
         StickBase();
     }
 
+    /// <summary>
+    /// To Stick the Base Position with Wheels
+    /// </summary>
     public void StickBase()
     {
         baseObject.transform.position = tyreObject.transform.position;
@@ -52,11 +60,19 @@ public class Car
         }
     }
 
-    public void jumpCode()
+    /// <summary>
+    /// Physic Jump
+    /// </summary>
+    public void JumpNow()
     {
         rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
     }
 
+
+    /// <summary>
+    /// Make a Moving Car on FixedUpdate() - Runs Physics Force
+    /// </summary>
+    /// <param name="boundary"></param>
     public void Moving(Boundary boundary)
     {
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
@@ -86,21 +102,40 @@ public class Car
         }
     }
 
-    public double GetSpeed()
-    {
-        return Speed;
-    }
-
     void ListenEvent()
     {
         if (baseObject.transform.position.z > 50 && baseObject.transform.position.z <= 100)
         {
             BlinkNow(2.0f);
         }
-        if(baseObject.transform.position.z > 490)
+        if (baseObject.transform.position.z > 490)
         {
             BlinkNow(2.0f);
         }
+    }
+
+    bool CountDown(float limit)
+    {
+        countdown += Time.deltaTime;
+        Debug.Log("Countdown : " + countdown.ToString("F0"));
+        if(limit < countdown)
+        {
+            countdown = 0;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// This is for Get Speed that returns Double Value
+    /// </summary>
+    /// <returns>Double Speed value</returns>
+    public double GetSpeed()
+    {
+        return Speed;
     }
 
     void RotationControlCheck()
@@ -114,22 +149,26 @@ public class Car
         }
     }
 
-    void BlinkNow(float duration)
+    /// <summary>
+    /// This is for enable blinking effects
+    /// </summary>
+    void BlinkNow(float limitDuration)
     {
-        timer += Time.deltaTime;
-        if(timer >= duration)
+        if (CountDown(limitDuration))
         {
-            Debug.Log("Running Close Blink" + timer);
-            checkActive();
-            timer = 0;
-        }
-        if(timer <= duration)
-        {
-            Debug.Log("Running Open Blink" + timer);
             resetScript.blinkingAnimate(tyreObject, 0.5f, 1.0f);
+            return;
+        }
+        else
+        {
+            return;
         }
     }
 
+    /// <summary>
+    /// This is for checking whether the object is active in Hierarchy or not. 
+    /// If not , It will automatically set it as true in hierarchy
+    /// </summary>
     public void checkActive()
     {
         if (!tyreObject.activeInHierarchy)
@@ -138,6 +177,10 @@ public class Car
         }
     }
 
+    /// <summary>
+    /// To Detect the Car Grounded Boolean. Must RUNS it on Update()
+    /// </summary>
+    /// <returns>Boolean Value.</returns>
     public bool DetectGround()
     {
         return isGrounded;
