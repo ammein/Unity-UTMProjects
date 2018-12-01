@@ -9,7 +9,8 @@ public class Car
     private Rigidbody rb , rigidBase;
     private double Speed;
     public ResetAnimation resetScript;
-    public bool isGrounded;
+    public bool isGrounded , isBaseGrounded;
+    public DetectGround baseGrounded;
     public DetectGround detectGround;
     private float timer = 0;
     private float countdown = 0;
@@ -38,6 +39,22 @@ public class Car
         rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
         resetScript = gameObject.GetComponent<ResetAnimation>();
         detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
+        if (!baseObject.GetComponent<DetectGround>())
+        {
+            baseGrounded = baseObject.AddComponent<DetectGround>();
+            for (int i = 0; i <= detectGround.groundTagName.Length; i++)
+            {
+                baseGrounded.groundTagName = detectGround.groundTagName;
+            }
+        }
+        else
+        {
+            baseGrounded = baseObject.GetComponent<DetectGround>();
+            for (int i = 0; i < detectGround.groundTagName.Length; i++)
+            {
+                baseGrounded.groundTagName = detectGround.groundTagName;
+            }
+        }
         ReadAngles();
     }
 
@@ -83,6 +100,12 @@ public class Car
         return;
     }
 
+    public bool DetectBaseGround()
+    {
+        Debug.Log("Base touch the ground ? " + isBaseGrounded);
+        return isBaseGrounded = baseGrounded.isGrounded;
+    }
+
 
     /// <summary>
     /// Make a Moving Car on FixedUpdate() - Runs Physics Force
@@ -93,6 +116,7 @@ public class Car
         ReadAngles();
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
         isGrounded = detectGround.isGrounded;
+        DetectBaseGround();
 
         rb.position = new Vector3(
             0.0f,
@@ -127,9 +151,10 @@ public class Car
 
     void ListenEvent()
     {
-        if (Mover.WrapAngle(rotX) >= -50.0f && Mover.WrapAngle(rotX) <= -10.0f)
+        if (Mover.WrapAngle(rotX) <= -0.0f && DetectBaseGround())
         {
             Debug.Log("Running Rotation X Event");
+            Stop();
             BlinkNow();
         }
         if (baseObject.transform.position.z > 490)
@@ -145,6 +170,12 @@ public class Car
     public double GetSpeed()
     {
         return Speed;
+    }
+
+    public void DisableGravity()
+    {
+        rb.useGravity = false;
+        return;
     }
 
     public void RotationControlCheck()

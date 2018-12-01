@@ -80,7 +80,6 @@ public class Mover : MonoBehaviour
     private bool ranOnce;
     public Car myCar = null;
 
-
     // Use this for initialization
     void Start()
     {
@@ -143,6 +142,7 @@ public class Mover : MonoBehaviour
         }
         else
         {
+            myCar.DisableGravity();
             myCar.Stop();
         }
     }
