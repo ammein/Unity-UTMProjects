@@ -13,7 +13,6 @@ public class Car
     public DetectGround detectGround;
     private float timer = 0;
     private float countdown = 0;
-    public RunCoroutine runCoroutine;
 
     public Car(GameObject myGameObject ,CarConfigurations carConfig)
     {
