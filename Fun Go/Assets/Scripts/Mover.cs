@@ -33,12 +33,19 @@ public class CarConfigurations
     public float speedAccelerate;
     [Tooltip("Max Speed Limit (Integer)")]
     public int maxSpeed;
-    [Header("Jump Configuration")]
+    [Space(20 , order = 0)]
+    [Header("Jump Configuration :")]
     [Tooltip("For on Jump , make realistic fall (Integer)")]
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
     public float delayInputPressed;
+    [Space(20 , order = 1)]
+    [Header("Rotation Controls : ", order = 3)]
+    [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
+    public float timeHoldForRotation;
+    [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
+    public float turnRate;
 }
 
 
@@ -57,11 +64,6 @@ public class Mover : MonoBehaviour
     [Tooltip("For End Position. End Game Position")]
     private Transform targetObject;
     [Space(20, order = 0)]
-    [Header("Rotation Controls : ", order = 3)]
-    [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
-    public float timeHoldForRotation;
-    [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
-    public float turnRate;
     [Header("Euler Angles Values(Read Only) :")]
     [SerializeField]
     private float eulerAnglesX;
@@ -88,10 +90,10 @@ public class Mover : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        myCar = new Car(gameObject , carConfig.speedForce, carConfig.maxSpeed, carConfig.speedAccelerate, carConfig.jumpForce, carConfig.jumpWeight, turnRate);
+        myCar = new Car(gameObject , carConfig);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
-        if (myCar.DetectGround())
+        if (myCar.detectGround)
         {
             Debug.Log("Assigning Detect Ground Script");
         }
@@ -108,7 +110,7 @@ public class Mover : MonoBehaviour
     {
         myCar.StickBase();
         desiredDirection = transform.position - targetObject.position;
-        the_return = Vector3.RotateTowards(transform.forward, desiredDirection, turnRate * Time.deltaTime, 1);
+        the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
         myCar.DetectGround();

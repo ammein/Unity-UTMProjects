@@ -4,33 +4,25 @@ using UnityEngine;
 
 public class Car
 {
-    public float speed;
-    public float maxSpeed;
-    public GameObject gameObject;
-    public GameObject baseObject;
-    public GameObject tyreObject;
-    private Rigidbody rb;
-    private Rigidbody rigidBase;
+    public float speed , maxSpeed , speedAccelerate , jumpWeight , turnRate , jumpForce;
+    public GameObject gameObject , baseObject , tyreObject;
+    private Rigidbody rb , rigidBase;
     private double Speed;
-    public float speedAccelerate;
-    public float jumpWeight;
-    public float turnRate;
-    public float jumpForce;
     public ResetAnimation resetScript;
     bool animateNow = false;
     public bool isGrounded;
-    private DetectGround detectGround;
+    public DetectGround detectGround;
     private float timer = 0;
 
-    public Car(GameObject myGameObject , float mySpeed , float myMaxSpeed , float accelerate , float jump , float weight , float turn)
+    public Car(GameObject myGameObject ,CarConfigurations carConfig)
     {
-        speed = mySpeed;
-        speedAccelerate = accelerate;
-        maxSpeed = myMaxSpeed;
+        speed = carConfig.speedForce;
+        speedAccelerate = carConfig.speedAccelerate;
+        maxSpeed = carConfig.maxSpeed;
         gameObject = myGameObject;
-        jumpWeight = weight;
-        turnRate = turn;
-        jumpForce = jump;
+        jumpWeight = carConfig.jumpWeight;
+        turnRate = carConfig.turnRate;
+        jumpForce = carConfig.jumpForce;
         Speed = 0;
     }
 
