@@ -151,16 +151,16 @@ public class Car
 
     void ListenEvent()
     {
-        if (Mover.WrapAngle(rotX) <= -0.0f && DetectBaseGround())
-        {
-            Debug.Log("Running Rotation X Event");
-            Stop();
-            BlinkNow();
-        }
+        //if (DetectBaseGround())
+        //{
+        //    Debug.Log("Running On Ground");
+        //    BlinkNow();
+        //}
         if (baseObject.transform.position.z > 490)
         {
             BlinkNow();
         }
+        return;
     }
 
     /// <summary>

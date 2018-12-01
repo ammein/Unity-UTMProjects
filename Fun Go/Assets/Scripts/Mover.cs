@@ -33,6 +33,7 @@ public class CarConfigurations
     [Space(20 , order = 0)]
     [Header("Jump Configuration :")]
     [Tooltip("For on Jump , make realistic fall (Integer)")]
+    [SerializeField]
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
@@ -73,8 +74,6 @@ public class Mover : MonoBehaviour
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
-    [HideInInspector]
-    public double Speed;
     private bool _isJumping;
     private ResetAnimation resetScript;
     private bool ranOnce;

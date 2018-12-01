@@ -16,7 +16,7 @@ public class UIController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().Speed;
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
         // Get Current UI W & H
         width = Screen.width;
         height = Screen.height;
