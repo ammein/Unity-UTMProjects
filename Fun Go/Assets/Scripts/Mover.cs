@@ -102,6 +102,7 @@ public class Mover : MonoBehaviour
         eulerAnglesX = WrapAngle(myCar.rotX);
         eulerAnglesY = WrapAngle(myCar.rotY);
         eulerAnglesZ = WrapAngle(myCar.rotZ);
+        MoveOrNotMove();
     }
 
     public void MoveOrNotMove()
