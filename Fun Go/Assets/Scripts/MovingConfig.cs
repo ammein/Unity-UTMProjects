@@ -55,6 +55,10 @@ public class Car
                 baseGrounded.groundTagName = detectGround.groundTagName;
             }
         }
+        if (!baseObject.GetComponent<CarCollider>())
+        {
+            baseObject.AddComponent<CarCollider>();
+        }
         ReadAngles();
     }
 
@@ -180,7 +184,7 @@ public class Car
 
     public void RotationControlCheck()
     {
-        Debug.LogWarning("Running Rotation : " + Mover.WrapAngle(rotX).ToString("F0"));
+        //Debug.LogWarning("Running Rotation : " + Mover.WrapAngle(rotX).ToString("F0"));
         Quaternion reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         if (rb.rotation != reset)
         {

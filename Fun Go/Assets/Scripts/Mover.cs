@@ -95,7 +95,6 @@ public class Mover : MonoBehaviour
             Debug.Break();
         }
         StartCoroutine(Jump());
-        //StartCoroutineAnimation();
     }
 
     void Update()
