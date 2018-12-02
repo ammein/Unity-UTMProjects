@@ -12,10 +12,10 @@ public class GameController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        for(int i = 0; i < numberSpawn; i++)
-        {
-            Instantiate(car, transform.position, transform.rotation);
-        }
+        //for(int i = 0; i < numberSpawn; i++)
+        //{
+        //    Instantiate(car, transform.position, transform.rotation);
+        //}
     }
 	
 	// Update is called once per frame
