@@ -20,11 +20,11 @@ public class GameController : MonoBehaviour {
     IEnumerator CloneObject()
     {
         spawn = GameObject.Find("SpawnPlayer").gameObject;
-        for (int i = 0; i <= numberSpawn; i++)
+        for (int i = 0; i < numberSpawn; i++)
         {
             yield return new WaitForSeconds(0.2f);
             obj = Instantiate(car, spawn.transform.position, spawn.transform.rotation);
-            if (i == numberSpawn)
+            if (i == (numberSpawn - 1))
             {
                 yield break;
             }
