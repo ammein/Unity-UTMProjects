@@ -134,12 +134,14 @@ public class Car
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
         if (isGrounded)
         {
+            Debug.Log("Move");
             rb.AddForce(movement * speed, ForceMode.Acceleration);
             rigidBase.mass = 1;
             return;
         }
         else if (!isGrounded)
         {
+            Debug.Log("UnMoved");
             rigidBase.mass = jumpWeight;
             rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
             return;
