@@ -31,9 +31,9 @@ public class CameraController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        player = GameObject.Find("Base");
+        playerRigid = GameObject.Find("Base").GetComponent<Rigidbody>();
         offset = transform.position - player.transform.position;
-        player = GameObject.FindWithTag("Player");
-        playerRigid = GameObject.FindWithTag("Player").GetComponent<Rigidbody>();
         flagCamera = false;
 	}
 

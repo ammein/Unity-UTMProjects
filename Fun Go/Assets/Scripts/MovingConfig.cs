@@ -162,10 +162,10 @@ public class Car
         //    Debug.Log("Running On Ground");
         //    BlinkNow();
         //}
-        if (baseObject.transform.position.z > 490)
-        {
-            BlinkNow();
-        }
+        //if (baseObject.transform.position.z > 490)
+        //{
+        //    BlinkNow();
+        //}
         return;
     }
 

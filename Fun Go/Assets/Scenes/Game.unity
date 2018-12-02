@@ -2845,8 +2845,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aa7e0a70e56752419c7a119a0ed993c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1076383750}
-  playerRigid: {fileID: 1076383755}
+  player: {fileID: 0}
+  playerRigid: {fileID: 0}
   distance: {x: 1.5, y: 0, z: -15}
   minFov: 60
   maxFov: 100
@@ -3013,16 +3013,6 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
---- !u!1 &1076383750 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1188350368776962, guid: e983a764a84c2044b9951744f07f2539,
-    type: 2}
-  m_PrefabInternal: {fileID: 1525049809}
---- !u!54 &1076383755 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 54167336466309466, guid: e983a764a84c2044b9951744f07f2539,
-    type: 2}
-  m_PrefabInternal: {fileID: 1525049809}
 --- !u!43 &1158977345
 Mesh:
   m_ObjectHideFlags: 0
