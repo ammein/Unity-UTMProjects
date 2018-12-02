@@ -4438,6 +4438,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114395849630938196, guid: 8801607cae0f9a4479bb5df7f8563fa0,
+        type: 2}
+      propertyPath: carConfig.maxSpeed
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8801607cae0f9a4479bb5df7f8563fa0, type: 2}
   m_IsPrefabAsset: 0

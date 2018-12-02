@@ -513,7 +513,7 @@ MonoBehaviour:
   carConfig:
     speedForce: 50
     speedAccelerate: 5
-    maxSpeed: 200
+    maxSpeed: 100
     jumpWeight: 2000
     jumpForce: 10
     delayInputPressed: 1
