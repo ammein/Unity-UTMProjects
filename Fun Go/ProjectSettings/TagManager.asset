@@ -13,6 +13,7 @@ TagManager:
   - ParentTyre
   - BeginSpawn
   - map
+  - ClonePlayer
   layers:
   - Default
   - TransparentFX

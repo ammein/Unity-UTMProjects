@@ -20,6 +20,14 @@ public class UIController : MonoBehaviour
     [HideInInspector]
     public string count;
 
+    [HideInInspector]
+    public bool counting = false;
+
+    private bool holdCar;
+
+    private GameObject[] allInstantiatePlayer;
+    private GameObject[] playerCar;
+
     // Use this for initialization
     void Start()
     {
@@ -31,18 +39,25 @@ public class UIController : MonoBehaviour
         SpeedUI.fixedHeight = height;
         CountdownUI.fixedWidth = width;
         CountdownUI.fixedHeight = height;
+        allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
+        playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
+        StopOrRun(true);
         StartCoroutine(Count(3));
     }
 
     void Update()
     {
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
+        allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
+        playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
     }
 
     IEnumerator Count(int value)
     {
         for (int i = value; i > 0; i--)
         {
+            counting = true;
+            StopOrRun(true);
             enableCount = true;
             count = i.ToString();
             yield return new WaitForSeconds(1);
@@ -50,14 +65,27 @@ public class UIController : MonoBehaviour
             if(i == 1)
             {
                 enableCount = true;
-                Debug.Log("Running Break");
                 count = "Go";
+                StopOrRun(false);
                 yield return new WaitForSeconds(1);
                 enableCount = false;
+                counting = false;
                 yield break;
             }
         }
         yield return null;
+    }
+
+    void StopOrRun(bool SetBool)
+    {
+        foreach(GameObject clonePlayer in allInstantiatePlayer)
+        {
+            clonePlayer.GetComponent<Mover>().pauseCar = SetBool;
+        }
+        foreach (GameObject currentPlayer in playerCar)
+        {
+            currentPlayer.GetComponent<Mover>().pauseCar = SetBool;
+        }
     }
 
     void CountDown()

@@ -53,7 +53,8 @@ public class CarConfigurations
 public class Mover : MonoBehaviour
 {
     [Tooltip("This is for stop vehicle")]
-    public bool pauseCar;
+    [SerializeField]
+    public bool pauseCar = false;
     [Header("Car Controls : ", order = 0)]
     public CarConfigurations carConfig;
     [Header("Boundaries : ", order = 1)]
@@ -85,15 +86,6 @@ public class Mover : MonoBehaviour
         myCar = new Car(gameObject);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
-        if (myCar.detectGround)
-        {
-            Debug.Log("Assigning Detect Ground Script");
-        }
-        else
-        {
-            Debug.LogWarning("You did not attach Detect Ground Script in your wheels object. Please Assign now !");
-            Debug.Break();
-        }
         StartCoroutine(Jump());
     }
 
@@ -106,9 +98,29 @@ public class Mover : MonoBehaviour
         // (Must onUpdate because it triggers on collision)
         myCar.DetectGround();
         myCar.DetectBaseGround();
+        UpdatePauseCar();
         eulerAnglesX = WrapAngle(myCar.rotX);
         eulerAnglesY = WrapAngle(myCar.rotY);
         eulerAnglesZ = WrapAngle(myCar.rotZ);
+    }
+
+    public void MoveOrNotMove()
+    {
+        if (!UpdatePauseCar())
+        {
+            myCar.EnableGravity();
+            myCar.Moving();
+        }
+        else
+        {
+            myCar.Stop();
+            myCar.DisableGravity();
+        }
+    }
+
+    public bool UpdatePauseCar()
+    {
+        return pauseCar;
     }
 
     // Source : https://forum.unity.com/threads/solved-how-to-get-rotation-value-that-is-in-the-inspector.460310/
@@ -135,15 +147,7 @@ public class Mover : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!pauseCar)
-        {
-            myCar.Moving();
-        }
-        else
-        {
-            myCar.DisableGravity();
-            myCar.Stop();
-        }
+        MoveOrNotMove();
     }
 
     IEnumerator Jump()

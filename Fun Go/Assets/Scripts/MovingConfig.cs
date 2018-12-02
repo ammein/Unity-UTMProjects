@@ -5,7 +5,7 @@ using UnityEngine;
 public class Car
 {
     public float speedForce, maxSpeed, speedAccelerate, jumpWeight, turnRate, jumpForce, rotX, rotY, rotZ;
-    public GameObject gameObject, baseObject, tyreObject;
+    public GameObject carObject, baseObject, tyreObject;
     private Rigidbody rb , rigidBase;
     private double Speed;
     public ResetAnimation resetScript;
@@ -16,21 +16,17 @@ public class Car
     private float countdown = 0;
     public Boundary boundary;
 
-    public Car(GameObject myGameObject)
+    public Car(GameObject gameObject)
     {
-        speedForce = myGameObject.GetComponent<Mover>().carConfig.speedForce;
-        speedAccelerate = myGameObject.GetComponent<Mover>().carConfig.speedAccelerate;
-        maxSpeed = myGameObject.GetComponent<Mover>().carConfig.maxSpeed;
-        gameObject = myGameObject;
-        jumpWeight = myGameObject.GetComponent<Mover>().carConfig.jumpWeight;
-        turnRate = myGameObject.GetComponent<Mover>().carConfig.turnRate;
-        jumpForce = myGameObject.GetComponent<Mover>().carConfig.jumpForce;
-        boundary = myGameObject.GetComponent<Mover>().boundary;
+        carObject = gameObject;
+        speedForce = carObject.GetComponent<Mover>().carConfig.speedForce;
+        speedAccelerate = carObject.GetComponent<Mover>().carConfig.speedAccelerate;
+        maxSpeed = carObject.GetComponent<Mover>().carConfig.maxSpeed;
+        jumpWeight = carObject.GetComponent<Mover>().carConfig.jumpWeight;
+        turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
+        jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
+        boundary = carObject.GetComponent<Mover>().boundary;
         Speed = 0;
-
-        Debug.Log("Speed Force : " + speedForce);
-        Debug.Log("Speed Accelerate : " + speedAccelerate);
-        Debug.Log("Speed Max : " + maxSpeed);
     }
 
 
@@ -39,13 +35,17 @@ public class Car
     /// </summary>
     public void InitStart()
     {
-        baseObject = gameObject.transform.Find("Base").gameObject;
-        tyreObject = gameObject.transform.Find("wheels").gameObject;
+        baseObject = carObject.transform.Find("Base").gameObject;
+        tyreObject = carObject.transform.Find("wheels").gameObject;
         rb = tyreObject.GetComponent<Rigidbody>();
-        rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
-        resetScript = gameObject.GetComponent<ResetAnimation>();
-        detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
-        Debug.Log("Detect Ground ? " + detectGround);
+        rigidBase = carObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
+        resetScript = carObject.GetComponent<ResetAnimation>();
+        detectGround = carObject.transform.Find("wheels").GetComponent<DetectGround>();
+        if (!detectGround)
+        {
+            detectGround = carObject.transform.Find("wheels").GetComponent<DetectGround>();
+        }
+        //Debug.Log("Detect Ground ? " + detectGround);
         if (!baseObject.GetComponent<DetectGround>())
         {
             baseGrounded = baseObject.AddComponent<DetectGround>();
@@ -93,7 +93,11 @@ public class Car
     /// </summary>
     public void JumpNow()
     {
-        rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
+        // Only Let Current Player
+        if(carObject.CompareTag("ParentPlayer"))
+        {
+            rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
+        }
     }
 
 
@@ -113,7 +117,7 @@ public class Car
 
     public bool DetectBaseGround()
     {
-        Debug.Log("Base touch the ground ? " + isBaseGrounded);
+        //Debug.Log("Base touch the ground ? " + isBaseGrounded);
         return isBaseGrounded = baseGrounded.isGrounded;
     }
 
@@ -125,7 +129,7 @@ public class Car
     public void Moving()
     {
         ReadAngles();
-        Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
+        DetectGround();
         rb.position = new Vector3(
             0.0f,
             Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
@@ -133,27 +137,15 @@ public class Car
             );
         RotationControlCheck();
         ListenEvent();
+        GetSpeed();
+        RunGround();
         // For Max Speed in Km/Hr
-        Speed = rb.velocity.magnitude * 3.6f;
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
-        if (DetectGround())
-        {
-            Debug.Log("Move");
-            rb.AddForce(movement * speedForce, ForceMode.Acceleration);
-            rigidBase.mass = 1;
-            return;
-        }
-        else if (!DetectGround())
-        {
-            Debug.Log("UnMoved");
-            rigidBase.mass = jumpWeight;
-            rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
-            return;
-        }
     }
 
     public void Stop()
     {
+        GetSpeed();
         rb.AddForce(Vector3.zero, ForceMode.Impulse);
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
@@ -179,6 +171,7 @@ public class Car
     /// <returns>Double Speed value</returns>
     public double GetSpeed()
     {
+        Speed = rb.velocity.magnitude * 3.6f;
         return Speed;
     }
 
@@ -188,9 +181,14 @@ public class Car
         return;
     }
 
+    public void EnableGravity()
+    {
+        rb.useGravity = true;
+        return;
+    }
+
     public void RotationControlCheck()
     {
-        //Debug.LogWarning("Running Rotation : " + Mover.WrapAngle(rotX).ToString("F0"));
         Quaternion reset = new Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
         if (rb.rotation != reset)
         {
@@ -215,6 +213,25 @@ public class Car
         if (!tyreObject.activeInHierarchy)
         {
             tyreObject.SetActive(true);
+        }
+    }
+
+    public void RunGround()
+    {
+        Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
+        if (DetectGround())
+        {
+            //Debug.Log("Move " + carObject.name);
+            rb.AddForce(movement * speedForce, ForceMode.Acceleration);
+            rigidBase.mass = 1;
+            return;
+        }
+        else if (!DetectGround())
+        {
+            //Debug.Log("UnMoved " + carObject.name + " ID : " + carObject.GetInstanceID());
+            rigidBase.mass = jumpWeight;
+            rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
+            return;
         }
     }
 

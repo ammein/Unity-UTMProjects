@@ -16,26 +16,37 @@ public class DetectGround : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collision Enter Running");
+        //Debug.Log("Collision Enter Running");
         foreach(string groundName in groundTagName)
         {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = true;
-                print("On the ground : " + collision.gameObject.tag + " with " + groundName);
+            }
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        // Let Clone Player Jump
+        foreach(string groundName in groundTagName)
+        {
+            if(gameObject.CompareTag("ClonePlayer") && collision.gameObject.CompareTag(groundName) && gameObject.GetInstanceID() == collision.gameObject.GetInstanceID())
+            {
+                gameObject.GetComponent<Mover>().myCar.JumpNow();
             }
         }
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        Debug.Log("Collision Exit Running");
+        //Debug.Log("Collision Exit Running");
         foreach (string groundName in groundTagName)
         {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = false;
-                print("In the air : " + collision.gameObject.tag + " with " + groundName);
+                //print("In the air : " + collision.gameObject.tag + " with " + groundName);
             }
         }
     }
