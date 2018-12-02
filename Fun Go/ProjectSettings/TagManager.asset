@@ -12,6 +12,7 @@ TagManager:
   - EndPos
   - ParentTyre
   - BeginSpawn
+  - map
   layers:
   - Default
   - TransparentFX
