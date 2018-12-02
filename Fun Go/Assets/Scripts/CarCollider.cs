@@ -9,7 +9,13 @@ public class CarCollider : MonoBehaviour {
         Debug.LogWarning("Collision Enter " + collision.gameObject.tag);
         if (collision.gameObject.CompareTag("Player"))
         {
-            Physics.IgnoreLayerCollision(9, 9);
+            if(collision.gameObject.transform.position.z >= 20.0f)
+            {
+                Debug.LogWarning("GameObject Position : " + collision.gameObject.transform.position.z);
+                Physics.IgnoreLayerCollision(9, 9);
+                return;
+            }
+            return;
         }
     }
 }

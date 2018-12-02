@@ -10,12 +10,13 @@ public class GameController : MonoBehaviour {
     public int numberSpawn;
     public Boundary boundary;
 
-	// Use this for initialization
-	void Start () {
-        //for(int i = 0; i < numberSpawn; i++)
-        //{
-        //    Instantiate(car, transform.position, transform.rotation);
-        //}
+    // Use this for initialization
+    void Start() {
+        spawn = GameObject.Find("SpawnPlayer").gameObject;
+        for (int i = 0; i < numberSpawn; i++)
+        {
+            Instantiate(car, spawn.transform.position, spawn.transform.rotation);
+        }
     }
 	
 	// Update is called once per frame

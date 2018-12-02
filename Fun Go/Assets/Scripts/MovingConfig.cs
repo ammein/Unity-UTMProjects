@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Car
 {
-    public float speed , maxSpeed , speedAccelerate , jumpWeight , turnRate , jumpForce , rotX , rotY , rotZ;
-    public GameObject gameObject , baseObject , tyreObject;
+    public float speedForce, maxSpeed, speedAccelerate, jumpWeight, turnRate, jumpForce, rotX, rotY, rotZ;
+    public GameObject gameObject, baseObject, tyreObject;
     private Rigidbody rb , rigidBase;
     private double Speed;
     public ResetAnimation resetScript;
@@ -14,17 +14,23 @@ public class Car
     public DetectGround detectGround;
     private float timer = 0;
     private float countdown = 0;
+    public Boundary boundary;
 
-    public Car(GameObject myGameObject ,CarConfigurations carConfig)
+    public Car(GameObject myGameObject)
     {
-        speed = carConfig.speedForce;
-        speedAccelerate = carConfig.speedAccelerate;
-        maxSpeed = carConfig.maxSpeed;
+        speedForce = myGameObject.GetComponent<Mover>().carConfig.speedForce;
+        speedAccelerate = myGameObject.GetComponent<Mover>().carConfig.speedAccelerate;
+        maxSpeed = myGameObject.GetComponent<Mover>().carConfig.maxSpeed;
         gameObject = myGameObject;
-        jumpWeight = carConfig.jumpWeight;
-        turnRate = carConfig.turnRate;
-        jumpForce = carConfig.jumpForce;
+        jumpWeight = myGameObject.GetComponent<Mover>().carConfig.jumpWeight;
+        turnRate = myGameObject.GetComponent<Mover>().carConfig.turnRate;
+        jumpForce = myGameObject.GetComponent<Mover>().carConfig.jumpForce;
+        boundary = myGameObject.GetComponent<Mover>().boundary;
         Speed = 0;
+
+        Debug.Log("Speed Force : " + speedForce);
+        Debug.Log("Speed Accelerate : " + speedAccelerate);
+        Debug.Log("Speed Max : " + maxSpeed);
     }
 
 
@@ -39,6 +45,7 @@ public class Car
         rigidBase = gameObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
         resetScript = gameObject.GetComponent<ResetAnimation>();
         detectGround = gameObject.transform.Find("wheels").GetComponent<DetectGround>();
+        Debug.Log("Detect Ground ? " + detectGround);
         if (!baseObject.GetComponent<DetectGround>())
         {
             baseGrounded = baseObject.AddComponent<DetectGround>();
@@ -115,13 +122,10 @@ public class Car
     /// Make a Moving Car on FixedUpdate() - Runs Physics Force
     /// </summary>
     /// <param name="boundary"></param>
-    public void Moving(Boundary boundary)
+    public void Moving()
     {
         ReadAngles();
         Vector3 movement = new Vector3(0.0f, 0.0f, speedAccelerate);
-        isGrounded = detectGround.isGrounded;
-        DetectBaseGround();
-
         rb.position = new Vector3(
             0.0f,
             Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
@@ -132,14 +136,14 @@ public class Car
         // For Max Speed in Km/Hr
         Speed = rb.velocity.magnitude * 3.6f;
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
-        if (isGrounded)
+        if (DetectGround())
         {
             Debug.Log("Move");
-            rb.AddForce(movement * speed, ForceMode.Acceleration);
+            rb.AddForce(movement * speedForce, ForceMode.Acceleration);
             rigidBase.mass = 1;
             return;
         }
-        else if (!isGrounded)
+        else if (!DetectGround())
         {
             Debug.Log("UnMoved");
             rigidBase.mass = jumpWeight;
@@ -220,7 +224,7 @@ public class Car
     /// <returns>Boolean Value.</returns>
     public bool DetectGround()
     {
-        return isGrounded;
+        return isGrounded = detectGround.isGrounded;
     }
 
 }

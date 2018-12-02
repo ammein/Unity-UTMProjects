@@ -82,7 +82,7 @@ public class Mover : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        myCar = new Car(gameObject, carConfig);
+        myCar = new Car(gameObject);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
         if (myCar.detectGround)
@@ -105,6 +105,7 @@ public class Mover : MonoBehaviour
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
         myCar.DetectGround();
+        myCar.DetectBaseGround();
         eulerAnglesX = WrapAngle(myCar.rotX);
         eulerAnglesY = WrapAngle(myCar.rotY);
         eulerAnglesZ = WrapAngle(myCar.rotZ);
@@ -136,7 +137,7 @@ public class Mover : MonoBehaviour
     {
         if (!pauseCar)
         {
-            myCar.Moving(boundary);
+            myCar.Moving();
         }
         else
         {
