@@ -16,26 +16,31 @@ public class CameraController : MonoBehaviour {
     [HideInInspector]
     public Rigidbody playerRigid;
     private bool flags;
-    public Vector3 distance;
-    public float minFov;
-    public float maxFov;
-    public float sensitivity;
-    private float fov;
+    //public float minFov;
+    //public float maxFov;
+    //public float sensitivity;
+    //private float fov;
     private float playerPosition;
     private float playerSpeed;
     private float cameraSpeed;
-    public float onMoveOffset;
+    //public float onMoveOffset;
     private float moveCam;
+    [Header("Camera Settings")]
     public CameraSettings cameraSettings;
     private bool flagCamera;
     private float orthoMove;
+    [Header("Offset Camera From Player Position")]
+    public float offsetCamX;
+    public float offsetCamY;
+    public float offsetCamZ;
 
 
     // Use this for initialization
     void Start () {
         player = GameObject.Find("PlayerCar").transform.Find("Base").gameObject;
         playerRigid = GameObject.Find("PlayerCar").transform.Find("Base").GetComponent<Rigidbody>();
-        offset = transform.position - player.transform.position;
+        offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY , player.transform.position.z + offsetCamZ) - player.transform.position;
+        //transform.LookAt(player.transform.position);
         flagCamera = false;
 	}
 
@@ -50,6 +55,11 @@ public class CameraController : MonoBehaviour {
     //    Camera.main.fieldOfView = fov;
     //    //Debug.Log("fov value : " + fov);
     //}
+
+    void Update()
+    {
+        offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY , player.transform.position.z + offsetCamZ) - player.transform.position;
+    }
 
     // Update is called once per frame
     void LateUpdate () {
@@ -77,11 +87,19 @@ public class CameraController : MonoBehaviour {
         if (flagCamera)
         {
             Camera.main.orthographicSize = orthoMove;
+            for(float i = 0; i < 3; i+= 0.5f)
+            {
+                offsetCamZ += i;
+            }
             transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Enable Flag Camera");
         }
         else
         {
+            for (float i = 0; i < 3; i -= 0.5f)
+            {
+                offsetCamZ -= i;
+            }
             Camera.main.orthographicSize = orthoMove;
             transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Disable Flag Camera");

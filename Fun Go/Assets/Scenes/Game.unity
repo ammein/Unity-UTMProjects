@@ -452,7 +452,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 980743810}
   m_LocalRotation: {x: 0.013212625, y: -0.70632577, z: 0.012332471, w: 0.70765615}
-  m_LocalPosition: {x: 23.04, y: 5.4, z: -0.02}
+  m_LocalPosition: {x: 23.04, y: 5.4, z: 18.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -471,17 +471,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   playerRigid: {fileID: 0}
-  distance: {x: 1.5, y: 0, z: -15}
-  minFov: 60
-  maxFov: 100
-  sensitivity: 1
-  onMoveOffset: 3
   cameraSettings:
     xMoveCameraMin: 0
     xMoveCameraMax: 4.25
     easing: 0.1
     orthoBegin: 5
     orthoEnds: 6
+  offsetCamX: 23.04
+  offsetCamY: 3.97
 --- !u!1001 &1525049809
 Prefab:
   m_ObjectHideFlags: 0
@@ -553,9 +550,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car: {fileID: 1192955619490104, guid: 68279968c993c634197ac4d31a184f2f, type: 2}
   spawn: {fileID: 407139157}
-  numberSpawn: 5
   obj: {fileID: 0}
   delaySpawnCar: 0.1
+  numberSpawn: 5
   Maps:
   - {fileID: 1739654636428194, guid: 23abfd98203f04048906dbcced12a55f, type: 2}
   - {fileID: 1690567453880006, guid: 37fe6374407fb4ea68bd33bdd610ab1a, type: 2}

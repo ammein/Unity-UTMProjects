@@ -31,7 +31,7 @@ public class DetectGround : MonoBehaviour {
         // Let Clone Player Jump
         foreach(string groundName in groundTagName)
         {
-            if(gameObject.CompareTag("ClonePlayer") && collision.gameObject.CompareTag(groundName) && gameObject.GetInstanceID() == collision.gameObject.GetInstanceID())
+            if(gameObject.CompareTag("ClonePlayer") && collision.gameObject.CompareTag(groundName))
             {
                 Debug.LogWarning("Collision Stay Clone Player" + groundName);
                 gameObject.GetComponent<Mover>().myCar.JumpNow();
