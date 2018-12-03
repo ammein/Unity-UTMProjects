@@ -49,7 +49,6 @@ public class CarConfigurations
 
 
 [RequireComponent(typeof(ResetAnimation))]
-[ExecuteInEditMode]
 public class Mover : MonoBehaviour
 {
     [Tooltip("This is for stop vehicle")]
@@ -103,6 +102,7 @@ public class Mover : MonoBehaviour
         eulerAnglesY = WrapAngle(myCar.rotY);
         eulerAnglesZ = WrapAngle(myCar.rotZ);
         MoveOrNotMove();
+        myCar.GetZMax();
     }
 
     public void MoveOrNotMove()

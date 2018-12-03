@@ -133,7 +133,7 @@ public class Car
         rb.position = new Vector3(
             0.0f,
             Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
-            Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
+            Mathf.Clamp(rb.position.z, boundary.zMin, GetZMax())
             );
         RotationControlCheck();
         ListenEvent();
@@ -141,6 +141,15 @@ public class Car
         RunGround();
         // For Max Speed in Km/Hr
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
+    }
+
+    /// <summary>
+    /// To Be Call on Update() Mover. Get Boundary Z Value Updated from GameController
+    /// </summary>
+    /// <returns>Get boundary.zMax value</returns>
+    public float GetZMax()
+    {
+        return boundary.zMax;
     }
 
     public void Stop()

@@ -11,7 +11,9 @@ public class CameraSettings
 
 public class CameraController : MonoBehaviour {
     private Vector3 offset;
+    [HideInInspector]
     public GameObject player;
+    [HideInInspector]
     public Rigidbody playerRigid;
     private bool flags;
     public Vector3 distance;
@@ -31,8 +33,8 @@ public class CameraController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        player = GameObject.Find("Base");
-        playerRigid = GameObject.Find("Base").GetComponent<Rigidbody>();
+        player = GameObject.Find("PlayerCar").transform.Find("Base").gameObject;
+        playerRigid = GameObject.Find("PlayerCar").transform.Find("Base").GetComponent<Rigidbody>();
         offset = transform.position - player.transform.position;
         flagCamera = false;
 	}

@@ -33,6 +33,7 @@ public class DetectGround : MonoBehaviour {
         {
             if(gameObject.CompareTag("ClonePlayer") && collision.gameObject.CompareTag(groundName) && gameObject.GetInstanceID() == collision.gameObject.GetInstanceID())
             {
+                Debug.LogWarning("Collision Stay Clone Player" + groundName);
                 gameObject.GetComponent<Mover>().myCar.JumpNow();
             }
         }

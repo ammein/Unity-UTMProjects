@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameController : MonoBehaviour {
+    [Header("Get Clone Car Object")]
     public GameObject car;
     [HideInInspector]
     public GameObject spawn;
@@ -10,18 +11,23 @@ public class GameController : MonoBehaviour {
     public int numberSpawn;
     [HideInInspector]
     public GameObject obj;
+    [Header("Time To Spawn Each Clone Car")]
     [Range(0.1f , 2.0f)]
     public float delaySpawnCar;
 
+    [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
 
     private float[] mapLength;
-    public float totalValue;
 
     private float spawnPosition;
     private Quaternion spawnRotation;
+    [Header("Offset Map Position on First Spawn")]
     [Range(0, -10)]
     public float offsetXMap;
+    [Header("Countdown Settings")]
+    [Range(0, 5)]
+    public int countStart;
 
     void Start() {
         spawnPosition = transform.position.z + offsetXMap;
@@ -32,28 +38,29 @@ public class GameController : MonoBehaviour {
 
     void Update()
     {
-        for (int i = 0; i < Maps.Length; i++)
-        {
-            mapLength[i] = Maps[i].transform.GetChild(0).transform.position.z;
-            totalValue += mapLength[i];
-            Debug.Log("All Map Length" + mapLength);
-        }
+        // Update each frame for get All Map Length Value
+        GetAllMapLength();
     }
 
     IEnumerator OutputMap()
     {
         for (int i = 0; i < Maps.Length; i++)
         {
-            yield return new WaitForSeconds(1);
             Instantiate(Maps[i], new Vector3(0.0f ,0.0f ,spawnPosition) , spawnRotation);
             spawnPosition += Maps[i].transform.GetChild(0).transform.position.z;
             spawnRotation *= Maps[i].transform.GetChild(0).transform.rotation;
+            yield return new WaitForSeconds(1);
             if (i == (Maps.Length - 1))
             {
                 yield break;
             }
         }
         yield return null;
+    }
+
+    public float GetAllMapLength()
+    {
+        return spawnPosition;
     }
 
     IEnumerator CloneObject()

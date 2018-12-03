@@ -28,11 +28,13 @@ public class UIController : MonoBehaviour
     private GameObject[] allInstantiatePlayer;
     private GameObject[] playerCar;
     private GameObject gameController;
+    private int getCount;
 
     // Use this for initialization
     void Start()
     {
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
+        getCount = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().countStart;
         // Get Current UI W & H
         width = Screen.width;
         height = Screen.height;
@@ -40,18 +42,23 @@ public class UIController : MonoBehaviour
         SpeedUI.fixedHeight = height;
         CountdownUI.fixedWidth = width;
         CountdownUI.fixedHeight = height;
-        allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
-        playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
+        InitiateCaller();
         StopOrRun(true);
-        StartCoroutine(Count(3));
+        StartCoroutine(Count(getCount));
     }
 
     void Update()
     {
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
+        InitiateCaller();
+    }
+
+    public void InitiateCaller()
+    {
         allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
         playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
         gameController = GameObject.FindGameObjectWithTag("GameController");
+        return;
     }
 
     IEnumerator Count(int value)
@@ -83,12 +90,12 @@ public class UIController : MonoBehaviour
         foreach(GameObject clonePlayer in allInstantiatePlayer)
         {
             clonePlayer.GetComponent<Mover>().pauseCar = SetBool;
-            //clonePlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().totalValue;
+            clonePlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
         }
         foreach (GameObject currentPlayer in playerCar)
         {
             currentPlayer.GetComponent<Mover>().pauseCar = SetBool;
-            //currentPlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().totalValue;
+            currentPlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
         }
     }
 
