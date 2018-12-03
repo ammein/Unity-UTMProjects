@@ -7,13 +7,13 @@ public class GameController : MonoBehaviour {
     public GameObject car;
     [HideInInspector]
     public GameObject spawn;
-    [Range(1.0f, 5.0f)]
-    public int numberSpawn;
     [HideInInspector]
     public GameObject obj;
-    [Header("Time To Spawn Each Clone Car")]
+    [Header("Spawn Settings")]
     [Range(0.1f , 2.0f)]
     public float delaySpawnCar;
+    [Range(1.0f, 5.0f)]
+    public int numberSpawn;
 
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
