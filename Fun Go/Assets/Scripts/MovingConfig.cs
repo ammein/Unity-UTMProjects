@@ -177,12 +177,14 @@ public class Car
 
     public void DisableGravity()
     {
+        rigidBase.useGravity = false;
         rb.useGravity = false;
         return;
     }
 
     public void EnableGravity()
     {
+        rigidBase.useGravity = true;
         rb.useGravity = true;
         return;
     }

@@ -27,6 +27,7 @@ public class UIController : MonoBehaviour
 
     private GameObject[] allInstantiatePlayer;
     private GameObject[] playerCar;
+    private GameObject gameController;
 
     // Use this for initialization
     void Start()
@@ -50,6 +51,7 @@ public class UIController : MonoBehaviour
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
         allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
         playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
+        gameController = GameObject.FindGameObjectWithTag("GameController");
     }
 
     IEnumerator Count(int value)
@@ -81,10 +83,12 @@ public class UIController : MonoBehaviour
         foreach(GameObject clonePlayer in allInstantiatePlayer)
         {
             clonePlayer.GetComponent<Mover>().pauseCar = SetBool;
+            //clonePlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().totalValue;
         }
         foreach (GameObject currentPlayer in playerCar)
         {
             currentPlayer.GetComponent<Mover>().pauseCar = SetBool;
+            //currentPlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().totalValue;
         }
     }
 
