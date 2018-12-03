@@ -15,6 +15,8 @@ public class Car
     private float timer = 0;
     private float countdown = 0;
     public Boundary boundary;
+    [HideInInspector]
+    public bool cloneFlag = false;
 
     public Car(GameObject gameObject)
     {
@@ -98,6 +100,17 @@ public class Car
         {
             rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
         }
+        // Only Let Clone Player
+        else if (carObject.CompareTag("ClonePlayer") && CloneJumpNow() && carObject.GetInstanceID() == carObject.GetInstanceID())
+        {
+            Debug.LogWarning("Clone Jump !" + carObject.GetInstanceID());
+            rb.AddForce(Vector3.up * jumpForce * 1, ForceMode.Impulse);
+        }
+    }
+
+    public bool CloneJumpNow()
+    {
+        return cloneFlag;
     }
 
 

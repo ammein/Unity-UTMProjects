@@ -102,6 +102,7 @@ public class Mover : MonoBehaviour
         eulerAnglesY = WrapAngle(myCar.rotY);
         eulerAnglesZ = WrapAngle(myCar.rotZ);
         MoveOrNotMove();
+        myCar.CloneJumpNow();
         myCar.GetZMax();
     }
 
@@ -161,6 +162,14 @@ public class Mover : MonoBehaviour
                 _isJumping = true;
                 myCar.JumpNow();
                 yield return new WaitForSeconds(carConfig.delayInputPressed);
+                _isJumping = false;
+            }
+            if (myCar.CloneJumpNow() && !_isJumping)
+            {
+                _isJumping = true;
+                myCar.JumpNow();
+                yield return new WaitForSeconds(carConfig.delayInputPressed);
+                myCar.cloneFlag = false;
                 _isJumping = false;
             }
             yield return null;

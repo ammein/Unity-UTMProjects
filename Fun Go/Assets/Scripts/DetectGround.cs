@@ -24,18 +24,13 @@ public class DetectGround : MonoBehaviour {
                 isGrounded = true;
             }
         }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        // Let Clone Player Jump
-        foreach(string groundName in groundTagName)
+        //Debug.Log("Clone Player ? " + gameObject.transform.parent.tag);
+        //Debug.Log("Collision Clone Player ? " + collision.gameObject.tag);
+        // Let Clone Player Jump If detect "Hill"
+        if (gameObject.transform.parent.tag == "ClonePlayer" && collision.gameObject.CompareTag("Hill"))
         {
-            if(gameObject.CompareTag("ClonePlayer") && collision.gameObject.CompareTag(groundName))
-            {
-                Debug.LogWarning("Collision Stay Clone Player" + groundName);
-                gameObject.GetComponent<Mover>().myCar.JumpNow();
-            }
+            Debug.LogWarning("Collision Enter Clone Player Hill");
+            gameObject.transform.parent.GetComponent<Mover>().myCar.cloneFlag = true;
         }
     }
 

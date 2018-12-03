@@ -804,7 +804,7 @@ GameObject:
   - component: {fileID: 65401218365218622}
   m_Layer: 0
   m_Name: ground_1
-  m_TagString: Ground
+  m_TagString: Hill
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
