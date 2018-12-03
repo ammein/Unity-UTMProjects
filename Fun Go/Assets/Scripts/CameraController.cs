@@ -87,19 +87,11 @@ public class CameraController : MonoBehaviour {
         if (flagCamera)
         {
             Camera.main.orthographicSize = orthoMove;
-            for(float i = 0; i < 3; i+= 0.5f)
-            {
-                offsetCamZ += i;
-            }
             transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Enable Flag Camera");
         }
         else
         {
-            for (float i = 0; i < 3; i -= 0.5f)
-            {
-                offsetCamZ -= i;
-            }
             Camera.main.orthographicSize = orthoMove;
             transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
             //Debug.Log("Disable Flag Camera");
