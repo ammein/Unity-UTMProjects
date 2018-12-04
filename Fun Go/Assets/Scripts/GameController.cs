@@ -2,6 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SingleOrMultiple
+{
+    SINGLE,
+    MULTIPLE
+}
+
+[System.Serializable]
+public class CameraSettings
+{
+    public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , rotationX , rotationY, rotationZ;
+}
+
 public class GameController : MonoBehaviour {
     [Header("Get Clone Car Object")]
     public GameObject car;
@@ -29,17 +41,56 @@ public class GameController : MonoBehaviour {
     [Range(0, 5)]
     public int countStart;
 
+    [Header("Offset Camera From Player Position")]
+    public float offsetCamX;
+    public float offsetCamY;
+    public float offsetCamZ;
+
+    [Header("Camera Settings")]
+    public CameraSettings cameraSettings;
+
+    [HideInInspector]
+    public SingleOrMultiple play;
+    [HideInInspector]
+    public CameraControl cameraObject;
+
+    private float offsetX;
+    private float offsetY;
+    private float offsetZ;
+
     void Start() {
+        play = SingleOrMultiple.SINGLE;
         spawnPosition = transform.position.z + offsetXMap;
         spawnRotation = transform.rotation;
         StartCoroutine(OutputMap());
         StartCoroutine(CloneObject());
+        AllOffset();
+        cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+    }
+
+    void AllOffset()
+    {
+        offsetX = offsetCamX;
+        offsetY = offsetCamY;
+        offsetZ = offsetCamZ;
+        return;
+    }
+
+    void LateUpdate()
+    {
+        cameraObject.UpdateOnMove(cameraSettings);
+        cameraObject.StartMoveCamera();
+        cameraObject.FlagCameraUpdate();
+        cameraObject.CameraMoveEffect();
     }
 
     void Update()
     {
         // Update each frame for get All Map Length Value
         GetAllMapLength();
+        cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
+        cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY , cameraSettings.rotationZ);
+        AllOffset();
     }
 
     IEnumerator OutputMap()

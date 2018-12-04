@@ -14,6 +14,8 @@ TagManager:
   - BeginSpawn
   - map
   - ClonePlayer
+  - PrimaryCamera
+  - SecondaryCamera
   layers:
   - Default
   - TransparentFX
