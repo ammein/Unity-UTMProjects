@@ -58,6 +58,9 @@ public class GameController : MonoBehaviour {
     private float offsetY;
     private float offsetZ;
 
+    [Header("Debug for Making All Clone Jump")]
+    public bool cloneJump = false;
+
     void Start() {
         play = SingleOrMultiple.SINGLE;
         spawnPosition = transform.position.z + offsetXMap;
@@ -65,6 +68,8 @@ public class GameController : MonoBehaviour {
         StartCoroutine(OutputMap());
         StartCoroutine(CloneObject());
         AllOffset();
+
+        // Make New Camera based on Player Options
         cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
     }
 
@@ -78,6 +83,8 @@ public class GameController : MonoBehaviour {
 
     void LateUpdate()
     {
+        // Everything for all camera to move
+        // Only move when all physics calculation rendered
         cameraObject.UpdateOnMove(cameraSettings);
         cameraObject.StartMoveCamera();
         cameraObject.FlagCameraUpdate();
@@ -88,9 +95,18 @@ public class GameController : MonoBehaviour {
     {
         // Update each frame for get All Map Length Value
         GetAllMapLength();
+
+        // To Make it Live Update for all settings
         cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
         cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY , cameraSettings.rotationZ);
         AllOffset();
+        DebugCloneJump();
+    }
+
+    void DebugCloneJump()
+    {
+        // Debug Purpose Only
+        GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.cloneFlag = cloneJump;
     }
 
     IEnumerator OutputMap()
