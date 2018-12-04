@@ -15,10 +15,17 @@ public class CameraSettings
 }
 
 public class GameController : MonoBehaviour {
+
+    [Header("Single Player or Multiplayer")]
+    public SingleOrMultiple play;
+    [Header("Horizontal or Vertical")]
+    public bool splitCameraMultiplayer;
     [Header("Get Clone Car Object")]
     public GameObject car;
     [Header("Debug for Making All Clone Jump")]
     public bool cloneJump = false;
+    [Header("Get Second Car Object")]
+    public GameObject secondCar;
     [HideInInspector]
     public GameObject spawn;
     [HideInInspector]
@@ -50,9 +57,6 @@ public class GameController : MonoBehaviour {
 
     [Header("Camera Settings")]
     public CameraSettings cameraSettings;
-
-    [HideInInspector]
-    public SingleOrMultiple play;
     [HideInInspector]
     public CameraControl cameraObject;
 
@@ -61,7 +65,6 @@ public class GameController : MonoBehaviour {
     private float offsetZ;
 
     void Start() {
-        play = SingleOrMultiple.SINGLE;
         spawnPosition = transform.position.z + offsetXMap;
         spawnRotation = transform.rotation;
         StartCoroutine(OutputMap());
@@ -70,6 +73,7 @@ public class GameController : MonoBehaviour {
 
         // Make New Camera based on Player Options
         cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+        SplitUpdate();
     }
 
     void AllOffset()
@@ -78,6 +82,11 @@ public class GameController : MonoBehaviour {
         offsetY = offsetCamY;
         offsetZ = offsetCamZ;
         return;
+    }
+
+    void SplitUpdate()
+    {
+        cameraObject.SplitRightOrSplitBottom = splitCameraMultiplayer;
     }
 
     void LateUpdate()
@@ -98,6 +107,8 @@ public class GameController : MonoBehaviour {
         // To Make it Live Update for all settings
         cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
         cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY , cameraSettings.rotationZ);
+        SplitUpdate();
+        cameraObject.SplitCamera();
         AllOffset();
         DebugCloneJump();
     }

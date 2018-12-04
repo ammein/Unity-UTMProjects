@@ -78,14 +78,30 @@ public class Mover : MonoBehaviour
     private ResetAnimation resetScript;
     private bool ranOnce;
     public Car myCar = null;
+    private SingleOrMultiple play;
+    private GameObject secondGameObject;
+
+    private GameObject cloneSecondPlayer;
 
     // Use this for initialization
     void Start()
     {
-        myCar = new Car(gameObject);
+        Initialize();
+        secondGameObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().secondCar;
+        //cloneSecondPlayer = Instantiate(secondGameObject, transform.position, transform.rotation);
+        myCar = new Car(gameObject , secondGameObject ,  play);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
         StartCoroutine(Jump());
+        StartCoroutine(CheckPlayerStatus());
+    }
+
+    /// <summary>
+    /// Made the initialize because bug always happen when switch condition SINGLE or MULTIPLE
+    /// </summary>
+    void Initialize()
+    {
+        play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
     }
 
     void Update()
@@ -95,7 +111,6 @@ public class Mover : MonoBehaviour
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
-        myCar.DetectGround();
         myCar.DetectBaseGround();
         UpdatePauseCar();
         eulerAnglesX = WrapAngle(myCar.rotX);
@@ -157,12 +172,37 @@ public class Mover : MonoBehaviour
         while (true)
         {
             _isJumping = false;
-            if (Input.GetKeyDown("space") && !_isJumping)
+            switch (play)
             {
-                _isJumping = true;
-                myCar.JumpNow();
-                yield return new WaitForSeconds(carConfig.delayInputPressed);
-                _isJumping = false;
+                case SingleOrMultiple.SINGLE:
+                    if (Input.GetKeyDown("space") && !_isJumping)
+                    {
+                        _isJumping = true;
+                        myCar.JumpNow();
+                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        _isJumping = false;
+                    }
+                    break;
+
+                case SingleOrMultiple.MULTIPLE:
+                    // First Player
+                    if (Input.GetKeyDown(KeyCode.Space) && !_isJumping)
+                    {
+                        _isJumping = true;
+                        myCar.JumpNow();
+                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        _isJumping = false;
+                    }
+
+                    // Second Player
+                    if (Input.GetKeyDown(KeyCode.UpArrow) && !_isJumping)
+                    {
+                        _isJumping = true;
+                        myCar.JumpNow();
+                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        _isJumping = false;
+                    }
+                    break;
             }
             if (myCar.CloneJumpNow() && !_isJumping)
             {
@@ -174,5 +214,29 @@ public class Mover : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    IEnumerator CheckPlayerStatus()
+    {
+        int countdown = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().countStart;
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                yield return new WaitForSeconds(countdown);
+                if (GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
+                {
+                    GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(false);
+                }
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (!GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
+                {
+                    GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(true);
+                }
+                yield return new WaitForSeconds(countdown);
+                break;
+        }
+        yield break;
     }
 }

@@ -26,15 +26,19 @@ public class UIController : MonoBehaviour
     private bool holdCar;
 
     private GameObject[] allInstantiatePlayer;
-    private GameObject[] playerCar;
+    private GameObject playerCar;
+    private GameObject playerCarSecond;
     private GameObject gameController;
     private int getCount;
+
+    private SingleOrMultiple play;
 
     // Use this for initialization
     void Start()
     {
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
         getCount = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().countStart;
+        play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
         // Get Current UI W & H
         width = Screen.width;
         height = Screen.height;
@@ -49,14 +53,15 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetSpeed();
+        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
         InitiateCaller();
     }
 
     public void InitiateCaller()
     {
         allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
-        playerCar = GameObject.FindGameObjectsWithTag("ParentPlayer");
+        playerCar = GameObject.FindGameObjectWithTag("ParentPlayer");
+        playerCarSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer");
         gameController = GameObject.FindGameObjectWithTag("GameController");
         return;
     }
@@ -92,10 +97,19 @@ public class UIController : MonoBehaviour
             clonePlayer.GetComponent<Mover>().pauseCar = SetBool;
             clonePlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
         }
-        foreach (GameObject currentPlayer in playerCar)
+        switch (play)
         {
-            currentPlayer.GetComponent<Mover>().pauseCar = SetBool;
-            currentPlayer.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
+            case SingleOrMultiple.SINGLE:
+                playerCar.GetComponent<Mover>().pauseCar = SetBool;
+                playerCar.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                playerCar.GetComponent<Mover>().pauseCar = SetBool;
+                playerCarSecond.GetComponent<Mover>().pauseCar = SetBool;
+                playerCar.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
+                playerCarSecond.GetComponent<Mover>().boundary.zMax = gameController.GetComponent<GameController>().GetAllMapLength();
+                break;
         }
     }
 

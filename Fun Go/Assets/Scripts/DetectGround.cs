@@ -8,10 +8,13 @@ public class DetectGround : MonoBehaviour {
     public string[] groundTagName;
     [HideInInspector] // Hides var belows
     public bool isGrounded;
+    [HideInInspector] // Hides var belows
+    public bool isGroundedSecond;
 
     void Start()
     {
         isGrounded = false;
+        isGroundedSecond = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -22,6 +25,7 @@ public class DetectGround : MonoBehaviour {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = true;
+                isGroundedSecond = true;
             }
         }
         //Debug.Log("Clone Player ? " + gameObject.transform.parent.tag);
@@ -42,6 +46,7 @@ public class DetectGround : MonoBehaviour {
             if (collision.gameObject.CompareTag(groundName))
             {
                 isGrounded = false;
+                isGroundedSecond = false;
                 //print("In the air : " + collision.gameObject.tag + " with " + groundName);
             }
         }

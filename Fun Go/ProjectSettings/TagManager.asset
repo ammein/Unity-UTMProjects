@@ -16,6 +16,7 @@ TagManager:
   - ClonePlayer
   - PrimaryCamera
   - SecondaryCamera
+  - SecondParentPlayer
   layers:
   - Default
   - TransparentFX

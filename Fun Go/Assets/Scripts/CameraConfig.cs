@@ -31,6 +31,7 @@ public class CameraControl
     // Camera
     public Camera cameraSingle;
     public Camera cameraDouble;
+    public bool SplitRightOrSplitBottom { get; set; }
 
     private SingleOrMultiple NumOfPlayer;
 
@@ -65,6 +66,7 @@ public class CameraControl
                 gameObjectSecond.name = "SecondPlayerCamera";
                 gameObjectSecond.tag = "SecondaryCamera";
                 CameraPlayerTwo(gameObjectSecond);
+                SplitCamera();
                 offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY, player.transform.position.z + offsetCamZ) - player.transform.position;
                 offsetSecond = new Vector3(playerSecond.transform.position.x + offsetCamX, playerSecond.transform.position.y + offsetCamY, playerSecond.transform.position.z + offsetCamZ) - playerSecond.transform.position;
                 break;
@@ -100,6 +102,28 @@ public class CameraControl
         cameraDouble.nearClipPlane = 0.3f;
     }
 
+    public void SplitCamera()
+    {
+        switch (NumOfPlayer)
+        {
+            case SingleOrMultiple.MULTIPLE:
+                if (SplitRightOrSplitBottom)
+                {
+                    cameraSingle.rect = new Rect(0.0f, 0.0f, 0.5f, 1.0f);
+                    cameraDouble.rect = new Rect(0.5f, 0.0f, 0.5f, 1.0f);
+                }
+                else
+                {
+                    cameraSingle.rect = new Rect(0.0f, 0.5f, 1.0f, 0.5f);
+                    cameraDouble.rect = new Rect(0.0f, 0.0f, 1.0f, 0.5f);
+                }
+                break;
+
+            case SingleOrMultiple.SINGLE:
+                break;
+        }
+    }
+
     public void UpdateOffset(float offsetCamX , float offsetCamY, float offsetCamZ)
     {
         switch (NumOfPlayer)
@@ -116,7 +140,17 @@ public class CameraControl
 
     public void UpdateRotation(float rotX , float rotY , float rotZ)
     {
-        gameObject.transform.rotation = Quaternion.Euler(rotY, rotX, rotZ) * defaultRotation;
+        switch (NumOfPlayer)
+        {
+            case SingleOrMultiple.SINGLE:
+                gameObject.transform.rotation = Quaternion.Euler(rotY, rotX, rotZ) * defaultRotation;
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                gameObject.transform.rotation = Quaternion.Euler(rotY, rotX, rotZ) * defaultRotation;
+                gameObjectSecond.transform.rotation = Quaternion.Euler(rotY, rotX, rotZ) * defaultRotation;
+                break;
+        }
     }
 
     public void StartMoveCamera()
@@ -196,9 +230,9 @@ public class CameraControl
                 orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
 
                 moveCamSecond += playerSpeedSecond * cameraSettings.easing;
-                moveCamSecond = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
+                moveCamSecond = Mathf.Clamp(moveCamSecond, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
                 orthoMoveSecond += cameraSpeedSecond * 0.1f;
-                orthoMoveSecond = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
+                orthoMoveSecond = Mathf.Clamp(orthoMoveSecond, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
                 break;
         }
     }
