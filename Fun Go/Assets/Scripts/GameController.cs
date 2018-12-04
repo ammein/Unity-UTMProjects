@@ -17,6 +17,8 @@ public class CameraSettings
 public class GameController : MonoBehaviour {
     [Header("Get Clone Car Object")]
     public GameObject car;
+    [Header("Debug for Making All Clone Jump")]
+    public bool cloneJump = false;
     [HideInInspector]
     public GameObject spawn;
     [HideInInspector]
@@ -57,9 +59,6 @@ public class GameController : MonoBehaviour {
     private float offsetX;
     private float offsetY;
     private float offsetZ;
-
-    [Header("Debug for Making All Clone Jump")]
-    public bool cloneJump = false;
 
     void Start() {
         play = SingleOrMultiple.SINGLE;
@@ -106,7 +105,11 @@ public class GameController : MonoBehaviour {
     void DebugCloneJump()
     {
         // Debug Purpose Only
-        GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.cloneFlag = cloneJump;
+        GameObject[] allClone = GameObject.FindGameObjectsWithTag("ClonePlayer");
+        foreach(GameObject clone in allClone)
+        {
+            clone.GetComponent<Mover>().myCar.cloneFlag = cloneJump;
+        }
     }
 
     IEnumerator OutputMap()
