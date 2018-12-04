@@ -114,7 +114,7 @@ public class GameController : MonoBehaviour {
         DebugCloneJump();
     }
 
-    // Source to make it as event. This triggers when a new value comes in. OnChange Event Using Class Get
+    // This triggers when a new value comes in. OnChange Event Using Class Get
     // Source : https://answers.unity.com/questions/1354785/call-a-function-when-a-bool-changes-value.html
     public bool EnableCloneJump
     {
