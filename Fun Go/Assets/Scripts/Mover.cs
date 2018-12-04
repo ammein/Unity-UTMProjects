@@ -182,6 +182,14 @@ public class Mover : MonoBehaviour
                         yield return new WaitForSeconds(carConfig.delayInputPressed);
                         _isJumping = false;
                     }
+                    if (myCar.CloneJumpNow() && !_isJumping)
+                    {
+                        _isJumping = true;
+                        myCar.JumpNow();
+                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        myCar.cloneFlag = false;
+                        _isJumping = false;
+                    }
                     break;
 
                 case SingleOrMultiple.MULTIPLE:
@@ -202,15 +210,15 @@ public class Mover : MonoBehaviour
                         yield return new WaitForSeconds(carConfig.delayInputPressed);
                         _isJumping = false;
                     }
+                    if (myCar.CloneJumpNow() && !_isJumping)
+                    {
+                        _isJumping = true;
+                        myCar.JumpNow();
+                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        myCar.cloneFlag = false;
+                        _isJumping = false;
+                    }
                     break;
-            }
-            if (myCar.CloneJumpNow() && !_isJumping)
-            {
-                _isJumping = true;
-                myCar.JumpNow();
-                yield return new WaitForSeconds(carConfig.delayInputPressed);
-                myCar.cloneFlag = false;
-                _isJumping = false;
             }
             yield return null;
         }

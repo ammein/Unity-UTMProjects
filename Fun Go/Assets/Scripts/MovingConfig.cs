@@ -267,17 +267,17 @@ public class Car
         {
             rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
         }
-        // Only Let Second Player
-        else if(carObjectSecond.CompareTag("SecondParentPlayer") && Input.GetKeyDown("SecondJump"))
-        {
-            Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
-            rbSecond.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
-        }
         // Only Let Clone Player
         else if (carObject.CompareTag("ClonePlayer") && CloneJumpNow() && carObject.GetInstanceID() == carObject.GetInstanceID())
         {
             Debug.LogWarning("Clone Jump !" + carObject.GetInstanceID());
             rb.AddForce(Vector3.up * jumpForce * 1, ForceMode.Impulse);
+        }
+        // Only Let Second Player
+        if(carObjectSecond.CompareTag("SecondParentPlayer"))
+        {
+            Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
+            rbSecond.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
         }
     }
 

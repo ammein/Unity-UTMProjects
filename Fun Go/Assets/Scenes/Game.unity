@@ -491,7 +491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd87ef49695508342bea570c6d8de681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  play: 0
+  play: 1
   splitCameraMultiplayer: 1
   car: {fileID: 1192955619490104, guid: 68279968c993c634197ac4d31a184f2f, type: 2}
   cloneJump: 0

@@ -63,6 +63,7 @@ public class GameController : MonoBehaviour {
     private float offsetX;
     private float offsetY;
     private float offsetZ;
+    private bool updateCloneJump;
 
     void Start() {
         spawnPosition = transform.position.z + offsetXMap;
@@ -113,14 +114,39 @@ public class GameController : MonoBehaviour {
         DebugCloneJump();
     }
 
+    // Source to make it as event. This triggers when a new value comes in. OnChange Event Using Class Get
+    // Source : https://answers.unity.com/questions/1354785/call-a-function-when-a-bool-changes-value.html
+    public bool EnableCloneJump
+    {
+        get
+        {
+            return updateCloneJump;
+        }
+
+        set
+        {
+            if (value == updateCloneJump)
+                return;
+
+            updateCloneJump = value;
+            if (updateCloneJump)
+            {
+                // Debug Purpose Only
+                GameObject[] allClone = GameObject.FindGameObjectsWithTag("ClonePlayer");
+                foreach (GameObject clone in allClone)
+                {
+                    clone.GetComponent<Mover>().myCar.cloneFlag = value;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Debug Purpose Only
+    /// </summary>
     void DebugCloneJump()
     {
-        // Debug Purpose Only
-        GameObject[] allClone = GameObject.FindGameObjectsWithTag("ClonePlayer");
-        foreach(GameObject clone in allClone)
-        {
-            clone.GetComponent<Mover>().myCar.cloneFlag = cloneJump;
-        }
+        EnableCloneJump = cloneJump;
     }
 
     IEnumerator OutputMap()
