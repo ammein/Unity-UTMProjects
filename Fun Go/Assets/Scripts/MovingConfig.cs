@@ -274,7 +274,7 @@ public class Car
             rb.AddForce(Vector3.up * jumpForce * 1, ForceMode.Impulse);
         }
         // Only Let Second Player
-        if(carObject.CompareTag("SecondParentPlayer") && carObjectSecond.GetInstanceID() == carObjectSecond.GetInstanceID())
+        if(carObject.CompareTag("SecondParentPlayer") && carObjectSecond.GetInstanceID() == carObjectSecond.GetInstanceID() && !CloneJumpNow())
         {
             Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
             rb.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
