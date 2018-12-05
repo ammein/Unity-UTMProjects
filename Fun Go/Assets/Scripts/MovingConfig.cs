@@ -274,10 +274,10 @@ public class Car
             rb.AddForce(Vector3.up * jumpForce * 1, ForceMode.Impulse);
         }
         // Only Let Second Player
-        if(carObjectSecond.CompareTag("SecondParentPlayer"))
+        if(carObject.CompareTag("SecondParentPlayer") && carObjectSecond.GetInstanceID() == carObjectSecond.GetInstanceID())
         {
             Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
-            rbSecond.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
+            rb.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
         }
     }
 
