@@ -39,6 +39,9 @@ public class CarConfigurations
     public float jumpForce;
     [Range(1.0f , 5.0f)]
     public float delayInputPressed;
+    [Header("Multiplayer Delay Input Press :")]
+    [Range(0.0f , 1.0f)]
+    public float delayInputPressedSecond;
     [Space(20 , order = 1)]
     [Header("Rotation Controls : ", order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
@@ -195,20 +198,20 @@ public class Mover : MonoBehaviour
 
                 case SingleOrMultiple.MULTIPLE:
                     // First Player
-                    if (Input.GetKeyDown(KeyCode.Space) && !_isJumping)
+                    if (Input.GetAxis("Jump") == 1 && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputPressedSecond);
                         _isJumping = false;
                     }
 
                     // Second Player
-                    if (Input.GetKeyDown(KeyCode.UpArrow) && !_isJumpingSecond)
+                    if (Input.GetAxis("SecondJump") == 1 && !_isJumpingSecond)
                     {
                         _isJumpingSecond = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputPressedSecond);
                         _isJumpingSecond = false;
                     }
                     if (myCar.CloneJumpNow() && !_isJumping)
