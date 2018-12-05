@@ -14,7 +14,7 @@ public class CameraControl
     public Rigidbody playerRigidSecond;
     private Vector3 offset;
     private Vector3 offsetSecond;
-    private bool flagCamera;
+    private bool flagCamera , flagCameraSecond;
     private float playerPosition;
     private float playerPositionSecond;
     private float playerSpeed;
@@ -51,6 +51,7 @@ public class CameraControl
                 gameObject.tag = "PrimaryCamera";
                 CameraPlayerOne(gameObject);
                 offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY, player.transform.position.z + offsetCamZ) - player.transform.position;
+                flagCamera = false;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -69,9 +70,11 @@ public class CameraControl
                 SplitCamera();
                 offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY, player.transform.position.z + offsetCamZ) - player.transform.position;
                 offsetSecond = new Vector3(playerSecond.transform.position.x + offsetCamX, playerSecond.transform.position.y + offsetCamY, playerSecond.transform.position.z + offsetCamZ) - playerSecond.transform.position;
+
+                flagCamera = false;
+                flagCameraSecond = false;
                 break;
         }
-        flagCamera = false;
     }
 
     void CameraPlayerOne(GameObject gameObject)
@@ -256,6 +259,7 @@ public class CameraControl
                     //Debug.Log("Disable Flag Camera");
                 }
 
+
                 if (Input.GetKeyDown("space"))
                 {
                     cameraSingle.orthographicSize = orthoMove++;
@@ -281,7 +285,7 @@ public class CameraControl
                     cameraSingle.orthographicSize = orthoMove++;
                 }
 
-                if (flagCamera)
+                if (flagCameraSecond)
                 {
                     cameraDouble.orthographicSize = orthoMoveSecond;
                     gameObjectSecond.transform.position = playerSecond.transform.position + new Vector3(0.0f, 0.0f, moveCamSecond) + offset;
@@ -294,7 +298,7 @@ public class CameraControl
                     //Debug.Log("Disable Flag Camera");
                 }
 
-                if (Input.GetKeyDown("up"))
+                if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     cameraDouble.orthographicSize = orthoMoveSecond++;
                 }
