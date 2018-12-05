@@ -87,7 +87,16 @@ public class GameController : MonoBehaviour {
 
     void SplitUpdate()
     {
-        cameraObject.SplitRightOrSplitBottom = splitCameraMultiplayer;
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                cameraObject.SplitRightOrSplitBottom = false;
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                cameraObject.SplitRightOrSplitBottom = splitCameraMultiplayer;
+                break;
+        }
     }
 
     void LateUpdate()
