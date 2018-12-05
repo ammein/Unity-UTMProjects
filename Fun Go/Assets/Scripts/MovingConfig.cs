@@ -6,6 +6,7 @@ public class Car
 {
     public float speedForce, maxSpeed, speedAccelerate, jumpWeight, turnRate, jumpForce, rotX, rotY, rotZ;
     public float speedForceSecond, maxSpeedSecond, speedAccelerateSecond, jumpWeightSecond, turnRateSecond, jumpForceSecond, rotXSecond, rotYSecond, rotZSecond;
+    private float finish;
     public GameObject carObject, baseObject, tyreObject , carObjectSecond , baseObjectSecond , tyreObjectSecond;
     private Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
     public double Speed , SpeedSecond;
@@ -17,7 +18,9 @@ public class Car
     public DetectGround detectGround;
     public DetectGround detectGroundSecond;
     private float timer = 0;
-    private float countdown = 0;
+    private bool countdown;
+    public bool reachFinishLineFirst = false;
+    public bool reachFinishLineSecond = false;
     public Boundary boundary;
     public Boundary boundarySecond;
     [HideInInspector]
@@ -40,6 +43,7 @@ public class Car
     public Car(GameObject gameObjectFirst , GameObject gameObjectSecond , SingleOrMultiple play)
     {
         playerDouble = play;
+        countdown = GameObject.Find("UICar").GetComponent<UIController>().counting;
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
@@ -67,7 +71,7 @@ public class Car
                 boundary = carObject.GetComponent<Mover>().boundary;
                 Speed = 0;
 
-                // SecondPlayer
+                // Second PLayer
                 carObjectSecond = gameObjectSecond;
                 carObjectSecond.name = "SecondPlayerCar";
                 carObjectSecond.tag = "SecondParentPlayer";
@@ -84,6 +88,15 @@ public class Car
         }
     }
 
+    void UpdateFinish()
+    {
+        countdown = GameObject.Find("UICar").GetComponent<UIController>().counting;
+        if (!countdown)
+        {
+            finish = GetZMax() - GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().finishLine;
+        }
+    }
+
 
     /// <summary>
     /// Init this Car on Start()
@@ -93,6 +106,7 @@ public class Car
         switch (playerDouble)
         {
             case SingleOrMultiple.MULTIPLE:
+                UpdateFinish();
                 // First Player
                 baseObject = carObject.transform.Find("Base").gameObject;
                 tyreObject = carObject.transform.Find("wheels").gameObject;
@@ -130,7 +144,6 @@ public class Car
                 baseObjectSecond = carObjectSecond.transform.Find("Base").gameObject;
                 tyreObjectSecond = carObjectSecond.transform.Find("wheels").gameObject;
                 rbSecond = tyreObjectSecond.GetComponent<Rigidbody>();
-                Debug.Log("Second Player lock with Rigidbody ? " + rbSecond.transform.parent.name);
                 rigidBaseSecond = carObjectSecond.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
                 resetScriptSecond = carObjectSecond.GetComponent<ResetAnimation>();
                 detectGroundSecond = carObjectSecond.transform.Find("wheels").GetComponent<DetectGround>();
@@ -167,6 +180,7 @@ public class Car
                 break;
 
             case SingleOrMultiple.SINGLE:
+                UpdateFinish();
                 baseObject = carObject.transform.Find("Base").gameObject;
                 tyreObject = carObject.transform.Find("wheels").gameObject;
                 rb = tyreObject.GetComponent<Rigidbody>();
@@ -223,6 +237,7 @@ public class Car
                     baseObject.SetActive(true);
                     tyreObject.SetActive(true);
                 }
+                UpdateFinish();
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -253,18 +268,20 @@ public class Car
                     baseObjectSecond.SetActive(true);
                     tyreObjectSecond.SetActive(true);
                 }
+                UpdateFinish();
                 break;
         }
     }
 
     /// <summary>
-    /// Physic Jump
+    /// Physic Jump. Filteration enabled
     /// </summary>
     public void JumpNow()
     {
         // Only Let First Player
         if(carObject.CompareTag("ParentPlayer"))
         {
+            Debug.Log("First Player Jump ! " + Input.GetAxis("Jump"));
             rb.AddForce(Vector3.up * jumpForce * Input.GetAxis("Jump"), ForceMode.Impulse);
         }
         // Only Let Clone Player
@@ -274,16 +291,27 @@ public class Car
             rb.AddForce(Vector3.up * jumpForce * 1, ForceMode.Impulse);
         }
         // Only Let Second Player
-        if(carObject.CompareTag("SecondParentPlayer") && carObjectSecond.GetInstanceID() == carObjectSecond.GetInstanceID() && !CloneJumpNow())
+        // Filter from 'carObject' but not 'carObjectSecond' because its a bug that run both
+        if(carObject.CompareTag("SecondParentPlayer") && carObjectSecond.GetInstanceID() == carObjectSecond.GetInstanceID())
         {
             Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
-            rb.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
+            rbSecond.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
         }
     }
 
     public bool CloneJumpNow()
     {
         return cloneFlag;
+    }
+
+    public float GetZFirstPos()
+    {
+        return rb.transform.position.z;
+    }
+
+    public float GetZSecondPos()
+    {
+        return rbSecond.transform.position.z;
     }
 
 
@@ -380,6 +408,52 @@ public class Car
         RotationControlCheck();
         ListenEvent();
         RunGround();
+        StopFinish();
+    }
+
+    public void StopFinish()
+    {
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                if (rb.transform.position.z > finish)
+                {
+                    StopFirst();
+                    reachFinishLineFirst = true;
+                }
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (rb.transform.position.z > finish)
+                {
+                    StopFirst();
+                    reachFinishLineFirst = true;
+                }
+
+                if (rbSecond.transform.position.z > finish)
+                {
+                    StopSecond();
+                    reachFinishLineSecond = true;
+                }
+                break;
+        }
+    }
+
+    void StopFirst()
+    {
+        rb.AddForce(Vector3.zero, ForceMode.Impulse);
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+        return;
+    }
+
+    void StopSecond()
+    {
+        // Second Player
+        rbSecond.AddForce(Vector3.zero, ForceMode.Impulse);
+        rbSecond.angularVelocity = Vector3.zero;
+        rbSecond.velocity = Vector3.zero;
+        return;
     }
 
     /// <summary>
@@ -466,8 +540,8 @@ public class Car
                 rb.useGravity = false;
 
                 // Second Player
-                rigidBase.useGravity = false;
-                rb.useGravity = false;
+                rigidBaseSecond.useGravity = false;
+                rbSecond.useGravity = false;
                 break;
         }
         return;
@@ -607,7 +681,7 @@ public class Car
                 {
                     //Debug.Log("Move " + carObject.name);
                     rbSecond.AddForce(movement * speedForceSecond, ForceMode.Acceleration);
-                    rigidBase.mass = 1;
+                    rigidBaseSecond.mass = 1;
                     return;
                 }
                 else if (!DetectGroundSecond())
