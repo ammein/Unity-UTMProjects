@@ -37,11 +37,12 @@ public class CarConfigurations
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
+    [Header("Single Player Delay Input Press :")]
     [Range(1.0f , 5.0f)]
-    public float delayInputPressed;
+    public float delayInputJump;
     [Header("Multiplayer Delay Input Press :")]
     [Range(0.0f , 1.0f)]
-    public float delayInputPressedSecond;
+    public float delayInputJumpSecond;
     [Space(20 , order = 1)]
     [Header("Rotation Controls : ", order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
@@ -183,14 +184,14 @@ public class Mover : MonoBehaviour
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         _isJumping = false;
                     }
                     if (myCar.CloneJumpNow() && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         myCar.cloneFlag = false;
                         _isJumping = false;
                     }
@@ -202,7 +203,7 @@ public class Mover : MonoBehaviour
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressedSecond);
+                        yield return new WaitForSeconds(carConfig.delayInputJumpSecond);
                         _isJumping = false;
                     }
 
@@ -211,14 +212,14 @@ public class Mover : MonoBehaviour
                     {
                         _isJumpingSecond = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressedSecond);
+                        yield return new WaitForSeconds(carConfig.delayInputJumpSecond);
                         _isJumpingSecond = false;
                     }
                     if (myCar.CloneJumpNow() && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         myCar.cloneFlag = false;
                         _isJumping = false;
                     }
