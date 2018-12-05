@@ -84,6 +84,7 @@ public class Mover : MonoBehaviour
     public Car myCar = null;
     private SingleOrMultiple play;
     private GameObject secondGameObject;
+    private GameObject firstGameObject;
 
     private GameObject cloneSecondPlayer;
 
@@ -91,9 +92,9 @@ public class Mover : MonoBehaviour
     void Start()
     {
         Initialize();
-        secondGameObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().secondCar;
-        //cloneSecondPlayer = Instantiate(secondGameObject, transform.position, transform.rotation);
-        myCar = new Car(gameObject , secondGameObject ,  play);
+        secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
+        firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
+        myCar = new Car(gameObject, secondGameObject ,  play);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
         StartCoroutine(Jump());
@@ -106,6 +107,7 @@ public class Mover : MonoBehaviour
     void Initialize()
     {
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
+        secondGameObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().secondCar;
     }
 
     void Update()
@@ -199,7 +201,7 @@ public class Mover : MonoBehaviour
 
                 case SingleOrMultiple.MULTIPLE:
                     // First Player
-                    if (Input.GetAxis("Jump") == 1 && !_isJumping)
+                    if (Input.GetKeyDown(KeyCode.Space) && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
@@ -208,7 +210,7 @@ public class Mover : MonoBehaviour
                     }
 
                     // Second Player
-                    if (Input.GetAxis("SecondJump") == 1 && !_isJumpingSecond)
+                    if (Input.GetKeyDown(KeyCode.UpArrow) && !_isJumpingSecond)
                     {
                         _isJumpingSecond = true;
                         myCar.JumpNow();

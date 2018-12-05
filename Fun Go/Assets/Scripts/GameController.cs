@@ -39,6 +39,9 @@ public class GameController : MonoBehaviour {
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
 
+    [Header("Stop Before Finish Line Offset")]
+    public float finishLine;
+
     private float[] mapLength;
 
     private float spawnPosition;
