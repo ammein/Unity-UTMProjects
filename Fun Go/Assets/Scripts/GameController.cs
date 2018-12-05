@@ -31,7 +31,7 @@ public class GameController : MonoBehaviour {
     [HideInInspector]
     public GameObject obj;
     [Header("Spawn Settings")]
-    [Range(0.1f , 2.0f)]
+    [Range(0.1f , 1.0f)]
     public float delaySpawnCar;
     [Range(1.0f, 5.0f)]
     public int numberSpawn;
