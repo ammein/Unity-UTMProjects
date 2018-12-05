@@ -6,15 +6,12 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
 
-    private double speedInit;
-    private Rect displayPosition;
+    private double speedInit , speedInitSecond;
     [Header("Speed UI Settings")]
     public GUIStyle SpeedUI;
 
     [Header("Countdown UI Settings")]
     public GUIStyle CountdownUI;
-    private float width;
-    private float height;
     [HideInInspector]
     public bool enableCount;
     [HideInInspector]
@@ -33,27 +30,34 @@ public class UIController : MonoBehaviour
 
     private SingleOrMultiple play;
 
+    private UIPlayer uiPlaySpeed;
+    private UIPlayer uiPlayCountdown;
+    private bool splitCam;
+
     // Use this for initialization
     void Start()
     {
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
         getCount = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().countStart;
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        // Get Current UI W & H
-        width = Screen.width;
-        height = Screen.height;
-        SpeedUI.fixedWidth = width;
-        SpeedUI.fixedHeight = height;
-        CountdownUI.fixedWidth = width;
-        CountdownUI.fixedHeight = height;
+        uiPlaySpeed = new UIPlayer(SpeedUI , play);
+        uiPlayCountdown = new UIPlayer(CountdownUI, play);
+        UpdateCameraSplit();
         InitiateCaller();
         StopOrRun(true);
         StartCoroutine(Count(getCount));
     }
 
+    void UpdateCameraSplit()
+    {
+        splitCam = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().splitCameraMultiplayer;
+    }
+
     void Update()
     {
+        UpdateCameraSplit();
         speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
+        speedInitSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.Speed;
         InitiateCaller();
     }
 
@@ -115,14 +119,14 @@ public class UIController : MonoBehaviour
 
     void CountDown()
     {
-        Rect displayCountdown = new Rect(0 + CountdownUI.contentOffset.x, 0 + CountdownUI.contentOffset.y, 100, 50);
-        GUI.TextArea(displayCountdown, count, CountdownUI);
+        uiPlayCountdown.CountTextArea(count);
+        uiPlayCountdown.DisplayArea(splitCam);
     }
 
     private void OnGUI()
     {
-        displayPosition = new Rect(0 + SpeedUI.contentOffset.x, 0 + SpeedUI.contentOffset.y , 100 , 50);
-        GUI.TextArea(displayPosition, speedInit.ToString("F0") + " km/hr", SpeedUI);
+        uiPlaySpeed.DisplayArea(splitCam);
+        uiPlaySpeed.UpdateSpeed(speedInit , speedInitSecond);
         if (enableCount)
         {
             CountDown();
