@@ -49,6 +49,12 @@ public class CarConfigurations
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
+    [Header("Respawn Settings")]
+    public int NumOfBlink;
+    public float blinkWait;
+    [Header("Player Coin")]
+    public int firstPlayerCoin = 0;
+    public int secondPlayerCoin = 0;
 }
 
 
@@ -99,6 +105,17 @@ public class Mover : MonoBehaviour
         targetObject = GameObject.Find("/EndPosition").transform;
         StartCoroutine(Jump());
         StartCoroutine(CheckPlayerStatus());
+        StartCoroutine(BlinkRespawn());
+    }
+
+    public bool UpdateRespawnFirst()
+    {
+        return myCar.respawnStatusFirst;
+    }
+
+    public bool UpdateRespawnSecond()
+    {
+        return myCar.respawnStatusSecond;
     }
 
     /// <summary>
@@ -117,6 +134,9 @@ public class Mover : MonoBehaviour
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
+        myCar.RespawnNow();
+        UpdateRespawnFirst();
+        UpdateRespawnSecond();
         myCar.DetectBaseGround();
         UpdatePauseCar();
         eulerAnglesX = WrapAngle(myCar.rotX);
@@ -253,5 +273,42 @@ public class Mover : MonoBehaviour
                 break;
         }
         yield break;
+    }
+
+    IEnumerator BlinkRespawn()
+    {
+        while (true)
+        {
+            if (UpdateRespawnFirst())
+            {
+                for(int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.respawnStatusFirst = false;
+                    }
+                }
+            }
+
+            if (UpdateRespawnSecond())
+            {
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.respawnStatusSecond = false;
+                    }
+                }
+            }
+            yield return null;
+        }
     }
 }

@@ -26,6 +26,11 @@ public class Car
     [HideInInspector]
     public bool cloneFlag = false;
     private SingleOrMultiple playerDouble;
+    public bool respawnStatusFirst = false;
+    public bool respawnStatusSecond = false;
+
+    public int firstPlayerCoin;
+    public int secondPlayerCoin;
 
     public Car(GameObject gameObject)
     {
@@ -56,6 +61,7 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
+                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
                 break;
 
@@ -69,6 +75,7 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
+                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
 
                 // Second PLayer
@@ -82,6 +89,7 @@ public class Car
                 turnRateSecond = carObjectSecond.GetComponent<Mover>().carConfig.turnRate;
                 jumpForceSecond = carObjectSecond.GetComponent<Mover>().carConfig.jumpForce;
                 boundarySecond = carObjectSecond.GetComponent<Mover>().boundary;
+                secondPlayerCoin = carObject.GetComponent<Mover>().carConfig.secondPlayerCoin;
                 SpeedSecond = 0;
                 break;
 
@@ -95,6 +103,32 @@ public class Car
         {
             finish = GetZMax() - GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().finishLine;
         }
+    }
+
+    public void SetCoin(int coinFirst , int coinSecond)
+    {
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                firstPlayerCoin = coinFirst;
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                firstPlayerCoin = coinFirst;
+                secondPlayerCoin = coinSecond;
+                break;
+        }
+        return;
+    }
+
+    public int GetFirstCoin()
+    {
+        return firstPlayerCoin;
+    }
+
+    public int GetSecondCoin()
+    {
+        return secondPlayerCoin;
     }
 
 
@@ -297,6 +331,35 @@ public class Car
             Debug.Log("Second Player Jump Now. Jump Value : " + Input.GetAxis("SecondJump"));
             rbSecond.AddForce(Vector3.up * jumpForceSecond * Input.GetAxis("SecondJump"), ForceMode.Impulse);
         }
+    }
+
+    public void RespawnNow()
+    {
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                if (Input.GetKeyDown(KeyCode.LeftControl) && carObject.CompareTag("ParentPlayer"))
+                {
+                    carObject.transform.position = carObject.transform.Find("RespawnPlayer").transform.position;
+                    respawnStatusFirst = true;
+                }
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (Input.GetKeyDown(KeyCode.LeftControl) && carObject.CompareTag("ParentPlayer"))
+                {
+                    carObject.transform.position = carObject.transform.Find("RespawnPlayer").transform.position;
+                    respawnStatusFirst = true;
+                }
+
+                if (Input.GetKeyDown(KeyCode.RightControl) && carObject.CompareTag("SecondParentPlayer"))
+                {
+                    carObjectSecond.transform.position = carObjectSecond.transform.Find("RespawnPlayer").transform.position;
+                    respawnStatusSecond = true;
+                }
+                break;
+        }
+        return;
     }
 
     public bool CloneJumpNow()
@@ -600,9 +663,80 @@ public class Car
     /// <summary>
     /// This is for enable blinking effects
     /// </summary>
-    void BlinkNow()
+    public void Blink()
     {
-        resetScript.blinkingAnimate(this, 0.5f, 1.0f);
+        //resetScript.blinkingAnimate(this, 0.5f, 1.0f);
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                if (respawnStatusFirst)
+                {
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                }
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (respawnStatusFirst)
+                {
+                    // First Player
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                }
+                if (respawnStatusSecond)
+                {
+                    // Second Player
+                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObjectSecond.transform.Find("wheels"));
+                }
+                break;
+        }
+    }
+
+
+    public void UnBlink()
+    {
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                if (respawnStatusFirst)
+                {
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = true;
+                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                }
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (respawnStatusFirst)
+                {
+                    // First Player
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = true;
+                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                }
+                if (respawnStatusSecond)
+                {
+                    // Second Player
+                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = true;
+                    CountAndUnblinkChildren(carObjectSecond.transform.Find("wheels"));
+                }
+                break;
+        }
+    }
+
+    void CountAndBlinkChildren(Transform child)
+    {
+        foreach(Transform children in child)
+        {
+            children.gameObject.GetComponent<Renderer>().enabled = false;
+        }
+    }
+
+    void CountAndUnblinkChildren(Transform child)
+    {
+        foreach(Transform children in child)
+        {
+            children.gameObject.GetComponent<Renderer>().enabled = true;
+        }
     }
 
     /// <summary>
