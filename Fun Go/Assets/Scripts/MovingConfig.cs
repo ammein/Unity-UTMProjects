@@ -29,6 +29,9 @@ public class Car
     public bool respawnStatusFirst = false;
     public bool respawnStatusSecond = false;
 
+    public int firstPlayerCoin;
+    public int secondPlayerCoin;
+
     public Car(GameObject gameObject)
     {
         carObject = gameObject;
@@ -58,6 +61,7 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
+                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
                 break;
 
@@ -71,6 +75,7 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
+                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
 
                 // Second PLayer
@@ -84,6 +89,7 @@ public class Car
                 turnRateSecond = carObjectSecond.GetComponent<Mover>().carConfig.turnRate;
                 jumpForceSecond = carObjectSecond.GetComponent<Mover>().carConfig.jumpForce;
                 boundarySecond = carObjectSecond.GetComponent<Mover>().boundary;
+                secondPlayerCoin = carObject.GetComponent<Mover>().carConfig.secondPlayerCoin;
                 SpeedSecond = 0;
                 break;
 
@@ -97,6 +103,32 @@ public class Car
         {
             finish = GetZMax() - GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().finishLine;
         }
+    }
+
+    public void SetCoin(int coinFirst , int coinSecond)
+    {
+        switch (playerDouble)
+        {
+            case SingleOrMultiple.SINGLE:
+                firstPlayerCoin = coinFirst;
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                firstPlayerCoin = coinFirst;
+                secondPlayerCoin = coinSecond;
+                break;
+        }
+        return;
+    }
+
+    public int GetFirstCoin()
+    {
+        return firstPlayerCoin;
+    }
+
+    public int GetSecondCoin()
+    {
+        return secondPlayerCoin;
     }
 
 

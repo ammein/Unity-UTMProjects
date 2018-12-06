@@ -18,6 +18,8 @@ TagManager:
   - SecondaryCamera
   - SecondParentPlayer
   - PositionTag
+  - HomeButton
+  - SinglePlayerButton
   layers:
   - Default
   - TransparentFX

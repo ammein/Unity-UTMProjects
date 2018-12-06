@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine;
 
 public enum SingleOrMultiple
@@ -16,8 +18,13 @@ public class CameraSettings
 
 public class GameController : MonoBehaviour {
 
+    public static GameController control;
+
     [Header("Single Player or Multiplayer")]
     public SingleOrMultiple play;
+    private Button singlePlayerButton;
+    private Button multiPlayerButton;
+    private Button homeButton;
     [Header("Horizontal or Vertical")]
     public bool splitCameraMultiplayer;
     [Header("Get Clone Car Object")]
@@ -68,16 +75,114 @@ public class GameController : MonoBehaviour {
     private float offsetZ;
     private bool updateCloneJump;
 
-    void Start() {
-        spawnPosition = transform.position.z + offsetXMap;
-        spawnRotation = transform.rotation;
-        StartCoroutine(OutputMap());
-        StartCoroutine(CloneObject());
-        AllOffset();
+    private Scene currentScene;
 
-        // Make New Camera based on Player Options
-        cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
-        SplitUpdate();
+    private int firstCoin;
+    private int secondCoin;
+
+    private bool sceneGame = false;
+
+
+    // TODO : Load Coin with scene changes
+    //void Awake()
+    //{
+    //    // To make it persist data without deleting it
+    //    // Source : https://unity3d.com/learn/tutorials/topics/scripting/persistence-saving-and-loading-data
+    //    if (control == null)
+    //    {
+    //        DontDestroyOnLoad(gameObject);
+    //        control = this;
+    //    }
+    //    else if (control != this)
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //}
+
+    void Start() {
+        CurrentActiveScene();
+    }
+
+    void LoadScene(string scene)
+    {
+        SceneManager.LoadScene(scene);
+    }
+
+    void CurrentActiveScene()
+    {
+        currentScene = SceneManager.GetActiveScene();
+        if(currentScene.name == "Game")
+        {
+            // Initialize and start all
+            spawnPosition = transform.position.z + offsetXMap;
+            spawnRotation = transform.rotation;
+            StartCoroutine(OutputMap());
+            StartCoroutine(CloneObject());
+            AllOffset();
+
+            // Make New Camera based on Player Options
+            cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+            SplitUpdate();
+
+            // TODO : Persist and Load Coin
+//            firstCoin = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetFirstCoin();
+//            secondCoin = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetSecondCoin();
+//#pragma warning disable CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
+//            if (firstCoin != null || secondCoin != null)
+//#pragma warning restore CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
+//            {
+//                GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.SetCoin(firstCoin, secondCoin);
+//            }
+            sceneGame = true;
+            homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
+            return;
+        }
+        else
+        {
+            singlePlayerButton = GameObject.FindGameObjectWithTag("SinglePlayerButton").GetComponent<Button>();
+            multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
+            sceneGame = false;
+            GetSecondCoin();
+            GetFirstCoin();
+            return;
+        }
+    }
+
+
+    void OnGUI()
+    {
+        if (!sceneGame)
+        {
+            if (singlePlayerButton != null)
+            {
+                singlePlayerButton.onClick.AddListener(delegate
+                {
+                    LoadScene("Game");
+                });
+            }
+            return;
+        }
+        else
+        {
+            if (homeButton != null)
+            {
+                homeButton.onClick.AddListener(delegate
+                {
+                    LoadScene("MainMenu");
+                });
+            }
+            return;
+        }
+    }
+
+    public int GetFirstCoin()
+    {
+        return firstCoin;
+    }
+
+    public int GetSecondCoin()
+    {
+        return secondCoin;
     }
 
     void AllOffset()
@@ -106,24 +211,32 @@ public class GameController : MonoBehaviour {
     {
         // Everything for all camera to move
         // Only move when all physics calculation rendered
-        cameraObject.UpdateOnMove(cameraSettings);
-        cameraObject.StartMoveCamera();
-        cameraObject.FlagCameraUpdate();
-        cameraObject.CameraMoveEffect();
+        if (sceneGame)
+        {
+            cameraObject.UpdateOnMove(cameraSettings);
+            cameraObject.StartMoveCamera();
+            cameraObject.FlagCameraUpdate();
+            cameraObject.CameraMoveEffect();
+            return;
+        }
     }
 
     void Update()
     {
-        // Update each frame for get All Map Length Value
-        GetAllMapLength();
+        if (sceneGame)
+        {
+            // Update each frame for get All Map Length Value
+            GetAllMapLength();
 
-        // To Make it Live Update for all settings
-        cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
-        cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY , cameraSettings.rotationZ);
-        SplitUpdate();
-        cameraObject.SplitCamera();
-        AllOffset();
-        DebugCloneJump();
+            // To Make it Live Update for all settings
+            cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
+            cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY, cameraSettings.rotationZ);
+            SplitUpdate();
+            cameraObject.SplitCamera();
+            AllOffset();
+            DebugCloneJump();
+            return;
+        }
     }
 
     // This triggers when a new value comes in. OnChange Event Using Class Get

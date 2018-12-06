@@ -52,6 +52,9 @@ public class CarConfigurations
     [Header("Respawn Settings")]
     public int NumOfBlink;
     public float blinkWait;
+    [Header("Player Coin")]
+    public int firstPlayerCoin = 0;
+    public int secondPlayerCoin = 0;
 }
 
 
