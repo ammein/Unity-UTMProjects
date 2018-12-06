@@ -37,7 +37,6 @@ public class PositionTagTransform : MonoBehaviour {
     {
         currentPos = positionTag.transform.parent.position;
         //currentRot = Quaternion.Euler(0.0f, positionTag.transform.parent.rotation.y, 0.0f);
-        UpdateOffset();
     }
 
     public float UpdateOffset()
@@ -45,14 +44,20 @@ public class PositionTagTransform : MonoBehaviour {
         return offset;
     }
 
+    void UpdateAllPos()
+    {
+        tempPos = posOffset;
+        tempPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
+        transform.position = tempPos + currentPos - new Vector3(0.0f, offsetFromPlayer - offset, 0.0f);
+        return;
+    }
+
     // Source Transform Movement 
     // Source : http://www.donovankeith.com/2016/05/making-objects-float-up-down-in-unity/
     void FixedUpdate () {
         // Float up/down with a Sin()
+        UpdateOffset();
         UpdatePos();
-        tempPos = posOffset;
-        tempPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
-        transform.position = tempPos + currentPos - new Vector3(0.0f, offsetFromPlayer - offset, 0.0f);
-        //transform.rotation = currentRot;
+        UpdateAllPos();
     }
 }

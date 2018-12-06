@@ -11,7 +11,7 @@ public enum SingleOrMultiple
 [System.Serializable]
 public class CameraSettings
 {
-    public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , rotationX , rotationY, rotationZ;
+    public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , orthoBeginSplit , orthoEndsSplit , rotationX , rotationY, rotationZ;
 }
 
 public class GameController : MonoBehaviour {
@@ -165,7 +165,10 @@ public class GameController : MonoBehaviour {
     {
         for (int i = 0; i < Maps.Length; i++)
         {
-            Instantiate(Maps[i], new Vector3(0.0f ,0.0f ,spawnPosition) , spawnRotation);
+            // Random Selected Map
+            int random = Random.Range(0, Maps.Length);
+            // Clone The Map in total of maps
+            Instantiate(Maps[random], new Vector3(0.0f ,0.0f ,spawnPosition) , spawnRotation);
             spawnPosition += Maps[i].transform.GetChild(0).transform.position.z;
             spawnRotation *= Maps[i].transform.GetChild(0).transform.rotation;
             yield return new WaitForSeconds(1);
