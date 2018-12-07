@@ -9,17 +9,17 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1031200979157926}
+  m_RootGameObject: {fileID: 1568979117334186}
   m_IsPrefabAsset: 1
---- !u!1 &1031200979157926
+--- !u!1 &1568979117334186
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4418790274594156}
-  - component: {fileID: 114202227551608860}
+  - component: {fileID: 4792800500347034}
+  - component: {fileID: 114636365689402320}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -27,12 +27,12 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4418790274594156
+--- !u!4 &4792800500347034
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1031200979157926}
+  m_GameObject: {fileID: 1568979117334186}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -40,12 +40,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114202227551608860
+--- !u!114 &114636365689402320
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1031200979157926}
+  m_GameObject: {fileID: 1568979117334186}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd87ef49695508342bea570c6d8de681, type: 3}
@@ -55,15 +55,14 @@ MonoBehaviour:
   splitCameraMultiplayer: 1
   car: {fileID: 1192955619490104, guid: 68279968c993c634197ac4d31a184f2f, type: 2}
   cloneJump: 0
-  secondCar: {fileID: 1165452326495688, guid: 55fff91bc1ac82242aaf93d16bdcb557, type: 2}
   spawn: {fileID: 0}
   obj: {fileID: 0}
   delaySpawnCar: 0.1
   numberSpawn: 5
   Maps:
-  - {fileID: 1739654636428194, guid: 23abfd98203f04048906dbcced12a55f, type: 2}
-  - {fileID: 1690567453880006, guid: 37fe6374407fb4ea68bd33bdd610ab1a, type: 2}
-  - {fileID: 1357821061844112, guid: 7240630bc91f54dc682d1a7d2b183165, type: 2}
+  - {fileID: 1064062955132484, guid: 23abfd98203f04048906dbcced12a55f, type: 2}
+  - {fileID: 1726640945446666, guid: 37fe6374407fb4ea68bd33bdd610ab1a, type: 2}
+  - {fileID: 1981569592126756, guid: 7240630bc91f54dc682d1a7d2b183165, type: 2}
   finishLine: 1000
   offsetXMap: -10
   countStart: 3

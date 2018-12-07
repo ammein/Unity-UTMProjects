@@ -52,9 +52,6 @@ public class CarConfigurations
     [Header("Respawn Settings")]
     public int NumOfBlink;
     public float blinkWait;
-    [Header("Player Coin")]
-    public int firstPlayerCoin = 0;
-    public int secondPlayerCoin = 0;
 }
 
 
@@ -94,18 +91,17 @@ public class Mover : MonoBehaviour
 
     private GameObject cloneSecondPlayer;
 
+    private GameController gameController;
+
+    [Header("Player Coin")]
+    private int firstPlayerCoin = 0;
+    private int secondPlayerCoin = 0;
+
     // Use this for initialization
     void Start()
     {
         Initialize();
-        secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
-        firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
-        myCar = new Car(gameObject, secondGameObject ,  play);
-        myCar.InitStart();
-        targetObject = GameObject.Find("/EndPosition").transform;
-        StartCoroutine(Jump());
-        StartCoroutine(CheckPlayerStatus());
-        StartCoroutine(BlinkRespawn());
+        InitCoroutine();
     }
 
     public bool UpdateRespawnFirst()
@@ -123,13 +119,29 @@ public class Mover : MonoBehaviour
     /// </summary>
     void Initialize()
     {
+        secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
+        firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        secondGameObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().secondCar;
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        myCar = new Car(gameObject, secondGameObject, play);
+        myCar.InitStart();
+        targetObject = GameObject.Find("/EndPosition").transform;
+    }
+
+    void InitCoroutine()
+    {
+        StartCoroutine(Jump());
+        StartCoroutine(CheckPlayerStatus());
+        StartCoroutine(BlinkRespawn());
     }
 
     void Update()
     {
         myCar.StickBase();
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        firstPlayerCoin = gameController.firstCoin;
+        secondPlayerCoin = gameController.secondCoin;
+        myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
         //desiredDirection = transform.position - targetObject.position;
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
@@ -257,17 +269,27 @@ public class Mover : MonoBehaviour
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
-                yield return new WaitForSeconds(countdown);
                 if (GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
                 {
                     GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(false);
+                    yield break;
                 }
+                else
+                {
+                    yield return null;
+                }
+                yield return new WaitForSeconds(countdown);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 if (!GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
                 {
                     GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(true);
+                    yield break;
+                }
+                else
+                {
+                    yield return null;
                 }
                 yield return new WaitForSeconds(countdown);
                 break;

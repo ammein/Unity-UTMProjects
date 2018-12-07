@@ -20,6 +20,8 @@ TagManager:
   - PositionTag
   - HomeButton
   - SinglePlayerButton
+  - MultiPlayerButton
+  - EndMap
   layers:
   - Default
   - TransparentFX
