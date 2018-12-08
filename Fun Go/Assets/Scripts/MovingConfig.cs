@@ -61,7 +61,6 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
-                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
                 break;
 
@@ -75,7 +74,6 @@ public class Car
                 turnRate = carObject.GetComponent<Mover>().carConfig.turnRate;
                 jumpForce = carObject.GetComponent<Mover>().carConfig.jumpForce;
                 boundary = carObject.GetComponent<Mover>().boundary;
-                firstPlayerCoin = carObject.GetComponent<Mover>().carConfig.firstPlayerCoin;
                 Speed = 0;
 
                 // Second PLayer
@@ -89,7 +87,6 @@ public class Car
                 turnRateSecond = carObjectSecond.GetComponent<Mover>().carConfig.turnRate;
                 jumpForceSecond = carObjectSecond.GetComponent<Mover>().carConfig.jumpForce;
                 boundarySecond = carObjectSecond.GetComponent<Mover>().boundary;
-                secondPlayerCoin = carObject.GetComponent<Mover>().carConfig.secondPlayerCoin;
                 SpeedSecond = 0;
                 break;
 
@@ -119,6 +116,16 @@ public class Car
                 break;
         }
         return;
+    }
+
+    public void UpdateFirstCoin()
+    {
+        firstPlayerCoin += 1;
+    }
+
+    public void UpdateSecondCoin()
+    {
+        secondPlayerCoin += 1;
     }
 
     public int GetFirstCoin()
@@ -429,7 +436,6 @@ public class Car
     /// <summary>
     /// Make a Moving Car on FixedUpdate() - Runs Physics Force
     /// </summary>
-    /// <param name="boundary"></param>
     public void Moving()
     {
         ReadAngles();
@@ -439,7 +445,7 @@ public class Car
                 rb.position = new Vector3(
                     0.0f,
                     Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
-                    Mathf.Clamp(rb.position.z, boundary.zMin, GetZMax())
+                    Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
                     );
                 // For Max Speed in Km/Hr
                 rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
@@ -452,14 +458,14 @@ public class Car
                 rb.position = new Vector3(
                     0.0f,
                     Mathf.Clamp(rb.position.y, boundary.yMin, boundary.yMax),
-                    Mathf.Clamp(rb.position.z, boundary.zMin, GetZMax())
+                    Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGround();
                 // Second Player
                 rbSecond.position = new Vector3(
                     0.0f,
                     Mathf.Clamp(rbSecond.position.y, boundary.yMin, boundary.yMax),
-                    Mathf.Clamp(rbSecond.position.z, boundary.zMin, GetZMax())
+                    Mathf.Clamp(rbSecond.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGroundSecond();
                 // For Max Speed in Km/Hr

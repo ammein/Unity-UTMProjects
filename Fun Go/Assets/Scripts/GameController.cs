@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
+using ExtensionMethods;
 
 public enum SingleOrMultiple
 {
@@ -16,9 +17,18 @@ public class CameraSettings
     public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , orthoBeginSplit , orthoEndsSplit , rotationX , rotationY, rotationZ;
 }
 
+[System.Serializable]
+public class CoinPlayer
+{
+    public int firstPlayer, secondPlayer;
+}
+
 public class GameController : MonoBehaviour {
 
     public static GameController control;
+
+    [Header("Coins Player")]
+    public CoinPlayer coin;
 
     [Header("Single Player or Multiplayer")]
     public SingleOrMultiple play;
@@ -31,8 +41,6 @@ public class GameController : MonoBehaviour {
     public GameObject car;
     [Header("Debug for Making All Clone Jump")]
     public bool cloneJump = false;
-    [Header("Get Second Car Object")]
-    public GameObject secondCar;
     [HideInInspector]
     public GameObject spawn;
     [HideInInspector]
@@ -51,7 +59,7 @@ public class GameController : MonoBehaviour {
 
     private float[] mapLength;
 
-    private float spawnPosition;
+    private float spawnPosition = 0;
     private Quaternion spawnRotation;
     [Header("Offset Map Position on First Spawn")]
     [Range(0, -10)]
@@ -77,70 +85,181 @@ public class GameController : MonoBehaviour {
 
     private Scene currentScene;
 
-    private int firstCoin;
-    private int secondCoin;
+    public AsyncOperation async;
+
+    public int firstCoin;
+    public int secondCoin;
 
     private bool sceneGame = false;
 
+    public bool loadingScene = false;
+
+    public Text loadingText;
+
 
     // TODO : Load Coin with scene changes
-    //void Awake()
-    //{
-    //    // To make it persist data without deleting it
-    //    // Source : https://unity3d.com/learn/tutorials/topics/scripting/persistence-saving-and-loading-data
-    //    if (control == null)
-    //    {
-    //        DontDestroyOnLoad(gameObject);
-    //        control = this;
-    //    }
-    //    else if (control != this)
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //}
-
-    void Start() {
-        CurrentActiveScene();
+    void Awake()
+    {
+        // To make it persist data without deleting it
+        // Source : https://unity3d.com/learn/tutorials/topics/scripting/persistence-saving-and-loading-data
+        if (control == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            control = this;
+        }
+        else if (control != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
-    void LoadScene(string scene)
+
+    // Run Start Here
+    void Start()
     {
+        spawnPosition = transform.position.z + offsetXMap;
+        spawnRotation = transform.rotation;
+        CurrentActiveScene();
+        InitCoroutine();
+    }
+
+
+    void LateUpdate()
+    {
+        // Everything for all camera to move
+        // Only move when all physics calculation rendered
+        if (sceneGame && !loadingScene)
+        {
+            cameraObject.UpdateOnMove(cameraSettings);
+            cameraObject.StartMoveCamera();
+            cameraObject.FlagCameraUpdate();
+            cameraObject.CameraMoveEffect();
+            return;
+        }
+    }
+
+    // Update Here
+    void Update()
+    {
+        GetScene();
+        CurrentActiveScene();
+        UpdateLoadingScene();
+        if (sceneGame && !loadingScene)
+        {
+            // Update each frame for get All Map Length Value
+            GetAllMapLength();
+            // To Make it Live Update for all settings
+            cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
+            cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY, cameraSettings.rotationZ);
+            SplitUpdate();
+            cameraObject.SplitCamera();
+            AllOffset();
+            DebugCloneJump();
+            return;
+        }
+
+        // Send Value to disk. This only for coin update value
+        if (!PlayerPrefs.HasKey("firstPlayer") && !PlayerPrefs.HasKey("secondPlayer"))
+        {
+            PlayerPrefs.SetInt("firstPlayer", 0);
+            PlayerPrefs.SetInt("secondPlayer", 0);
+        }
+        else
+        {
+            firstCoin = PlayerPrefs.GetInt("firstPlayer");
+            secondCoin = PlayerPrefs.GetInt("secondPlayer");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
+
+    // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
+    IEnumerator LoadScene(int scene)
+    {
+        GameObject allObject = GameObject.Find("Canvas");
+        allObject.FindObject("TipsTrick").SetActive(true);
+        yield return new WaitForSeconds(1);
+        // load the scene asynchronously
         SceneManager.LoadScene(scene);
+        // Return IEnumerator to null
+        yield return null;
+        // deactivate scene
+        //async.allowSceneActivation = false;
+        // Flag the loading scene to be tag onto other conditions
+        //loadingScene = true;
+        //while (!async.isDone)
+        //{
+        //if (loadingText != null)
+        //{
+        //    loadingText.text = "Loading progress: " + (async.progress * 100) + "%";
+        //}
+
+        //if ((double)async.progress >= 0.9f)
+        //{
+        //    Debug.Log("Progress : " + (double)async.progress);
+        //    async.allowSceneActivation = true;
+        //    if (loadingText != null)
+        //    {
+        //        loadingText.text = "Game Loaded";
+        //    }
+        //    yield return new WaitForSeconds(1);
+        //    Destroy(loadingText);
+        //    loadingScene = false;
+        //    // Activate back the scene
+        //    Debug.Log("Allow Scene Activate " + async.allowSceneActivation);
+        //    Debug.Log("Async Done ? " + async.isDone);
+        //}
+
+        //    if((double)async.progress >= 0.9f)
+        //    {
+        //        loadingScene = false;
+        //    }
+        //    yield return null;
+        //}
+    }
+
+    public Scene GetScene()
+    {
+        return currentScene = SceneManager.GetActiveScene();
+    }
+
+    public bool UpdateLoadingScene()
+    {
+        return loadingScene;
     }
 
     void CurrentActiveScene()
     {
-        currentScene = SceneManager.GetActiveScene();
         if(currentScene.name == "Game")
         {
+            Debug.Log("Running Game");
             // Initialize and start all
-            spawnPosition = transform.position.z + offsetXMap;
-            spawnRotation = transform.rotation;
-            StartCoroutine(OutputMap());
-            StartCoroutine(CloneObject());
             AllOffset();
-
             // Make New Camera based on Player Options
-            cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
             SplitUpdate();
-
-            // TODO : Persist and Load Coin
-//            firstCoin = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetFirstCoin();
-//            secondCoin = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetSecondCoin();
-//#pragma warning disable CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
-//            if (firstCoin != null || secondCoin != null)
-//#pragma warning restore CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
-//            {
-//                GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.SetCoin(firstCoin, secondCoin);
-//            }
             sceneGame = true;
             homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
             return;
         }
-        else
+        if(currentScene.name == "MainMenu")
         {
             singlePlayerButton = GameObject.FindGameObjectWithTag("SinglePlayerButton").GetComponent<Button>();
             multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
+            singlePlayerButton.onClick.AddListener(delegate
+            {
+                StartPlay(SingleOrMultiple.SINGLE);
+                StartCoroutine(LoadScene(1));
+
+            });
+
+            multiPlayerButton.onClick.AddListener(delegate
+            {
+                StartPlay(SingleOrMultiple.MULTIPLE);
+                StartCoroutine(LoadScene(1));
+            });
             sceneGame = false;
             GetSecondCoin();
             GetFirstCoin();
@@ -148,31 +267,16 @@ public class GameController : MonoBehaviour {
         }
     }
 
-
-    void OnGUI()
+    void InitCoroutine()
     {
-        if (!sceneGame)
-        {
-            if (singlePlayerButton != null)
-            {
-                singlePlayerButton.onClick.AddListener(delegate
-                {
-                    LoadScene("Game");
-                });
-            }
-            return;
-        }
-        else
-        {
-            if (homeButton != null)
-            {
-                homeButton.onClick.AddListener(delegate
-                {
-                    LoadScene("MainMenu");
-                });
-            }
-            return;
-        }
+        StartCoroutine(OutputMap());
+        StartCoroutine(CloneObject());
+        StartCoroutine(StartCamera());
+    }
+
+    void StartPlay(SingleOrMultiple playType)
+    {
+        play = playType;
     }
 
     public int GetFirstCoin()
@@ -204,38 +308,6 @@ public class GameController : MonoBehaviour {
             case SingleOrMultiple.MULTIPLE:
                 cameraObject.SplitRightOrSplitBottom = splitCameraMultiplayer;
                 break;
-        }
-    }
-
-    void LateUpdate()
-    {
-        // Everything for all camera to move
-        // Only move when all physics calculation rendered
-        if (sceneGame)
-        {
-            cameraObject.UpdateOnMove(cameraSettings);
-            cameraObject.StartMoveCamera();
-            cameraObject.FlagCameraUpdate();
-            cameraObject.CameraMoveEffect();
-            return;
-        }
-    }
-
-    void Update()
-    {
-        if (sceneGame)
-        {
-            // Update each frame for get All Map Length Value
-            GetAllMapLength();
-
-            // To Make it Live Update for all settings
-            cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
-            cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY, cameraSettings.rotationZ);
-            SplitUpdate();
-            cameraObject.SplitCamera();
-            AllOffset();
-            DebugCloneJump();
-            return;
         }
     }
 
@@ -276,21 +348,43 @@ public class GameController : MonoBehaviour {
 
     IEnumerator OutputMap()
     {
-        for (int i = 0; i < Maps.Length; i++)
+        while (true)
         {
-            // Random Selected Map
-            int random = Random.Range(0, Maps.Length);
-            // Clone The Map in total of maps
-            Instantiate(Maps[random], new Vector3(0.0f ,0.0f ,spawnPosition) , spawnRotation);
-            spawnPosition += Maps[i].transform.GetChild(0).transform.position.z;
-            spawnRotation *= Maps[i].transform.GetChild(0).transform.rotation;
-            yield return new WaitForSeconds(1);
-            if (i == (Maps.Length - 1))
+            if (currentScene.name == "Game")
             {
+                Debug.Log("Running Map");
+                for (int i = 0; i < Maps.Length; i++)
+                {
+                    // Random Selected Map
+                    int random = Random.Range(0, Maps.Length);
+                    // Clone The Map in total of maps
+                    Instantiate(Maps[random], new Vector3(0.0f, 0.0f, spawnPosition), spawnRotation);
+                    spawnPosition += Maps[random].transform.GetChild(0).transform.position.z;
+                    spawnRotation *= Maps[random].transform.GetChild(0).transform.rotation;
+                    yield return new WaitForSeconds(1);
+                    if (i == (Maps.Length - 1))
+                    {
+                        yield break;
+                    }
+                }
+            }
+            yield return null;
+        }
+    }
+
+    IEnumerator StartCamera()
+    {
+        while (true)
+        {
+            Debug.Log("Running Coroutine Camera : " + loadingScene);
+            if (currentScene.name == "Game")
+            {
+                Debug.Log("Pass through scene = " + currentScene.name);
+                cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
                 yield break;
             }
+            yield return null;
         }
-        yield return null;
     }
 
     public float GetAllMapLength()
@@ -300,16 +394,23 @@ public class GameController : MonoBehaviour {
 
     IEnumerator CloneObject()
     {
-        spawn = GameObject.Find("SpawnPlayer").gameObject;
-        for (int i = 0; i < numberSpawn; i++)
+        Debug.Log("Running Clone Car");
+        while (true)
         {
-            yield return new WaitForSeconds(delaySpawnCar);
-            obj = Instantiate(car, spawn.transform.position, spawn.transform.rotation);
-            if (i == (numberSpawn - 1))
+            if (currentScene.name == "Game")
             {
-                yield break;
+                spawn = GameObject.Find("SpawnPlayer").gameObject;
+                for (int i = 0; i < numberSpawn; i++)
+                {
+                    yield return new WaitForSeconds(delaySpawnCar);
+                    obj = Instantiate(car, spawn.transform.position, spawn.transform.rotation);
+                    if (i == (numberSpawn - 1))
+                    {
+                        yield break;
+                    }
+                }
             }
+            yield return null;
         }
-        yield return null;
     }
 }

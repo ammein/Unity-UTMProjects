@@ -9,6 +9,7 @@ public class UIPlayer
     private Rect displayPosition , firstPosition , secondPosition;
     private GUIStyle uiSetting;
     private double speedInit , speedInitSecond;
+    private int firstCoin, secondCoin;
     public string count;
     private SingleOrMultiple play;
 
@@ -43,7 +44,6 @@ public class UIPlayer
 
         thumb = thumbColor;
         whitePixel = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-        Debug.Log("Color Thumb " + Color.white);
         whitePixel.SetPixel(0, 0, new Color(thumb.r , thumb.g , thumb.b));
         whitePixel.Apply();
 
@@ -120,13 +120,36 @@ public class UIPlayer
         }
     }
 
+    public void UpdateCoinValue(int first , int second)
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                firstCoin = first;
+                GUI.TextArea(firstPosition, "Coin : " + first.ToString(), uiSetting);
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                firstCoin = first;
+                GUI.TextArea(firstPosition, "Coin : " + first.ToString(), uiSetting);
+                secondCoin = second;
+                GUI.TextArea(secondPosition, "Coin : " + first.ToString(), uiSetting);
+                break;
+        }
+    }
+
+    void DisplayCoin()
+    {
+
+    }
+
     public void SliderTracking(float zFirstPos , float zSecondPos , bool split , Boundary boundary)
     {
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
                 // First Player
-                firstPosition = new Rect((-width / 2) + uiSetting.contentOffset.x, 0 + uiSetting.contentOffset.y, 100, 30);
+                firstPosition = new Rect((-width / 2) + uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 1.25f, 30);
                 zFirstPos = GUI.HorizontalSlider(firstPosition, zFirstPos, 0, boundary.zMax , sliderBackground, sliderThumb);
                 break;
 
@@ -134,7 +157,7 @@ public class UIPlayer
                 if (split)
                 {
                     // First Player
-                    firstPosition = new Rect((-width / 2) + uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);
+                    firstPosition = new Rect(0+ uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);
                     zFirstPos = GUI.HorizontalSlider(firstPosition, zFirstPos, 0, boundary.zMax, sliderBackground, sliderThumb);
                     // Second Player
                     secondPosition = new Rect(0 + uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);

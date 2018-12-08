@@ -7,6 +7,9 @@ public class UIController : MonoBehaviour
 {
 
     private double speedInit , speedInitSecond;
+    [Header("Coin UI Settings")]
+    public GUIStyle CoinUI;
+
     [Header("Speed UI Settings")]
     public GUIStyle SpeedUI;
 
@@ -42,36 +45,64 @@ public class UIController : MonoBehaviour
     private UIPlayer uiPlaySpeed;
     private UIPlayer uiPlayCountdown;
     private UIPlayer uiSliderTracking;
+    private UIPlayer uiCoinDisplay;
     private bool splitCam;
 
     private Boundary getBoundary;
 
     private float GetZFirst , GetZSecond;
 
+    private int getFirstCoin, getSecondCoin;
+
     // Use this for initialization
     void Start()
     {
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
+        InitiateCaller();
+        if (!gameController.GetComponent<GameController>().loadingScene)
+        {
+            GetSpeedValue();
+            FetchGameController();
+            BoundaryUpdate();
+            InstanceUI();
+            UpdateCameraSplit();
+            StopOrRun(true);
+            StartCoroutine(Count(getCount));
+        }
+    }
+
+    void FetchGameController()
+    {
         getCount = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().countStart;
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        BoundaryUpdate();
-        uiPlaySpeed = new UIPlayer(SpeedUI , play);
+    }
+
+    void InstanceUI()
+    {
+        uiPlaySpeed = new UIPlayer(SpeedUI, play);
         uiPlayCountdown = new UIPlayer(CountdownUI, play);
-        uiSliderTracking = new UIPlayer(sliderTracking, play , thumbSlider , backgroundSlider);
-        UpdateCameraSplit();
-        InitiateCaller();
-        StopOrRun(true);
-        StartCoroutine(Count(getCount));
+        uiSliderTracking = new UIPlayer(sliderTracking, play, thumbSlider, backgroundSlider);
+        uiCoinDisplay = new UIPlayer(CoinUI , play);
     }
 
     void BoundaryUpdate()
     {
-        getBoundary = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().boundary;
-        GetZFirst = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetZFirstPos();
-        GetZSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetZSecondPos();
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                getBoundary = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().boundary;
+                GetZFirst = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetZFirstPos();
+                break;
 
-        Debug.LogWarning("Z First " + GetZFirst);
-        Debug.LogWarning("Z Second " + GetZSecond);
+            case SingleOrMultiple.MULTIPLE:
+                // First Player
+                getBoundary = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().boundary;
+                GetZFirst = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetZFirstPos();
+
+                // Second Player
+                GetZSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetZSecondPos();
+                break;
+
+        }
     }
 
     void UpdateCameraSplit()
@@ -81,11 +112,44 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        BoundaryUpdate();
-        UpdateCameraSplit();
-        speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
-        speedInitSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.Speed;
-        InitiateCaller();
+        if (!gameController.GetComponent<GameController>().loadingScene)
+        {
+            BoundaryUpdate();
+            UpdateCameraSplit();
+            GetSpeedValue();
+            InitiateCaller();
+            GetCoinValue();
+        }
+    }
+
+    void GetSpeedValue()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                speedInit = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.Speed;
+                speedInitSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.Speed;
+                break;
+        }
+    }
+
+    void GetCoinValue()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                getFirstCoin = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetFirstCoin();
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                getFirstCoin = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetFirstCoin();
+                getSecondCoin = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetSecondCoin();
+                break;
+        }
     }
 
     public void InitiateCaller()
@@ -152,12 +216,23 @@ public class UIController : MonoBehaviour
 
     private void OnGUI()
     {
-        uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
-        uiPlaySpeed.DisplayArea(splitCam);
-        uiPlaySpeed.UpdateSpeed(speedInit , speedInitSecond);
-        if (enableCount)
-        {
-            CountDown();
-        }
+        //if (!gameController.GetComponent<GameController>().loadingScene)
+        //{
+            uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
+            uiPlaySpeed.DisplayArea(splitCam);
+            uiCoinDisplay.DisplayArea(splitCam);
+            uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+            if (enableCount)
+            {
+                CountDown();
+            }
+        //}
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetInt("firstPlayer", getFirstCoin);
+        PlayerPrefs.SetInt("secondPlayer", getSecondCoin);
     }
 }
