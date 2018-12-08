@@ -100,8 +100,12 @@ public class Mover : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Initialize();
-        InitCoroutine();
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        //if (!gameController.loadingScene)
+        //{
+            Initialize();
+            InitCoroutine();
+        //}
     }
 
     public bool UpdateRespawnFirst()
@@ -122,7 +126,6 @@ public class Mover : MonoBehaviour
         secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
         firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         myCar = new Car(gameObject, secondGameObject, play);
         myCar.InitStart();
         targetObject = GameObject.Find("/EndPosition").transform;
@@ -137,26 +140,29 @@ public class Mover : MonoBehaviour
 
     void Update()
     {
-        myCar.StickBase();
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        firstPlayerCoin = gameController.firstCoin;
-        secondPlayerCoin = gameController.secondCoin;
-        myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
-        //desiredDirection = transform.position - targetObject.position;
-        //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
-        // Initialize and get current gameObject DetectGround script 
-        // (Must onUpdate because it triggers on collision)
-        myCar.RespawnNow();
-        UpdateRespawnFirst();
-        UpdateRespawnSecond();
-        myCar.DetectBaseGround();
-        UpdatePauseCar();
-        eulerAnglesX = WrapAngle(myCar.rotX);
-        eulerAnglesY = WrapAngle(myCar.rotY);
-        eulerAnglesZ = WrapAngle(myCar.rotZ);
-        MoveOrNotMove();
-        myCar.CloneJumpNow();
-        myCar.GetZMax();
+        //if (!gameController.loadingScene)
+        //{
+            myCar.StickBase();
+            gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+            firstPlayerCoin = gameController.firstCoin;
+            secondPlayerCoin = gameController.secondCoin;
+            myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
+            //desiredDirection = transform.position - targetObject.position;
+            //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
+            // Initialize and get current gameObject DetectGround script 
+            // (Must onUpdate because it triggers on collision)
+            myCar.RespawnNow();
+            UpdateRespawnFirst();
+            UpdateRespawnSecond();
+            myCar.DetectBaseGround();
+            UpdatePauseCar();
+            eulerAnglesX = WrapAngle(myCar.rotX);
+            eulerAnglesY = WrapAngle(myCar.rotY);
+            eulerAnglesZ = WrapAngle(myCar.rotZ);
+            MoveOrNotMove();
+            myCar.CloneJumpNow();
+            myCar.GetZMax();
+        //}
     }
 
     public void MoveOrNotMove()
@@ -202,7 +208,10 @@ public class Mover : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        MoveOrNotMove();
+        //if (!gameController.loadingScene)
+        //{
+            MoveOrNotMove();
+        //}
     }
 
     IEnumerator Jump()

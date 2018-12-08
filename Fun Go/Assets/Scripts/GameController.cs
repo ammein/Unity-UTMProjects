@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
+using ExtensionMethods;
 
 public enum SingleOrMultiple
 {
@@ -84,10 +85,16 @@ public class GameController : MonoBehaviour {
 
     private Scene currentScene;
 
+    public AsyncOperation async;
+
     public int firstCoin;
     public int secondCoin;
 
     private bool sceneGame = false;
+
+    public bool loadingScene = false;
+
+    public Text loadingText;
 
 
     // TODO : Load Coin with scene changes
@@ -116,9 +123,102 @@ public class GameController : MonoBehaviour {
         InitCoroutine();
     }
 
-    void LoadScene(string scene)
+
+    void LateUpdate()
     {
+        // Everything for all camera to move
+        // Only move when all physics calculation rendered
+        if (sceneGame && !loadingScene)
+        {
+            cameraObject.UpdateOnMove(cameraSettings);
+            cameraObject.StartMoveCamera();
+            cameraObject.FlagCameraUpdate();
+            cameraObject.CameraMoveEffect();
+            return;
+        }
+    }
+
+    // Update Here
+    void Update()
+    {
+        GetScene();
+        CurrentActiveScene();
+        UpdateLoadingScene();
+        if (sceneGame && !loadingScene)
+        {
+            // Update each frame for get All Map Length Value
+            GetAllMapLength();
+            // To Make it Live Update for all settings
+            cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
+            cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY, cameraSettings.rotationZ);
+            SplitUpdate();
+            cameraObject.SplitCamera();
+            AllOffset();
+            DebugCloneJump();
+            return;
+        }
+
+        // Send Value to disk. This only for coin update value
+        if (!PlayerPrefs.HasKey("firstPlayer") && !PlayerPrefs.HasKey("secondPlayer"))
+        {
+            PlayerPrefs.SetInt("firstPlayer", 0);
+            PlayerPrefs.SetInt("secondPlayer", 0);
+        }
+        else
+        {
+            firstCoin = PlayerPrefs.GetInt("firstPlayer");
+            secondCoin = PlayerPrefs.GetInt("secondPlayer");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
+
+    // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
+    IEnumerator LoadScene(int scene)
+    {
+        GameObject allObject = GameObject.Find("Canvas");
+        allObject.FindObject("TipsTrick").SetActive(true);
+        yield return new WaitForSeconds(1);
+        // load the scene asynchronously
         SceneManager.LoadScene(scene);
+        // Return IEnumerator to null
+        yield return null;
+        // deactivate scene
+        //async.allowSceneActivation = false;
+        // Flag the loading scene to be tag onto other conditions
+        //loadingScene = true;
+        //while (!async.isDone)
+        //{
+        //if (loadingText != null)
+        //{
+        //    loadingText.text = "Loading progress: " + (async.progress * 100) + "%";
+        //}
+
+        //if ((double)async.progress >= 0.9f)
+        //{
+        //    Debug.Log("Progress : " + (double)async.progress);
+        //    async.allowSceneActivation = true;
+        //    if (loadingText != null)
+        //    {
+        //        loadingText.text = "Game Loaded";
+        //    }
+        //    yield return new WaitForSeconds(1);
+        //    Destroy(loadingText);
+        //    loadingScene = false;
+        //    // Activate back the scene
+        //    Debug.Log("Allow Scene Activate " + async.allowSceneActivation);
+        //    Debug.Log("Async Done ? " + async.isDone);
+        //}
+
+        //    if((double)async.progress >= 0.9f)
+        //    {
+        //        loadingScene = false;
+        //    }
+        //    yield return null;
+        //}
     }
 
     public Scene GetScene()
@@ -126,40 +226,39 @@ public class GameController : MonoBehaviour {
         return currentScene = SceneManager.GetActiveScene();
     }
 
+    public bool UpdateLoadingScene()
+    {
+        return loadingScene;
+    }
+
     void CurrentActiveScene()
     {
         if(currentScene.name == "Game")
         {
+            Debug.Log("Running Game");
             // Initialize and start all
             AllOffset();
             // Make New Camera based on Player Options
             SplitUpdate();
-
-            // TODO : Persist and Load Coin
-//            firstCoin = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetFirstCoin();
-//            secondCoin = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetSecondCoin();
-//#pragma warning disable CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
-//            if (firstCoin != null || secondCoin != null)
-//#pragma warning restore CS0472 // The result of the expression is always the same since a value of this type is never equal to 'null'
-//            {
-//                GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.SetCoin(firstCoin, secondCoin);
-//            }
             sceneGame = true;
             homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
             return;
         }
-        else
+        if(currentScene.name == "MainMenu")
         {
             singlePlayerButton = GameObject.FindGameObjectWithTag("SinglePlayerButton").GetComponent<Button>();
             multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
             singlePlayerButton.onClick.AddListener(delegate
             {
                 StartPlay(SingleOrMultiple.SINGLE);
+                StartCoroutine(LoadScene(1));
+
             });
 
             multiPlayerButton.onClick.AddListener(delegate
             {
                 StartPlay(SingleOrMultiple.MULTIPLE);
+                StartCoroutine(LoadScene(1));
             });
             sceneGame = false;
             GetSecondCoin();
@@ -178,40 +277,6 @@ public class GameController : MonoBehaviour {
     void StartPlay(SingleOrMultiple playType)
     {
         play = playType;
-    }
-
-
-    void OnGUI()
-    {
-        if (!sceneGame)
-        {
-            if (singlePlayerButton != null)
-            {
-                singlePlayerButton.onClick.AddListener(delegate
-                {
-                    LoadScene("Game");
-                });
-            }
-            if(multiPlayerButton != null)
-            {
-                multiPlayerButton.onClick.AddListener(delegate
-                {
-                    LoadScene("Game");
-                });
-            }
-            return;
-        }
-        else
-        {
-            if (homeButton != null)
-            {
-                homeButton.onClick.AddListener(delegate
-                {
-                    LoadScene("MainMenu");
-                });
-            }
-            return;
-        }
     }
 
     public int GetFirstCoin()
@@ -243,58 +308,6 @@ public class GameController : MonoBehaviour {
             case SingleOrMultiple.MULTIPLE:
                 cameraObject.SplitRightOrSplitBottom = splitCameraMultiplayer;
                 break;
-        }
-    }
-
-    void LateUpdate()
-    {
-        // Everything for all camera to move
-        // Only move when all physics calculation rendered
-        if (sceneGame)
-        {
-            cameraObject.UpdateOnMove(cameraSettings);
-            cameraObject.StartMoveCamera();
-            cameraObject.FlagCameraUpdate();
-            cameraObject.CameraMoveEffect();
-            return;
-        }
-    }
-
-    // Update Here
-    void Update()
-    {
-        GetScene();
-        CurrentActiveScene();
-        if (sceneGame)
-        {
-            // Update each frame for get All Map Length Value
-            GetAllMapLength();
-            Debug.Log("Map Length " + GetAllMapLength());
-            // To Make it Live Update for all settings
-            cameraObject.UpdateOffset(offsetX, offsetY, offsetZ);
-            cameraObject.UpdateRotation(cameraSettings.rotationX, cameraSettings.rotationY, cameraSettings.rotationZ);
-            SplitUpdate();
-            cameraObject.SplitCamera();
-            AllOffset();
-            DebugCloneJump();
-            return;
-        }
-
-        // Send Value to disk. This only for coin update value
-        if (!PlayerPrefs.HasKey("firstPlayer") && !PlayerPrefs.HasKey("secondPlayer"))
-        {
-            PlayerPrefs.SetInt("firstPlayer", 0);
-            PlayerPrefs.SetInt("secondPlayer", 0);
-        }
-        else
-        {
-            firstCoin = PlayerPrefs.GetInt("firstPlayer");
-            secondCoin = PlayerPrefs.GetInt("secondPlayer");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
         }
     }
 
@@ -339,6 +352,7 @@ public class GameController : MonoBehaviour {
         {
             if (currentScene.name == "Game")
             {
+                Debug.Log("Running Map");
                 for (int i = 0; i < Maps.Length; i++)
                 {
                     // Random Selected Map
@@ -362,16 +376,12 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if(currentScene.name == "Game")
+            Debug.Log("Running Coroutine Camera : " + loadingScene);
+            if (currentScene.name == "Game")
             {
-                if (cameraObject == null)
-                {
-                    cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
-                }
-                else
-                {
-                    yield break;
-                }
+                Debug.Log("Pass through scene = " + currentScene.name);
+                cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+                yield break;
             }
             yield return null;
         }

@@ -57,14 +57,17 @@ public class UIController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        GetSpeedValue();
-        FetchGameController();
-        BoundaryUpdate();
-        InstanceUI();
-        UpdateCameraSplit();
         InitiateCaller();
-        StopOrRun(true);
-        StartCoroutine(Count(getCount));
+        if (!gameController.GetComponent<GameController>().loadingScene)
+        {
+            GetSpeedValue();
+            FetchGameController();
+            BoundaryUpdate();
+            InstanceUI();
+            UpdateCameraSplit();
+            StopOrRun(true);
+            StartCoroutine(Count(getCount));
+        }
     }
 
     void FetchGameController()
@@ -88,8 +91,6 @@ public class UIController : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 getBoundary = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().boundary;
                 GetZFirst = GameObject.FindGameObjectWithTag("ParentPlayer").GetComponent<Mover>().myCar.GetZFirstPos();
-
-                Debug.LogWarning("Z First " + GetZFirst);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -99,9 +100,6 @@ public class UIController : MonoBehaviour
 
                 // Second Player
                 GetZSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer").GetComponent<Mover>().myCar.GetZSecondPos();
-
-                Debug.LogWarning("Z First " + GetZFirst);
-                Debug.LogWarning("Z Second " + GetZSecond);
                 break;
 
         }
@@ -114,11 +112,14 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        BoundaryUpdate();
-        UpdateCameraSplit();
-        GetSpeedValue();
-        InitiateCaller();
-        GetCoinValue();
+        if (!gameController.GetComponent<GameController>().loadingScene)
+        {
+            BoundaryUpdate();
+            UpdateCameraSplit();
+            GetSpeedValue();
+            InitiateCaller();
+            GetCoinValue();
+        }
     }
 
     void GetSpeedValue()
@@ -215,15 +216,18 @@ public class UIController : MonoBehaviour
 
     private void OnGUI()
     {
-        uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
-        uiPlaySpeed.DisplayArea(splitCam);
-        uiCoinDisplay.DisplayArea(splitCam);
-        uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
-        uiPlaySpeed.UpdateSpeed(speedInit , speedInitSecond);
-        if (enableCount)
-        {
-            CountDown();
-        }
+        //if (!gameController.GetComponent<GameController>().loadingScene)
+        //{
+            uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
+            uiPlaySpeed.DisplayArea(splitCam);
+            uiCoinDisplay.DisplayArea(splitCam);
+            uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+            if (enableCount)
+            {
+                CountDown();
+            }
+        //}
     }
 
     private void OnApplicationQuit()
