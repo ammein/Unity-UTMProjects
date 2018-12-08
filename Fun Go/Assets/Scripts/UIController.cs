@@ -122,6 +122,11 @@ public class UIController : MonoBehaviour
         uiRankDisplay.NumberPosition();
     }
 
+    private void FixedUpdate()
+    {
+        uiRankDisplay.NumberPosition();
+    }
+
     void GetSpeedValue()
     {
         switch (play)

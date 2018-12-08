@@ -27,6 +27,7 @@ public class UIPlayer
     private GameObject[] allPlayers;
 
     private int rankFirst , rankSecond;
+    private string rankFirstString, rankSecondString;
 
     // Methods to find layer
     public static GameObject[] FindGameObjectsWithLayer(int layer)
@@ -209,33 +210,62 @@ public class UIPlayer
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
-                allPlayers = UIPlayer.FindGameObjectsWithLayer(9);
-                rankFirst = 1;
-                for(int r = 1; r < allPlayers.Length; r++)
+                allPlayers = GameObject.FindGameObjectsWithTag("Car");
+                rankFirst = allPlayers.Length;
+                for (int r = 0; r < allPlayers.Length; r++)
                 {
-                    if(DistanceFromStart("ParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
                     {
                         rankFirst++;
+                        if (rankFirst > allPlayers.Length)
+                        {
+                            rankFirst = allPlayers.Length - 1;
+                        }
+                    }
+                    else if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankFirst--;
                     }
                 }
+                UpdateRankText();
                  break;
 
             case SingleOrMultiple.MULTIPLE:
-                allPlayers = UIPlayer.FindGameObjectsWithLayer(9);
-                rankFirst = 1;
-                for (int r = 1; r < allPlayers.Length; r++)
+                allPlayers = GameObject.FindGameObjectsWithTag("Car");
+                rankFirst = allPlayers.Length;
+                rankSecond = allPlayers.Length;
+                for (int r = 0; r < allPlayers.Length; r++)
                 {
-                    Debug.Log("All Players = " + allPlayers[r]);
-                    if (DistanceFromStart("ParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
                     {
                         rankFirst++;
+                        if (rankFirst > allPlayers.Length)
+                        {
+                            rankFirst = allPlayers.Length - 1;
+                        }
                     }
-
-                    if (DistanceFromStart("SecondParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    else if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
                     {
-                        rankSecond++;
+                        rankFirst--;
                     }
                 }
+
+                for(int r = 0; r < allPlayers.Length; r++)
+                {
+                     if (GameObject.FindGameObjectWithTag("SecondParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankSecond++;
+                        if (rankSecond > allPlayers.Length)
+                        {
+                            rankSecond = allPlayers.Length - 1;
+                        }
+                    }
+                    if(GameObject.FindGameObjectWithTag("SecondParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankSecond--;
+                    }
+                }
+                UpdateRankText();
                 break;
         }
     }
@@ -245,19 +275,60 @@ public class UIPlayer
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
-                GUI.TextArea(firstPosition, rankFirst.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
+                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
-                GUI.TextArea(firstPosition,rankFirst.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
-                GUI.TextArea(secondPosition,rankSecond.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
+                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
+                GUI.TextArea(secondPosition, rankSecondString, uiSetting);
                 break;
         }
     }
 
+    public void UpdateRankText()
+    {
+        switch (rankFirst)
+        {
+            case 1:
+                rankFirstString = rankFirst.ToString() + "st";
+                break;
+
+            case 2:
+                rankFirstString = rankFirst.ToString() + "nd";
+                break;
+
+            case 3:
+                rankFirstString = rankFirst.ToString() + "rd";
+                break;
+
+            default:
+                rankFirstString = rankFirst.ToString() + "th";
+                break;
+        }
+        switch (rankSecond)
+        {
+            case 1:
+                rankSecondString = rankSecond.ToString() + "st";
+                break;
+
+            case 2:
+                rankSecondString = rankSecond.ToString() + "nd";
+                break;
+
+            case 3:
+                rankSecondString = rankSecond.ToString() + "rd";
+                break;
+
+            default:
+                rankSecondString = rankSecond.ToString() + "th";
+                break;
+        }
+        return;
+    }
+
     private float DistanceFromStart(string playerIndex)
     {
-        return GameObject.FindGameObjectWithTag(playerIndex).transform.position.z - 0;
+        return GameObject.Find(playerIndex).gameObject.transform.parent.Find("Base").transform.position.z - 0;
     }
 
     public void CountTextArea(string countNow)
