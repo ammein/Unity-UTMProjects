@@ -4,6 +4,7 @@ using UnityEngine;
 
 
 // Extend Game Object for finding Inactive GameObject
+// Ex : parentObject.Find("anyInactiveGameObjectName");
 // Source : https://forum.unity.com/threads/c-extension-methods-on-gameobject.183491/
 namespace ExtensionMethods
 {
