@@ -1158,6 +1158,17 @@ Prefab:
       propertyPath: loadingText
       value: 
       objectReference: {fileID: 965883534}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: car
+      value: 
+      objectReference: {fileID: 1406313719496384, guid: 68279968c993c634197ac4d31a184f2f,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: numberSpawn
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
   m_IsPrefabAsset: 0

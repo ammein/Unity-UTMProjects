@@ -16,6 +16,9 @@ public class UIController : MonoBehaviour
     [Header("Countdown UI Settings")]
     public GUIStyle CountdownUI;
 
+    [Header("Countdown UI Settings")]
+    public GUIStyle RankUI;
+
     [Header("Slider UI Player Tracking Settings")]
     [Tooltip("If you want to edit Size of slider , make a padding of a slider each side. And if you wanted to change background , just easily navigate to 'Normal' Collapse Tab")]
     public GUIStyle sliderTracking;
@@ -46,6 +49,7 @@ public class UIController : MonoBehaviour
     private UIPlayer uiPlayCountdown;
     private UIPlayer uiSliderTracking;
     private UIPlayer uiCoinDisplay;
+    private UIPlayer uiRankDisplay;
     private bool splitCam;
 
     private Boundary getBoundary;
@@ -79,6 +83,7 @@ public class UIController : MonoBehaviour
         uiPlayCountdown = new UIPlayer(CountdownUI, play);
         uiSliderTracking = new UIPlayer(sliderTracking, play, thumbSlider, backgroundSlider);
         uiCoinDisplay = new UIPlayer(CoinUI , play);
+        uiRankDisplay = new UIPlayer(RankUI, play);
     }
 
     void BoundaryUpdate()
@@ -114,6 +119,12 @@ public class UIController : MonoBehaviour
         GetSpeedValue();
         InitiateCaller();
         GetCoinValue();
+        uiRankDisplay.NumberPosition();
+    }
+
+    private void FixedUpdate()
+    {
+        uiRankDisplay.NumberPosition();
     }
 
     void GetSpeedValue()
@@ -214,6 +225,8 @@ public class UIController : MonoBehaviour
         uiPlaySpeed.DisplayArea(splitCam);
         uiCoinDisplay.DisplayArea(splitCam);
         uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+        uiRankDisplay.DisplayArea(splitCam);
+        uiRankDisplay.DisplayRank();
         uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
         if (enableCount)
         {

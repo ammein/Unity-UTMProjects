@@ -6,15 +6,6 @@ public class CarCollider : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            if(collision.gameObject.transform.position.z >= 20.0f)
-            {
-                //Debug.LogWarning("GameObject Position : " + collision.gameObject.transform.position.z);
-                Physics.IgnoreLayerCollision(9, 9);
-                return;
-            }
-            return;
-        }
+
     }
 }

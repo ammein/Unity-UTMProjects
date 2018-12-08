@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ExtensionMethods;
 
 public class UIPlayer
 {
@@ -20,6 +21,32 @@ public class UIPlayer
 
     private Color thumb;
     private Color background;
+
+    public int firstPlayerPosition , secondPlayerPosition;
+
+    private GameObject[] allPlayers;
+
+    private int rankFirst , rankSecond;
+    private string rankFirstString, rankSecondString;
+
+    // Methods to find layer
+    public static GameObject[] FindGameObjectsWithLayer(int layer)
+    {
+        GameObject[] goArray = Object.FindObjectsOfType<GameObject>();
+        List<GameObject> goList = new System.Collections.Generic.List<GameObject>();
+        for (int i = 0; i < goArray.Length; i++)
+        {
+            if (goArray[i].layer == layer)
+            {
+                goList.Add(goArray[i]);
+            }
+        }
+        if (goList.Count == 0)
+        {
+            return null;
+        }
+        return goList.ToArray();
+    }
 
     public UIPlayer(GUIStyle UIStyle , SingleOrMultiple playOption)
     {
@@ -176,6 +203,132 @@ public class UIPlayer
                 }
                 break;
         }
+    }
+
+    public void NumberPosition()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                allPlayers = GameObject.FindGameObjectsWithTag("Car");
+                rankFirst = allPlayers.Length;
+                for (int r = 0; r < allPlayers.Length; r++)
+                {
+                    if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankFirst++;
+                        if (rankFirst > allPlayers.Length)
+                        {
+                            rankFirst = allPlayers.Length - 1;
+                        }
+                    }
+                    else if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankFirst--;
+                    }
+                }
+                UpdateRankText();
+                 break;
+
+            case SingleOrMultiple.MULTIPLE:
+                allPlayers = GameObject.FindGameObjectsWithTag("Car");
+                rankFirst = allPlayers.Length;
+                rankSecond = allPlayers.Length;
+                for (int r = 0; r < allPlayers.Length; r++)
+                {
+                    if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankFirst++;
+                        if (rankFirst > allPlayers.Length)
+                        {
+                            rankFirst = allPlayers.Length - 1;
+                        }
+                    }
+                    else if (GameObject.FindGameObjectWithTag("ParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankFirst--;
+                    }
+                }
+
+                for(int r = 0; r < allPlayers.Length; r++)
+                {
+                     if (GameObject.FindGameObjectWithTag("SecondParentPlayer").transform.Find("Base").position.z < allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankSecond++;
+                        if (rankSecond > allPlayers.Length)
+                        {
+                            rankSecond = allPlayers.Length - 1;
+                        }
+                    }
+                    if(GameObject.FindGameObjectWithTag("SecondParentPlayer").transform.Find("Base").position.z > allPlayers[r].transform.parent.Find("Base").position.z)
+                    {
+                        rankSecond--;
+                    }
+                }
+                UpdateRankText();
+                break;
+        }
+    }
+
+    public void DisplayRank()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
+                GUI.TextArea(secondPosition, rankSecondString, uiSetting);
+                break;
+        }
+    }
+
+    public void UpdateRankText()
+    {
+        switch (rankFirst)
+        {
+            case 1:
+                rankFirstString = rankFirst.ToString() + "st";
+                break;
+
+            case 2:
+                rankFirstString = rankFirst.ToString() + "nd";
+                break;
+
+            case 3:
+                rankFirstString = rankFirst.ToString() + "rd";
+                break;
+
+            default:
+                rankFirstString = rankFirst.ToString() + "th";
+                break;
+        }
+        switch (rankSecond)
+        {
+            case 1:
+                rankSecondString = rankSecond.ToString() + "st";
+                break;
+
+            case 2:
+                rankSecondString = rankSecond.ToString() + "nd";
+                break;
+
+            case 3:
+                rankSecondString = rankSecond.ToString() + "rd";
+                break;
+
+            default:
+                rankSecondString = rankSecond.ToString() + "th";
+                break;
+        }
+        return;
+    }
+
+    private float DistanceFromStart(string playerIndex)
+    {
+        return GameObject.Find(playerIndex).gameObject.transform.parent.Find("Base").transform.position.z - 0;
     }
 
     public void CountTextArea(string countNow)

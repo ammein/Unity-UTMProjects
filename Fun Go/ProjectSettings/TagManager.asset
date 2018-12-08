@@ -22,6 +22,7 @@ TagManager:
   - SinglePlayerButton
   - MultiPlayerButton
   - EndMap
+  - Car
   layers:
   - Default
   - TransparentFX
@@ -33,7 +34,7 @@ TagManager:
   - 
   - PostProcessing
   - Car
-  - 
+  - IgnoreCollision
   - 
   - 
   - 

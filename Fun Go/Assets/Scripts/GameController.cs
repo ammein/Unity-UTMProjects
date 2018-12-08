@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour {
     [Header("Spawn Settings")]
     [Range(0.1f , 1.0f)]
     public float delaySpawnCar;
-    [Range(1.0f, 5.0f)]
+    [Range(1.0f, 10.0f)]
     public int numberSpawn;
 
     [Header("Get All Map Prefabs")]
@@ -272,7 +272,6 @@ public class GameController : MonoBehaviour {
     {
         if(currentScene.name == "Game")
         {
-            Debug.Log("Running Game");
             // Initialize and start all
             AllOffset();
             // Make New Camera based on Player Options
@@ -389,7 +388,6 @@ public class GameController : MonoBehaviour {
         {
             if (currentScene.name == "Game")
             {
-                Debug.Log("Running Map");
                 for (int i = 0; i < Maps.Length; i++)
                 {
                     // Random Selected Map
@@ -416,7 +414,6 @@ public class GameController : MonoBehaviour {
             Debug.Log("Running Coroutine Camera : " + loadingScene);
             if (currentScene.name == "Game")
             {
-                Debug.Log("Pass through scene = " + currentScene.name);
                 cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
                 yield break;
             }

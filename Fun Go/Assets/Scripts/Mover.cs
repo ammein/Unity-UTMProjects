@@ -103,6 +103,7 @@ public class Mover : MonoBehaviour
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         Initialize();
         InitCoroutine();
+        Physics.IgnoreLayerCollision(10, 10);
     }
 
     public bool UpdateRespawnFirst()
