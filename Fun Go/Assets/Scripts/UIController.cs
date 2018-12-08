@@ -58,16 +58,13 @@ public class UIController : MonoBehaviour
     void Start()
     {
         InitiateCaller();
-        if (!gameController.GetComponent<GameController>().loadingScene)
-        {
-            GetSpeedValue();
-            FetchGameController();
-            BoundaryUpdate();
-            InstanceUI();
-            UpdateCameraSplit();
-            StopOrRun(true);
-            StartCoroutine(Count(getCount));
-        }
+        GetSpeedValue();
+        FetchGameController();
+        BoundaryUpdate();
+        InstanceUI();
+        UpdateCameraSplit();
+        StopOrRun(true);
+        StartCoroutine(Count(getCount));
     }
 
     void FetchGameController()
@@ -112,14 +109,11 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        if (!gameController.GetComponent<GameController>().loadingScene)
-        {
-            BoundaryUpdate();
-            UpdateCameraSplit();
-            GetSpeedValue();
-            InitiateCaller();
-            GetCoinValue();
-        }
+        BoundaryUpdate();
+        UpdateCameraSplit();
+        GetSpeedValue();
+        InitiateCaller();
+        GetCoinValue();
     }
 
     void GetSpeedValue()
@@ -216,18 +210,15 @@ public class UIController : MonoBehaviour
 
     private void OnGUI()
     {
-        //if (!gameController.GetComponent<GameController>().loadingScene)
-        //{
-            uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
-            uiPlaySpeed.DisplayArea(splitCam);
-            uiCoinDisplay.DisplayArea(splitCam);
-            uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
-            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
-            if (enableCount)
-            {
-                CountDown();
-            }
-        //}
+        uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
+        uiPlaySpeed.DisplayArea(splitCam);
+        uiCoinDisplay.DisplayArea(splitCam);
+        uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+        uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+        if (enableCount)
+        {
+            CountDown();
+        }
     }
 
     private void OnApplicationQuit()

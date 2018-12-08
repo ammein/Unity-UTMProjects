@@ -84,16 +84,18 @@ public class GameController : MonoBehaviour {
     private bool updateCloneJump;
 
     private Scene currentScene;
+    [HideInInspector]
+    public int countScene;
 
     public AsyncOperation async;
-
+    [Header("Player Coins")]
     public int firstCoin;
     public int secondCoin;
 
     private bool sceneGame = false;
-
-    public bool loadingScene = false;
-
+    [HideInInspector]
+    public bool loadingScene = true;
+    [Header("Loading Text UI Object")]
     public Text loadingText;
 
 
@@ -111,8 +113,30 @@ public class GameController : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+
+        loadingText.gameObject.SetActive(false);
     }
 
+    private void OnEnable()
+    {
+        Debug.Log("On Enable called");
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public void OnSceneLoaded(Scene scene , LoadSceneMode mode)
+    {
+        Debug.Log("On Scene Loaded " + scene.name);
+        loadingScene = true;
+        Debug.Log(mode);
+    }
+
+
+    // called when the game is terminated
+    void OnDisable()
+    {
+        Debug.Log("OnDisable");
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
     // Run Start Here
     void Start()
@@ -128,7 +152,7 @@ public class GameController : MonoBehaviour {
     {
         // Everything for all camera to move
         // Only move when all physics calculation rendered
-        if (sceneGame && !loadingScene)
+        if (sceneGame)
         {
             cameraObject.UpdateOnMove(cameraSettings);
             cameraObject.StartMoveCamera();
@@ -144,7 +168,7 @@ public class GameController : MonoBehaviour {
         GetScene();
         CurrentActiveScene();
         UpdateLoadingScene();
-        if (sceneGame && !loadingScene)
+        if (sceneGame)
         {
             // Update each frame for get All Map Length Value
             GetAllMapLength();
@@ -177,48 +201,61 @@ public class GameController : MonoBehaviour {
     }
 
     // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
-    IEnumerator LoadScene(int scene)
+    IEnumerator AsyncLoadScene(string scene)
+    {
+        //// deactivate scene
+        //async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+        //async.allowSceneActivation = false;
+        //loadingScene = true;
+        //while (!async.isDone)
+        //{
+        //    Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
+        //    countScene = SceneManager.sceneCount;
+        //    Debug.Log((double)async.progress);
+        //    if(async.progress >= 0.9f)
+        //    {
+        //        if(countScene == 1)
+        //        {
+        //            async.allowSceneActivation = true;
+        //        }
+        //        Scene nextScene = SceneManager.GetSceneByName(scene);
+        //        SceneManager.SetActiveScene(nextScene);
+        //    }
+        //    yield return null;
+        //}
+
+        // deactivate scene
+        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+        // this value stops the scene from displaying when it's finished loading
+        loadingScene = true;
+        while (!async.isDone)
+        {
+            countScene = SceneManager.sceneCount;
+            loadingText.text = async.progress.ToString();
+            Debug.Log("Count Scene = " + countScene);
+            if (countScene == 1)
+            {
+                loadingScene = false;
+            }
+        }
+        yield return null;
+    }
+
+    IEnumerator SyncLoadScene(string scene)
     {
         GameObject allObject = GameObject.Find("Canvas");
         allObject.FindObject("TipsTrick").SetActive(true);
-        yield return new WaitForSeconds(1);
+        loadingText.gameObject.SetActive(true);
+        loadingScene = false;
+        yield return new WaitForSeconds(0.5f);
+        loadingText.text = "Loading .";
+        yield return new WaitForSeconds(0.5f);
+        loadingText.text = "Loading . .";
+        yield return new WaitForSeconds(0.5f);
         // load the scene asynchronously
         SceneManager.LoadScene(scene);
         // Return IEnumerator to null
         yield return null;
-        // deactivate scene
-        //async.allowSceneActivation = false;
-        // Flag the loading scene to be tag onto other conditions
-        //loadingScene = true;
-        //while (!async.isDone)
-        //{
-        //if (loadingText != null)
-        //{
-        //    loadingText.text = "Loading progress: " + (async.progress * 100) + "%";
-        //}
-
-        //if ((double)async.progress >= 0.9f)
-        //{
-        //    Debug.Log("Progress : " + (double)async.progress);
-        //    async.allowSceneActivation = true;
-        //    if (loadingText != null)
-        //    {
-        //        loadingText.text = "Game Loaded";
-        //    }
-        //    yield return new WaitForSeconds(1);
-        //    Destroy(loadingText);
-        //    loadingScene = false;
-        //    // Activate back the scene
-        //    Debug.Log("Allow Scene Activate " + async.allowSceneActivation);
-        //    Debug.Log("Async Done ? " + async.isDone);
-        //}
-
-        //    if((double)async.progress >= 0.9f)
-        //    {
-        //        loadingScene = false;
-        //    }
-        //    yield return null;
-        //}
     }
 
     public Scene GetScene()
@@ -251,14 +288,14 @@ public class GameController : MonoBehaviour {
             singlePlayerButton.onClick.AddListener(delegate
             {
                 StartPlay(SingleOrMultiple.SINGLE);
-                StartCoroutine(LoadScene(1));
+                StartCoroutine(SyncLoadScene("Game"));
 
             });
 
             multiPlayerButton.onClick.AddListener(delegate
             {
                 StartPlay(SingleOrMultiple.MULTIPLE);
-                StartCoroutine(LoadScene(1));
+                StartCoroutine(SyncLoadScene("Game"));
             });
             sceneGame = false;
             GetSecondCoin();
