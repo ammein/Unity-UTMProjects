@@ -37,14 +37,21 @@ public class CarConfigurations
     public int jumpWeight;
     [Tooltip("This is for number of JumpForce. Try hit space")]
     public float jumpForce;
+    [Header("Single Player Delay Input Press :")]
     [Range(1.0f , 5.0f)]
-    public float delayInputPressed;
+    public float delayInputJump;
+    [Header("Multiplayer Delay Input Press :")]
+    [Range(0.0f , 1.0f)]
+    public float delayInputJumpSecond;
     [Space(20 , order = 1)]
     [Header("Rotation Controls : ", order = 3)]
     [Tooltip("This is for trigger LookAt rotation if the position is off. (Seconds)")]
     public float timeHoldForRotation;
     [Tooltip("This is for Turn Rate on LookAt rotation. Float applicable")]
     public float turnRate;
+    [Header("Respawn Settings")]
+    public int NumOfBlink;
+    public float blinkWait;
 }
 
 
@@ -74,26 +81,38 @@ public class Mover : MonoBehaviour
     private Vector3 the_return;
     private Vector3 desiredDirection;
     private Quaternion reset;
-    private bool _isJumping;
+    private bool _isJumping , _isJumpingSecond;
     private ResetAnimation resetScript;
     private bool ranOnce;
     public Car myCar = null;
     private SingleOrMultiple play;
     private GameObject secondGameObject;
+    private GameObject firstGameObject;
 
     private GameObject cloneSecondPlayer;
+
+    private GameController gameController;
+
+    [Header("Player Coin")]
+    private int firstPlayerCoin = 0;
+    private int secondPlayerCoin = 0;
 
     // Use this for initialization
     void Start()
     {
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         Initialize();
-        secondGameObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().secondCar;
-        //cloneSecondPlayer = Instantiate(secondGameObject, transform.position, transform.rotation);
-        myCar = new Car(gameObject , secondGameObject ,  play);
-        myCar.InitStart();
-        targetObject = GameObject.Find("/EndPosition").transform;
-        StartCoroutine(Jump());
-        StartCoroutine(CheckPlayerStatus());
+        InitCoroutine();
+    }
+
+    public bool UpdateRespawnFirst()
+    {
+        return myCar.respawnStatusFirst;
+    }
+
+    public bool UpdateRespawnSecond()
+    {
+        return myCar.respawnStatusSecond;
     }
 
     /// <summary>
@@ -101,16 +120,35 @@ public class Mover : MonoBehaviour
     /// </summary>
     void Initialize()
     {
+        secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
+        firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
+        myCar = new Car(gameObject, secondGameObject, play);
+        myCar.InitStart();
+        targetObject = GameObject.Find("/EndPosition").transform;
+    }
+
+    void InitCoroutine()
+    {
+        StartCoroutine(Jump());
+        StartCoroutine(CheckPlayerStatus());
+        StartCoroutine(BlinkRespawn());
     }
 
     void Update()
     {
         myCar.StickBase();
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        firstPlayerCoin = gameController.firstCoin;
+        secondPlayerCoin = gameController.secondCoin;
+        myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
         //desiredDirection = transform.position - targetObject.position;
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
         // Initialize and get current gameObject DetectGround script 
         // (Must onUpdate because it triggers on collision)
+        myCar.RespawnNow();
+        UpdateRespawnFirst();
+        UpdateRespawnSecond();
         myCar.DetectBaseGround();
         UpdatePauseCar();
         eulerAnglesX = WrapAngle(myCar.rotX);
@@ -172,6 +210,7 @@ public class Mover : MonoBehaviour
         while (true)
         {
             _isJumping = false;
+            _isJumpingSecond = false;
             switch (play)
             {
                 case SingleOrMultiple.SINGLE:
@@ -179,14 +218,14 @@ public class Mover : MonoBehaviour
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         _isJumping = false;
                     }
                     if (myCar.CloneJumpNow() && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         myCar.cloneFlag = false;
                         _isJumping = false;
                     }
@@ -198,23 +237,23 @@ public class Mover : MonoBehaviour
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJumpSecond);
                         _isJumping = false;
                     }
 
                     // Second Player
-                    if (Input.GetKeyDown(KeyCode.UpArrow) && !_isJumping)
+                    if (Input.GetKeyDown(KeyCode.UpArrow) && !_isJumpingSecond)
                     {
-                        _isJumping = true;
+                        _isJumpingSecond = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
-                        _isJumping = false;
+                        yield return new WaitForSeconds(carConfig.delayInputJumpSecond);
+                        _isJumpingSecond = false;
                     }
                     if (myCar.CloneJumpNow() && !_isJumping)
                     {
                         _isJumping = true;
                         myCar.JumpNow();
-                        yield return new WaitForSeconds(carConfig.delayInputPressed);
+                        yield return new WaitForSeconds(carConfig.delayInputJump);
                         myCar.cloneFlag = false;
                         _isJumping = false;
                     }
@@ -230,21 +269,68 @@ public class Mover : MonoBehaviour
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
-                yield return new WaitForSeconds(countdown);
                 if (GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
                 {
                     GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(false);
+                    yield break;
                 }
+                else
+                {
+                    yield return null;
+                }
+                yield return new WaitForSeconds(countdown);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 if (!GameObject.FindGameObjectWithTag("SecondParentPlayer").activeInHierarchy)
                 {
                     GameObject.FindGameObjectWithTag("SecondParentPlayer").SetActive(true);
+                    yield break;
+                }
+                else
+                {
+                    yield return null;
                 }
                 yield return new WaitForSeconds(countdown);
                 break;
         }
         yield break;
+    }
+
+    IEnumerator BlinkRespawn()
+    {
+        while (true)
+        {
+            if (UpdateRespawnFirst())
+            {
+                for(int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.respawnStatusFirst = false;
+                    }
+                }
+            }
+
+            if (UpdateRespawnSecond())
+            {
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.respawnStatusSecond = false;
+                    }
+                }
+            }
+            yield return null;
+        }
     }
 }

@@ -14,7 +14,7 @@ public class CameraControl
     public Rigidbody playerRigidSecond;
     private Vector3 offset;
     private Vector3 offsetSecond;
-    private bool flagCamera;
+    private bool flagCamera , flagCameraSecond;
     private float playerPosition;
     private float playerPositionSecond;
     private float playerSpeed;
@@ -24,7 +24,9 @@ public class CameraControl
     private GameObject gameObject;
     private GameObject gameObjectSecond;
     private float orthoMove;
+    private float orthoMoveSplit;
     private float orthoMoveSecond;
+    private float orthoMoveSecondSplit;
     private float moveCam;
     private float moveCamSecond;
 
@@ -51,6 +53,7 @@ public class CameraControl
                 gameObject.tag = "PrimaryCamera";
                 CameraPlayerOne(gameObject);
                 offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY, player.transform.position.z + offsetCamZ) - player.transform.position;
+                flagCamera = false;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -69,9 +72,11 @@ public class CameraControl
                 SplitCamera();
                 offset = new Vector3(player.transform.position.x + offsetCamX, player.transform.position.y + offsetCamY, player.transform.position.z + offsetCamZ) - player.transform.position;
                 offsetSecond = new Vector3(playerSecond.transform.position.x + offsetCamX, playerSecond.transform.position.y + offsetCamY, playerSecond.transform.position.z + offsetCamZ) - playerSecond.transform.position;
+
+                flagCamera = false;
+                flagCameraSecond = false;
                 break;
         }
-        flagCamera = false;
     }
 
     void CameraPlayerOne(GameObject gameObject)
@@ -224,15 +229,30 @@ public class CameraControl
                 break;
 
             case SingleOrMultiple.MULTIPLE:
-                moveCam += playerSpeed * cameraSettings.easing;
-                moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
-                orthoMove += cameraSpeed * 0.1f;
-                orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
+                if (SplitRightOrSplitBottom)
+                {
+                    moveCam += playerSpeed * cameraSettings.easing;
+                    moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
+                    orthoMove += cameraSpeed * 0.1f;
+                    orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBeginSplit, cameraSettings.orthoEndsSplit);
 
-                moveCamSecond += playerSpeedSecond * cameraSettings.easing;
-                moveCamSecond = Mathf.Clamp(moveCamSecond, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
-                orthoMoveSecond += cameraSpeedSecond * 0.1f;
-                orthoMoveSecond = Mathf.Clamp(orthoMoveSecond, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
+                    moveCamSecond += playerSpeedSecond * cameraSettings.easing;
+                    moveCamSecond = Mathf.Clamp(moveCamSecond, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
+                    orthoMoveSecond += cameraSpeedSecond * 0.1f;
+                    orthoMoveSecond = Mathf.Clamp(orthoMoveSecond, cameraSettings.orthoBeginSplit, cameraSettings.orthoEndsSplit);
+                }
+                else
+                {
+                    moveCam += playerSpeed * cameraSettings.easing;
+                    moveCam = Mathf.Clamp(moveCam, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
+                    orthoMove += cameraSpeed * 0.1f;
+                    orthoMove = Mathf.Clamp(orthoMove, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
+
+                    moveCamSecond += playerSpeedSecond * cameraSettings.easing;
+                    moveCamSecond = Mathf.Clamp(moveCamSecond, cameraSettings.xMoveCameraMin, cameraSettings.xMoveCameraMax);
+                    orthoMoveSecond += cameraSpeedSecond * 0.1f;
+                    orthoMoveSecond = Mathf.Clamp(orthoMoveSecond, cameraSettings.orthoBegin, cameraSettings.orthoEnds);
+                }
                 break;
         }
     }
@@ -252,9 +272,10 @@ public class CameraControl
                 else
                 {
                     cameraSingle.orthographicSize = orthoMove;
-                    gameObject.transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
+                    gameObject.transform.position = player.transform.position + offset;
                     //Debug.Log("Disable Flag Camera");
                 }
+
 
                 if (Input.GetKeyDown("space"))
                 {
@@ -266,13 +287,13 @@ public class CameraControl
                 if (flagCamera)
                 {
                     cameraSingle.orthographicSize = orthoMove;
-                    gameObject.transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
+                    gameObject.transform.position = player.transform.position + offset;
                     //Debug.Log("Enable Flag Camera");
                 }
                 else
                 {
                     cameraSingle.orthographicSize = orthoMove;
-                    gameObject.transform.position = player.transform.position + new Vector3(0.0f, 0.0f, moveCam) + offset;
+                    gameObject.transform.position = player.transform.position + offset;
                     //Debug.Log("Disable Flag Camera");
                 }
 
@@ -281,20 +302,20 @@ public class CameraControl
                     cameraSingle.orthographicSize = orthoMove++;
                 }
 
-                if (flagCamera)
+                if (flagCameraSecond)
                 {
                     cameraDouble.orthographicSize = orthoMoveSecond;
-                    gameObjectSecond.transform.position = playerSecond.transform.position + new Vector3(0.0f, 0.0f, moveCamSecond) + offset;
+                    gameObjectSecond.transform.position = playerSecond.transform.position + offset;
                     //Debug.Log("Enable Flag Camera");
                 }
                 else
                 {
                     cameraDouble.orthographicSize = orthoMoveSecond;
-                    gameObjectSecond.transform.position = playerSecond.transform.position + new Vector3(0.0f, 0.0f, moveCamSecond) + offset;
+                    gameObjectSecond.transform.position = playerSecond.transform.position + offset;
                     //Debug.Log("Disable Flag Camera");
                 }
 
-                if (Input.GetKeyDown("up"))
+                if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     cameraDouble.orthographicSize = orthoMoveSecond++;
                 }

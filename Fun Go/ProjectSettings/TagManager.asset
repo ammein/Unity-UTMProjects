@@ -17,6 +17,11 @@ TagManager:
   - PrimaryCamera
   - SecondaryCamera
   - SecondParentPlayer
+  - PositionTag
+  - HomeButton
+  - SinglePlayerButton
+  - MultiPlayerButton
+  - EndMap
   layers:
   - Default
   - TransparentFX
