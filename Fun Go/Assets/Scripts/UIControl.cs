@@ -157,7 +157,7 @@ public class UIPlayer
                 if (split)
                 {
                     // First Player
-                    firstPosition = new Rect(0+ uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);
+                    firstPosition = new Rect((-width / 2) + uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);
                     zFirstPos = GUI.HorizontalSlider(firstPosition, zFirstPos, 0, boundary.zMax, sliderBackground, sliderThumb);
                     // Second Player
                     secondPosition = new Rect(0 + uiSetting.contentOffset.x, 0 + 18.0f, Screen.width / 2.8f, 30);
