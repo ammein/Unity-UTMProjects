@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ExtensionMethods;
 
 public class UIPlayer
 {
@@ -20,6 +21,31 @@ public class UIPlayer
 
     private Color thumb;
     private Color background;
+
+    public int firstPlayerPosition , secondPlayerPosition;
+
+    private GameObject[] allPlayers;
+
+    private int rankFirst , rankSecond;
+
+    // Methods to find layer
+    public static GameObject[] FindGameObjectsWithLayer(int layer)
+    {
+        GameObject[] goArray = Object.FindObjectsOfType<GameObject>();
+        List<GameObject> goList = new System.Collections.Generic.List<GameObject>();
+        for (int i = 0; i < goArray.Length; i++)
+        {
+            if (goArray[i].layer == layer)
+            {
+                goList.Add(goArray[i]);
+            }
+        }
+        if (goList.Count == 0)
+        {
+            return null;
+        }
+        return goList.ToArray();
+    }
 
     public UIPlayer(GUIStyle UIStyle , SingleOrMultiple playOption)
     {
@@ -176,6 +202,62 @@ public class UIPlayer
                 }
                 break;
         }
+    }
+
+    public void NumberPosition()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                allPlayers = UIPlayer.FindGameObjectsWithLayer(9);
+                rankFirst = 1;
+                for(int r = 1; r < allPlayers.Length; r++)
+                {
+                    if(DistanceFromStart("ParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    {
+                        rankFirst++;
+                    }
+                }
+                 break;
+
+            case SingleOrMultiple.MULTIPLE:
+                allPlayers = UIPlayer.FindGameObjectsWithLayer(9);
+                rankFirst = 1;
+                for (int r = 1; r < allPlayers.Length; r++)
+                {
+                    Debug.Log("All Players = " + allPlayers[r]);
+                    if (DistanceFromStart("ParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    {
+                        rankFirst++;
+                    }
+
+                    if (DistanceFromStart("SecondParentPlayer") < DistanceFromStart(allPlayers[r - 1].name))
+                    {
+                        rankSecond++;
+                    }
+                }
+                break;
+        }
+    }
+
+    public void DisplayRank()
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                GUI.TextArea(firstPosition, rankFirst.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                GUI.TextArea(firstPosition,rankFirst.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
+                GUI.TextArea(secondPosition,rankSecond.ToString() + " / " + allPlayers.Length.ToString(), uiSetting);
+                break;
+        }
+    }
+
+    private float DistanceFromStart(string playerIndex)
+    {
+        return GameObject.FindGameObjectWithTag(playerIndex).transform.position.z - 0;
     }
 
     public void CountTextArea(string countNow)

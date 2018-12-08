@@ -11,7 +11,7 @@ public class CarCollider : MonoBehaviour {
             if(collision.gameObject.transform.position.z >= 20.0f)
             {
                 //Debug.LogWarning("GameObject Position : " + collision.gameObject.transform.position.z);
-                Physics.IgnoreLayerCollision(9, 9);
+                Physics.IgnoreLayerCollision(10, 10);
                 return;
             }
             return;
