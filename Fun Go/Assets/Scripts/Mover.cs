@@ -126,6 +126,9 @@ public class Mover : MonoBehaviour
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
         myCar = new Car(gameObject, secondGameObject, play);
         myCar.InitStart();
+        myCar.AssignTyreAccesories(gameController.accessory.tyre[2] , firstGameObject.tag , new Color(1,1,1,1));
+        myCar.AssignFullBody(gameController.accessory.body[0], firstGameObject.tag, new Color(0.5f, 0.25f, 0.60f, 1.0f));
+        myCar.AssignRandomAccessoriesClone(gameController.accessory);
         targetObject = GameObject.Find("/EndPosition").transform;
     }
 

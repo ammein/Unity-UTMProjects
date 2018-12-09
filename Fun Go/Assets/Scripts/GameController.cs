@@ -18,6 +18,25 @@ public class CameraSettings
 }
 
 [System.Serializable]
+public class CloneAccessoriesController
+{
+    public bool body, tyre, rear, roof;
+}
+
+[System.Serializable]
+public class Accessories
+{
+    [Header("Upload Your Accessories Here")]
+    public GameObject[] roof;
+    public GameObject[] body;
+    public GameObject[] tyre;
+    public GameObject[] rear;
+
+    [Header("Enable/Disable Random Accessories")]
+    public CloneAccessoriesController clone;
+}
+
+[System.Serializable]
 public class CoinPlayer
 {
     public int firstPlayer, secondPlayer;
@@ -53,6 +72,9 @@ public class GameController : MonoBehaviour {
 
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
+
+    [Header("All Accessories Prefabs")]
+    public Accessories accessory;
 
     [Header("Stop Before Finish Line Offset")]
     public float finishLine;
@@ -411,7 +433,6 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            Debug.Log("Running Coroutine Camera : " + loadingScene);
             if (currentScene.name == "Game")
             {
                 cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
