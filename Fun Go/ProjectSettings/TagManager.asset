@@ -23,6 +23,10 @@ TagManager:
   - MultiPlayerButton
   - EndMap
   - Car
+  - Roof
+  - Body
+  - Tyre
+  - Rear
   layers:
   - Default
   - TransparentFX
