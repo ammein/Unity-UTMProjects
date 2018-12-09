@@ -44,9 +44,9 @@ public class Accessories
 }
 
 [System.Serializable]
-public class CoinPlayer
+public class PlayerPreferences
 {
-    public int firstPlayer, secondPlayer;
+    public int firstCoinPlayer, secondCoinPlayer;
 }
 
 public class GameController : MonoBehaviour {
@@ -54,7 +54,7 @@ public class GameController : MonoBehaviour {
     public static GameController control;
 
     [Header("Coins Player")]
-    public CoinPlayer coin;
+    public PlayerPreferences playerPreferences;
 
     [Header("Single Player or Multiplayer")]
     public SingleOrMultiple play;
@@ -117,9 +117,6 @@ public class GameController : MonoBehaviour {
     public int countScene;
 
     public AsyncOperation async;
-    [Header("Player Coins")]
-    public int firstCoin;
-    public int secondCoin;
 
     private bool sceneGame = false;
     [HideInInspector]
@@ -219,8 +216,8 @@ public class GameController : MonoBehaviour {
         }
         else
         {
-            firstCoin = PlayerPrefs.GetInt("firstPlayer");
-            secondCoin = PlayerPrefs.GetInt("secondPlayer");
+            playerPreferences.firstCoinPlayer = PlayerPrefs.GetInt("firstPlayer");
+            playerPreferences.secondCoinPlayer = PlayerPrefs.GetInt("secondPlayer");
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -346,12 +343,12 @@ public class GameController : MonoBehaviour {
 
     public int GetFirstCoin()
     {
-        return firstCoin;
+        return playerPreferences.firstCoinPlayer;
     }
 
     public int GetSecondCoin()
     {
-        return secondCoin;
+        return playerPreferences.secondCoinPlayer;
     }
 
     void AllOffset()

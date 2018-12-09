@@ -147,8 +147,8 @@ public class Mover : MonoBehaviour
     {
         myCar.StickBase();
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        firstPlayerCoin = gameController.firstCoin;
-        secondPlayerCoin = gameController.secondCoin;
+        firstPlayerCoin = gameController.playerPreferences.firstCoinPlayer;
+        secondPlayerCoin = gameController.playerPreferences.secondCoinPlayer;
         myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
         //desiredDirection = transform.position - targetObject.position;
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
