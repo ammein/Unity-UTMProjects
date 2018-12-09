@@ -225,7 +225,7 @@ public class UIController : MonoBehaviour
         uiPlaySpeed.DisplayArea(splitCam);
         uiCoinDisplay.DisplayArea(splitCam);
         uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
-        uiRankDisplay.DisplayArea(splitCam);
+        uiRankDisplay.DisplayRankArea(splitCam);
         uiRankDisplay.DisplayRank();
         uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
         if (enableCount)
