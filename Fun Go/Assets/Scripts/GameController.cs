@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour {
 
     public static GameController control;
 
-    [Header("Coins Player")]
+    [Header("Player Preferences : ")]
     public PlayerPreferences playerPreferences;
 
     [Header("Single Player or Multiplayer")]
