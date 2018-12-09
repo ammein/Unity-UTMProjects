@@ -20,7 +20,14 @@ public class CameraSettings
 [System.Serializable]
 public class CloneAccessoriesController
 {
-    public bool body, tyre, rear, roof;
+    [Header("Enable/Disable All Clone Accesories : ")]
+    public bool enableClone = true;
+    [Space(10.0f , order = 0)]
+    [Header("Clone Type : ")]
+    public bool body;
+    public bool tyre;
+    public bool rear;
+    public bool roof;
 }
 
 [System.Serializable]

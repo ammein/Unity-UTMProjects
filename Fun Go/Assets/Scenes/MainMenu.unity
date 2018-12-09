@@ -1256,6 +1256,16 @@ Prefab:
       propertyPath: accessory.roof.Array.data[1]
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.cloneStatus
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.enableClone
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
   m_IsPrefabAsset: 0
