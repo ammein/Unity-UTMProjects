@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ExtensionMethods;
 
 public class Car : MonoBehaviour
 {
@@ -719,7 +720,10 @@ public class Car : MonoBehaviour
     {
         foreach(Transform children in child)
         {
-            children.gameObject.GetComponent<Renderer>().enabled = false;
+            if (children.gameObject.GetComponent<Renderer>().enabled)
+            {
+                children.gameObject.GetComponent<Renderer>().enabled = false;
+            }
         }
     }
 
@@ -727,7 +731,10 @@ public class Car : MonoBehaviour
     {
         foreach(Transform children in child)
         {
-            children.gameObject.GetComponent<Renderer>().enabled = true;
+            if (!children.gameObject.GetComponent<Renderer>().enabled)
+            {
+                children.gameObject.GetComponent<Renderer>().enabled = true;
+            }
         }
     }
 
@@ -872,6 +879,15 @@ public class Car : MonoBehaviour
         }
     }
 
+
+    void DisableRenderChildren(Transform child)
+    {
+        foreach (Transform children in child)
+        {
+            children.gameObject.GetComponent<Renderer>().enabled = false;
+        }
+    }
+
     /// <summary>
     /// To Assign Roof Accessories Selected By Player or Randoms by Bot
     /// </summary>
@@ -942,8 +958,8 @@ public class Car : MonoBehaviour
             return;
         }
         GameObject newTyre = Instantiate(tyre, tyre.transform.position, tyre.transform.rotation);
-        CountAndBlinkChildren(assign.gameObject.transform.parent.transform.Find("wheels"));
         AssignColorAccessories(newTyre.transform, theColor);
+        DisableRenderChildren(assign.gameObject.transform.parent.transform.Find("wheels"));
         newTyre.transform.parent = assign.gameObject.transform.parent.transform.Find("wheels");
     }
 
@@ -987,8 +1003,8 @@ public class Car : MonoBehaviour
             {
                 int randomSelected = Random.Range(0, accessories.roof.Length);
                 GameObject objectRandom = accessories.roof[randomSelected];
-                Color randomColor = new Color(Random.Range(0.0f, 1.0f) , Random.Range(0.0f, 1.0f) , Random.Range(0.0f, 1.0f));
-                AssignRoofAccessories(objectRandom, "ClonePlayer" , randomColor);
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignRoofAccessories(objectRandom, "ClonePlayer", randomColor);
             }
             else
             {
@@ -1005,7 +1021,7 @@ public class Car : MonoBehaviour
                 int randomSelected = Random.Range(0, accessories.body.Length);
                 GameObject objectRandom = accessories.body[randomSelected];
                 Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
-                AssignFullBody(objectRandom, "ClonePlayer" , randomColor);
+                AssignFullBody(objectRandom, "ClonePlayer", randomColor);
             }
             else
             {
@@ -1047,6 +1063,16 @@ public class Car : MonoBehaviour
                 AssignRearAccessories(accessories.rear[0], "ClonePlayer", randomColor);
             }
         }
+    }
+
+    public bool EvenNumber(int value)
+    {
+        return value % 2 == 0;
+    }
+
+    public bool OddNumber(int value)
+    {
+        return value % 2 == 1;
     }
 
     /// <summary>
