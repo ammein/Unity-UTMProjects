@@ -7,25 +7,68 @@ public class CarCollider : MonoBehaviour {
     [HideInInspector]
     public bool boom = false;
 
+    private GameObject destroyObject;
+    private GameController gameController;
+
+
+    private void Start()
+    {
+        destroyObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().destroy.destroyObject;
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        StartCoroutine(RunBoom());
+    }
+
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Hill"))
+        foreach(string detect in gameController.destroy.detectTagToDestroy)
         {
-            GameObject destroy = Instantiate(gameObject.transform.parent.GetComponent<Mover>().destroyObject, transform.position, transform.rotation);
-            gameObject.transform.parent.transform.parent = destroy.transform;
-            foreach(Transform destroyChildren in destroy.transform)
+            if (collision.gameObject.CompareTag(detect))
             {
-                destroyChildren.GetComponent<DestructionController>().objectToDestroy = destroy;
+                boom = true;
             }
-            boom = true;
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    IEnumerator RunBoom()
     {
-        if (collision.gameObject.CompareTag("Hill"))
+        while (true)
         {
-            boom = false;
+            Debug.Log("Boom = " + boom);
+            if (boom)
+            {
+                Debug.Log("Run Boom !");
+                GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
+                foreach (Transform destroyChild in destroy.transform)
+                {
+                    if (destroy != null)
+                    {
+                        destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
+                    }
+                }
+                yield return new WaitForSeconds(2);
+            }
+            else
+            {
+                yield return null;
+            }
+            yield return null;
         }
     }
+
+    // Debug Only
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Space) && gameObject.transform.parent.CompareTag("ParentPlayer"))
+    //    {
+    //        GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
+    //        foreach(Transform destroyChild in destroy.transform)
+    //        {
+    //            if(destroy != null)
+    //            {
+    //                destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
+    //            }
+    //        }
+    //    }
+    //}
+
 }

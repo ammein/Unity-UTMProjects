@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1265,6 +1265,11 @@ Prefab:
       propertyPath: accessory.rear.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: destroy.detectTagToDestroy.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4792800500347034, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1389,6 +1394,28 @@ Prefab:
         type: 2}
       propertyPath: accessory.clone.enableClone
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: destroyObject
+      value: 
+      objectReference: {fileID: 1037652786940680, guid: cde6f1eee5ee85d49acd7de55dca6fae,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: destroy.destroyObject
+      value: 
+      objectReference: {fileID: 1227396574820656, guid: 529e32ed648704e4292100e5aca5073c,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: destroy.timeToDestroyAll
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: destroy.detectTagToDestroy.Array.data[0]
+      value: Hill
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b540c5109744fc14db69cc0b877eee64, type: 2}

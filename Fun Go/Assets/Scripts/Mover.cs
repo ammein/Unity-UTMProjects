@@ -63,8 +63,6 @@ public class Mover : MonoBehaviour
     public bool pauseCar = false;
     [Header("Car Controls : ", order = 0)]
     public CarConfigurations carConfig;
-    [Header("Destroy Object Animation")]
-    public GameObject destroyObject;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
@@ -167,6 +165,8 @@ public class Mover : MonoBehaviour
         MoveOrNotMove();
         myCar.CloneJumpNow();
         myCar.GetZMax();
+        myCar.UpdateFirstBoom();
+        myCar.UpdateSecondBoom();
     }
 
     public void MoveOrNotMove()
@@ -337,6 +337,42 @@ public class Mover : MonoBehaviour
                     if (i == (carConfig.NumOfBlink - 1))
                     {
                         myCar.respawnStatusSecond = false;
+                    }
+                }
+            }
+
+            if (myCar.UpdateFirstBoom())
+            {
+                myCar.StopFirst();
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.ReturnFirstSpawnPosition();
+                        myCar.tyreObject.GetComponent<CarCollider>().boom = false;
+                        myCar.Moving();
+                    }
+                }
+            }
+
+            if (myCar.UpdateSecondBoom())
+            {
+                myCar.StopSecond();
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.ReturnFirstSpawnPosition();
+                        myCar.tyreObjectSecond.GetComponent<CarCollider>().boom = false;
+                        myCar.Moving();
                     }
                 }
             }

@@ -49,9 +49,22 @@ public class PlayerPreferences
     public int firstCoinPlayer, secondCoinPlayer;
 }
 
+[System.Serializable]
+public class ObjectDestroySettings
+{
+    [Header("Destory Setting")]
+    public GameObject destroyObject;
+    public float timeToDestroyAll;
+    [Space(20 , order =0)]
+    [Header("Name your object tag to destroy :")]
+    public string[] detectTagToDestroy;
+}
+
 public class GameController : MonoBehaviour {
 
     public static GameController control;
+    [Header("Destroy Object Animation")]
+    public ObjectDestroySettings destroy;
 
     [Header("Player Preferences : ")]
     public PlayerPreferences playerPreferences;

@@ -371,6 +371,42 @@ public class Car : MonoBehaviour
         return;
     }
 
+    public void ReturnFirstSpawnPosition()
+    {
+        carObject.transform.position = carObject.transform.Find("RespawnPlayer").transform.position;
+        return;
+    }
+
+    public void ReturnSecondSpawnPosition()
+    {
+        carObjectSecond.transform.position = carObjectSecond.transform.Find("RespawnPlayer").transform.position;
+        return;
+    }
+
+    public bool UpdateFirstBoom()
+    {
+        if (carObject.CompareTag("ParentPlayer"))
+        {
+            return tyreObject.GetComponent<CarCollider>().boom;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public bool UpdateSecondBoom()
+    {
+        if (carObject.CompareTag("SecondParentPlayer"))
+        {
+            return tyreObjectSecond.GetComponent<CarCollider>().boom;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public bool CloneJumpNow()
     {
         return cloneFlag;
@@ -509,7 +545,7 @@ public class Car : MonoBehaviour
         }
     }
 
-    void StopFirst()
+    public void StopFirst()
     {
         rb.AddForce(Vector3.zero, ForceMode.Impulse);
         rb.angularVelocity = Vector3.zero;
@@ -517,7 +553,7 @@ public class Car : MonoBehaviour
         return;
     }
 
-    void StopSecond()
+    public void StopSecond()
     {
         // Second Player
         rbSecond.AddForce(Vector3.zero, ForceMode.Impulse);
