@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ExtensionMethods;
 
-public class Car
+public class Car : MonoBehaviour
 {
     public float speedForce, maxSpeed, speedAccelerate, jumpWeight, turnRate, jumpForce, rotX, rotY, rotZ;
     public float speedForceSecond, maxSpeedSecond, speedAccelerateSecond, jumpWeightSecond, turnRateSecond, jumpForceSecond, rotXSecond, rotYSecond, rotZSecond;
     private float finish;
     public GameObject carObject, baseObject, tyreObject , carObjectSecond , baseObjectSecond , tyreObjectSecond;
+    private GameObject assign;
     private Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
     public double Speed , SpeedSecond;
     public ResetAnimation resetScript;
@@ -475,7 +477,6 @@ public class Car
                 break;
         }
         RotationControlCheck();
-        ListenEvent();
         RunGround();
         StopFinish();
     }
@@ -557,20 +558,6 @@ public class Car
                 rbSecond.velocity = Vector3.zero;
                 break;
         }
-    }
-
-    void ListenEvent()
-    {
-        //if (DetectBaseGround())
-        //{
-        //    Debug.Log("Running On Ground");
-        //    BlinkNow();
-        //}
-        //if (baseObject.transform.position.z > 490)
-        //{
-        //    BlinkNow();
-        //}
-        return;
     }
 
     /// <summary>
@@ -733,7 +720,10 @@ public class Car
     {
         foreach(Transform children in child)
         {
-            children.gameObject.GetComponent<Renderer>().enabled = false;
+            if (children.gameObject.GetComponent<Renderer>().enabled)
+            {
+                children.gameObject.GetComponent<Renderer>().enabled = false;
+            }
         }
     }
 
@@ -741,7 +731,10 @@ public class Car
     {
         foreach(Transform children in child)
         {
-            children.gameObject.GetComponent<Renderer>().enabled = true;
+            if (!children.gameObject.GetComponent<Renderer>().enabled)
+            {
+                children.gameObject.GetComponent<Renderer>().enabled = true;
+            }
         }
     }
 
@@ -842,6 +835,244 @@ public class Car
     public bool DetectGround()
     {
         return isGrounded = detectGround.isGrounded;
+    }
+
+
+    // TODO : Detect if Renderer is enabled. If not , it will throw error on console
+    public void AssignBaseColor(GameObject player , Color theColor)
+    {
+        switch (player.tag)
+        {
+            case "ParentPlayer":
+                carObject.transform.Find("Base").GetComponent<Renderer>().material.color = theColor;
+                foreach (Transform tyre in tyreObject.transform)
+                {
+                    tyre.GetComponent<Renderer>().material.color = new Color(theColor.r, theColor.g, theColor.b, theColor.a);
+                }
+                break;
+
+            case "SecondParentPlayer":
+                carObjectSecond.transform.Find("Base").GetComponent<Renderer>().material.color = theColor;
+                foreach (Transform tyre in tyreObject.transform)
+                {
+                    tyre.GetComponent<Renderer>().material.color = new Color(theColor.r, theColor.g, theColor.b, theColor.a);
+                }
+                break;
+
+            case "ClonePlayer":
+                carObject.transform.Find("Base").GetComponent<Renderer>().material.color = theColor;
+                foreach(Transform tyre in tyreObject.transform)
+                {
+                    tyre.GetComponent<Renderer>().material.color = new Color(theColor.r, theColor.g, theColor.b, theColor.a);
+                }
+                break;
+        }
+    }
+
+    void AssignColorAccessories(Transform assignedObject , Color theColor)
+    {
+        foreach(Transform childAssigned in assignedObject)
+        {
+            childAssigned.GetComponent<Renderer>().material.color = new Color(theColor.r, theColor.g, theColor.b , theColor.a);
+            float randomSmooth = Random.Range(0.0f, 1.0f);
+            childAssigned.GetComponent<Renderer>().material.SetFloat("_Glossiness", randomSmooth);
+        }
+    }
+
+
+    void DisableRenderChildren(Transform child)
+    {
+        foreach (Transform children in child)
+        {
+            children.gameObject.GetComponent<Renderer>().enabled = false;
+        }
+    }
+
+    /// <summary>
+    /// To Assign Roof Accessories Selected By Player or Randoms by Bot
+    /// </summary>
+    /// <param name="roof"></param>
+    /// <param name="name"></param>
+    public void AssignRoofAccessories(GameObject roof, string playerTag, Color theColor)
+    {
+        if (playerTag == "SecondParentPlayer")
+        {
+            assign = baseObjectSecond;
+        }
+        else if (baseObject.transform.parent.CompareTag(playerTag))
+        {
+            assign = baseObject;
+        }
+        else
+        {
+            return;
+        }
+        GameObject newRoof = Instantiate(roof, roof.transform.position, roof.transform.rotation);
+        AssignColorAccessories(newRoof.transform, theColor);
+        newRoof.transform.parent = assign.gameObject.transform.parent.transform.Find("Base");
+    }
+
+    /// <summary>
+    /// To Assign Rear Accessories Selected By Player or Randoms by Bot
+    /// </summary>
+    /// <param name="rear"></param>
+    /// <param name="secondPlayer"></param>
+    /// <param name="name"></param>
+    public void AssignRearAccessories(GameObject rear , string playerTag , Color theColor)
+    {
+        if (playerTag == "SecondParentPlayer")
+        {
+            assign = baseObjectSecond;
+        }
+        else if (baseObject.transform.parent.CompareTag(playerTag))
+        {
+            assign = baseObject;
+        }
+        else
+        {
+            return;
+        }
+        GameObject newRear = Instantiate(rear, rear.transform.position, rear.transform.rotation);
+        AssignColorAccessories(newRear.transform, theColor);
+        newRear.transform.parent = assign.gameObject.transform.parent.transform.Find("Base");
+    }
+
+    /// <summary>
+    /// To Assign Tyre Accessories Selected By Player or Randoms by Bot
+    /// </summary>
+    /// <param name="tyre"></param>
+    /// <param name="secondPlayer"></param>
+    /// <param name="name"></param>
+    public void AssignTyreAccesories(GameObject tyre, string playerTag, Color theColor)
+    {
+        if (playerTag == "SecondParentPlayer")
+        {
+            assign = baseObjectSecond;
+        }
+        else if (baseObject.transform.parent.CompareTag(playerTag))
+        {
+            assign = baseObject;
+        }
+        else
+        {
+            return;
+        }
+        GameObject newTyre = Instantiate(tyre, tyre.transform.position, tyre.transform.rotation);
+        AssignColorAccessories(newTyre.transform, theColor);
+        DisableRenderChildren(assign.gameObject.transform.parent.transform.Find("wheels"));
+        newTyre.transform.parent = assign.gameObject.transform.parent.transform.Find("wheels");
+    }
+
+    /// <summary>
+    /// To Assign Body Accessories Selected By Player or Randoms by Bot
+    /// </summary>
+    /// <param name="fullBody"></param>
+    /// <param name="secondPlayer"></param>
+    /// <param name="name"></param>
+    public void AssignFullBody(GameObject fullBody, string playerTag, Color theColor)
+    {
+        if (playerTag == "SecondParentPlayer")
+        {
+            assign = baseObjectSecond;
+        }
+        else if (baseObject.transform.parent.CompareTag(playerTag))
+        {
+            assign = baseObject;
+        }
+        else
+        {
+            return;
+        }
+        GameObject newBody = Instantiate(fullBody, fullBody.transform.position, fullBody.transform.rotation);
+        assign.gameObject.GetComponent<Renderer>().enabled = false;
+        AssignColorAccessories(newBody.transform, theColor);
+        newBody.transform.parent = assign.gameObject.transform.parent.transform.Find("Base");
+    }
+
+
+    /// <summary>
+    /// Assigning Random Clone Accessories. Each one of them receive one type of tag only
+    /// </summary>
+    /// <param name="accessories"></param>
+    public void AssignRandomAccessoriesClone(Accessories accessories)
+    {
+        if (accessories.clone.roof)
+        {
+            // Roof
+            if (accessories.roof.Length > 1)
+            {
+                int randomSelected = Random.Range(0, accessories.roof.Length);
+                GameObject objectRandom = accessories.roof[randomSelected];
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignRoofAccessories(objectRandom, "ClonePlayer", randomColor);
+            }
+            else
+            {
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignRoofAccessories(accessories.roof[0], "ClonePlayer", randomColor);
+            }
+        }
+
+        if (accessories.clone.body)
+        {
+            // Body
+            if (accessories.body.Length > 1)
+            {
+                int randomSelected = Random.Range(0, accessories.body.Length);
+                GameObject objectRandom = accessories.body[randomSelected];
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignFullBody(objectRandom, "ClonePlayer", randomColor);
+            }
+            else
+            {
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignFullBody(accessories.body[0], "ClonePlayer", randomColor);
+            }
+        }
+
+        if (accessories.clone.tyre)
+        {
+            //Tyre
+            if (accessories.tyre.Length > 1)
+            {
+                int randomSelected = Random.Range(0, accessories.tyre.Length);
+                GameObject objectRandom = accessories.tyre[randomSelected];
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignTyreAccesories(objectRandom, "ClonePlayer", randomColor);
+            }
+            else
+            {
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignTyreAccesories(accessories.tyre[0], "ClonePlayer", randomColor);
+            }
+        }
+
+        if (accessories.clone.rear)
+        {
+            // Rear
+            if (accessories.rear.Length > 1)
+            {
+                int randomSelected = Random.Range(0, accessories.rear.Length);
+                GameObject objectRandom = accessories.rear[randomSelected];
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignRearAccessories(objectRandom, "ClonePlayer", randomColor);
+            }
+            else
+            {
+                Color randomColor = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+                AssignRearAccessories(accessories.rear[0], "ClonePlayer", randomColor);
+            }
+        }
+    }
+
+    public bool EvenNumber(int value)
+    {
+        return value % 2 == 0;
+    }
+
+    public bool OddNumber(int value)
+    {
+        return value % 2 == 1;
     }
 
     /// <summary>

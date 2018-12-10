@@ -84,6 +84,7 @@ public class Mover : MonoBehaviour
     private bool _isJumping , _isJumpingSecond;
     private ResetAnimation resetScript;
     private bool ranOnce;
+    [HideInInspector]
     public Car myCar = null;
     private SingleOrMultiple play;
     private GameObject secondGameObject;
@@ -126,6 +127,12 @@ public class Mover : MonoBehaviour
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
         myCar = new Car(gameObject, secondGameObject, play);
         myCar.InitStart();
+        myCar.AssignTyreAccesories(gameController.accessory.tyre[2] , firstGameObject.tag , new Color(1,1,1,1));
+        myCar.AssignFullBody(gameController.accessory.body[0], firstGameObject.tag, new Color(0.5f, 0.25f, 0.60f, 1.0f));
+        if (gameController.accessory.clone.enableClone)
+        {
+            myCar.AssignRandomAccessoriesClone(gameController.accessory);
+        }
         targetObject = GameObject.Find("/EndPosition").transform;
     }
 
@@ -140,8 +147,8 @@ public class Mover : MonoBehaviour
     {
         myCar.StickBase();
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        firstPlayerCoin = gameController.firstCoin;
-        secondPlayerCoin = gameController.secondCoin;
+        firstPlayerCoin = gameController.playerPreferences.firstCoinPlayer;
+        secondPlayerCoin = gameController.playerPreferences.secondCoinPlayer;
         myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
         //desiredDirection = transform.position - targetObject.position;
         //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);

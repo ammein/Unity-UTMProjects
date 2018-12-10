@@ -1121,6 +1121,26 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.roof.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.body.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.tyre.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.rear.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4792800500347034, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1169,6 +1189,86 @@ Prefab:
       propertyPath: numberSpawn
       value: 10
       objectReference: {fileID: 0}
+<<<<<<< HEAD
+=======
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.roof.Array.data[0]
+      value: 
+      objectReference: {fileID: 1166718120501906, guid: 5aa7e01c61faa8948b2438dc154bca35,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.body.Array.data[0]
+      value: 
+      objectReference: {fileID: 1680106121545668, guid: 1e329356aafa0584aa4b6c150c1653de,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.tyre.Array.data[0]
+      value: 
+      objectReference: {fileID: 1179717902431802, guid: aa0a8cba69d136d46bc336af3a541828,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.tyre.Array.data[1]
+      value: 
+      objectReference: {fileID: 1668715605981496, guid: 97ba60c7bc221c549a4249b132fbed7d,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.tyre.Array.data[2]
+      value: 
+      objectReference: {fileID: 1995732762163218, guid: 347c8db1fca82c349ab6ec1da2995e6c,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.body.Array.data[1]
+      value: 
+      objectReference: {fileID: 1680106121545668, guid: 1e329356aafa0584aa4b6c150c1653de,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.rear.Array.data[0]
+      value: 
+      objectReference: {fileID: 1040320622628882, guid: 23059b004c379844a89d533dcaf04c47,
+        type: 2}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.body
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.tyre
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.roof
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.rear
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.roof.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.cloneStatus
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
+        type: 2}
+      propertyPath: accessory.clone.enableClone
+      value: 1
+      objectReference: {fileID: 0}
+>>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
   m_IsPrefabAsset: 0

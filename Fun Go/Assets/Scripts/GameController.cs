@@ -18,17 +18,43 @@ public class CameraSettings
 }
 
 [System.Serializable]
-public class CoinPlayer
+public class CloneAccessoriesController
 {
-    public int firstPlayer, secondPlayer;
+    [Header("Enable/Disable All Clone Accesories : ")]
+    public bool enableClone = true;
+    [Space(10.0f , order = 0)]
+    [Header("Clone Type : ")]
+    public bool body;
+    public bool tyre;
+    public bool rear;
+    public bool roof;
+}
+
+[System.Serializable]
+public class Accessories
+{
+    [Header("Upload Your Accessories Here")]
+    public GameObject[] roof;
+    public GameObject[] body;
+    public GameObject[] tyre;
+    public GameObject[] rear;
+
+    [Header("Enable/Disable Random Accessories")]
+    public CloneAccessoriesController clone;
+}
+
+[System.Serializable]
+public class PlayerPreferences
+{
+    public int firstCoinPlayer, secondCoinPlayer;
 }
 
 public class GameController : MonoBehaviour {
 
     public static GameController control;
 
-    [Header("Coins Player")]
-    public CoinPlayer coin;
+    [Header("Player Preferences : ")]
+    public PlayerPreferences playerPreferences;
 
     [Header("Single Player or Multiplayer")]
     public SingleOrMultiple play;
@@ -53,6 +79,9 @@ public class GameController : MonoBehaviour {
 
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
+
+    [Header("All Accessories Prefabs")]
+    public Accessories accessory;
 
     [Header("Stop Before Finish Line Offset")]
     public float finishLine;
@@ -88,9 +117,6 @@ public class GameController : MonoBehaviour {
     public int countScene;
 
     public AsyncOperation async;
-    [Header("Player Coins")]
-    public int firstCoin;
-    public int secondCoin;
 
     private bool sceneGame = false;
     [HideInInspector]
@@ -190,8 +216,8 @@ public class GameController : MonoBehaviour {
         }
         else
         {
-            firstCoin = PlayerPrefs.GetInt("firstPlayer");
-            secondCoin = PlayerPrefs.GetInt("secondPlayer");
+            playerPreferences.firstCoinPlayer = PlayerPrefs.GetInt("firstPlayer");
+            playerPreferences.secondCoinPlayer = PlayerPrefs.GetInt("secondPlayer");
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -317,12 +343,12 @@ public class GameController : MonoBehaviour {
 
     public int GetFirstCoin()
     {
-        return firstCoin;
+        return playerPreferences.firstCoinPlayer;
     }
 
     public int GetSecondCoin()
     {
-        return secondCoin;
+        return playerPreferences.secondCoinPlayer;
     }
 
     void AllOffset()
@@ -411,7 +437,6 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            Debug.Log("Running Coroutine Camera : " + loadingScene);
             if (currentScene.name == "Game")
             {
                 cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);

@@ -3,27 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - tyre
-  - Hill
-  - Ground
-  - ParentPlayer
-  - Canvas
-  - EndPos
-  - ParentTyre
-  - BeginSpawn
-  - map
-  - ClonePlayer
-  - PrimaryCamera
-  - SecondaryCamera
-  - SecondParentPlayer
-  - PositionTag
-  - HomeButton
-  - SinglePlayerButton
-  - MultiPlayerButton
-  - EndMap
-  - Car
-  - jalan
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -33,9 +13,9 @@ TagManager:
   - UI
   - 
   - 
-  - PostProcessing
-  - Car
-  - IgnoreCollision
+  - 
+  - 
+  - 
   - 
   - 
   - 
@@ -60,7 +40,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: cloud
-    uniqueID: 1668085411
     locked: 0

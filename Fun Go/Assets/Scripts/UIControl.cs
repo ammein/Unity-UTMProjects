@@ -7,7 +7,7 @@ public class UIPlayer
 {
     private float width;
     private float height;
-    private Rect displayPosition , firstPosition , secondPosition;
+    private Rect displayPosition , firstPosition , secondPosition , firstRankPosition , secondRankPosition;
     private GUIStyle uiSetting;
     private double speedInit , speedInitSecond;
     private int firstCoin, secondCoin;
@@ -270,17 +270,59 @@ public class UIPlayer
         }
     }
 
+<<<<<<< HEAD
+=======
+    public void DisplayRankArea(bool split)
+    {
+        switch (play)
+        {
+            case SingleOrMultiple.SINGLE:
+                firstRankPosition = new Rect(0 + uiSetting.contentOffset.x, 0 + uiSetting.contentOffset.y, 100, 50);
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                if (split)
+                {
+                    // First Player
+                    firstRankPosition = new Rect((-width / 2) + uiSetting.contentOffset.x, 0 + uiSetting.contentOffset.y, 100, 50);
+                    // Second Player
+                    secondRankPosition = new Rect(0 + uiSetting.contentOffset.x, 0 + uiSetting.contentOffset.y, 100, 50);
+                    return;
+                }
+                else
+                {
+                    // First Player
+                    firstRankPosition = new Rect(0 + uiSetting.contentOffset.x, (height / 2) + uiSetting.contentOffset.y, 100, 50);
+                    // Second Player
+                    secondRankPosition = new Rect(0, 0 + uiSetting.contentOffset.y, 100, 50);
+                }
+                break;
+
+
+        }
+    }
+
+>>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
     public void DisplayRank()
     {
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
+<<<<<<< HEAD
                 GUI.TextArea(firstPosition, rankFirstString, uiSetting);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 GUI.TextArea(firstPosition, rankFirstString, uiSetting);
                 GUI.TextArea(secondPosition, rankSecondString, uiSetting);
+=======
+                GUI.TextArea(firstRankPosition, rankFirstString, uiSetting);
+                break;
+
+            case SingleOrMultiple.MULTIPLE:
+                GUI.TextArea(firstRankPosition, rankFirstString, uiSetting);
+                GUI.TextArea(secondRankPosition, rankSecondString, uiSetting);
+>>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
                 break;
         }
     }
