@@ -270,8 +270,6 @@ public class UIPlayer
         }
     }
 
-<<<<<<< HEAD
-=======
     public void DisplayRankArea(bool split)
     {
         switch (play)
@@ -302,27 +300,17 @@ public class UIPlayer
         }
     }
 
->>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
     public void DisplayRank()
     {
         switch (play)
         {
             case SingleOrMultiple.SINGLE:
-<<<<<<< HEAD
-                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
-                break;
-
-            case SingleOrMultiple.MULTIPLE:
-                GUI.TextArea(firstPosition, rankFirstString, uiSetting);
-                GUI.TextArea(secondPosition, rankSecondString, uiSetting);
-=======
                 GUI.TextArea(firstRankPosition, rankFirstString, uiSetting);
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 GUI.TextArea(firstRankPosition, rankFirstString, uiSetting);
                 GUI.TextArea(secondRankPosition, rankSecondString, uiSetting);
->>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
                 break;
         }
     }

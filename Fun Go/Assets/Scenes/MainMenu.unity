@@ -1189,8 +1189,6 @@ Prefab:
       propertyPath: numberSpawn
       value: 10
       objectReference: {fileID: 0}
-<<<<<<< HEAD
-=======
     - target: {fileID: 114636365689402320, guid: b540c5109744fc14db69cc0b877eee64,
         type: 2}
       propertyPath: accessory.roof.Array.data[0]
@@ -1268,7 +1266,6 @@ Prefab:
       propertyPath: accessory.clone.enableClone
       value: 1
       objectReference: {fileID: 0}
->>>>>>> 7c40da04e5383f19b30e313fe955bdc0ec11acc9
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b540c5109744fc14db69cc0b877eee64, type: 2}
   m_IsPrefabAsset: 0
