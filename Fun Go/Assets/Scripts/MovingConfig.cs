@@ -178,9 +178,9 @@ public class Car : MonoBehaviour
                         baseGrounded.groundTagName = detectGround.groundTagName;
                     }
                 }
-                if (!baseObject.GetComponent<CarCollider>())
+                if (!tyreObject.GetComponent<CarCollider>())
                 {
-                    baseObject.AddComponent<CarCollider>();
+                    tyreObject.AddComponent<CarCollider>();
                 }
 
                 // Second Player
@@ -215,9 +215,9 @@ public class Car : MonoBehaviour
                         baseGroundedSecond.groundTagName = detectGroundSecond.groundTagName;
                     }
                 }
-                if (!baseObjectSecond.GetComponent<CarCollider>())
+                if (!tyreObjectSecond.GetComponent<CarCollider>())
                 {
-                    baseObjectSecond.AddComponent<CarCollider>();
+                    tyreObjectSecond.AddComponent<CarCollider>();
                 }
                 ReadAngles();
                 break;
@@ -251,9 +251,9 @@ public class Car : MonoBehaviour
                         baseGrounded.groundTagName = detectGround.groundTagName;
                     }
                 }
-                if (!baseObject.GetComponent<CarCollider>())
+                if (!tyreObject.GetComponent<CarCollider>())
                 {
-                    baseObject.AddComponent<CarCollider>();
+                    tyreObject.AddComponent<CarCollider>();
                 }
                 ReadAngles();
                 break;

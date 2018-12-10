@@ -63,6 +63,8 @@ public class Mover : MonoBehaviour
     public bool pauseCar = false;
     [Header("Car Controls : ", order = 0)]
     public CarConfigurations carConfig;
+    [Header("Destroy Object Animation")]
+    public GameObject destroyObject;
     [Header("Boundaries : ", order = 1)]
     [Space(20, order = 0)]
     public Boundary boundary; // Call the class
