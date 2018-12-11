@@ -54,8 +54,6 @@ public class CarConfigurations
     public float blinkWait;
 }
 
-
-[RequireComponent(typeof(ResetAnimation))]
 public class Mover : MonoBehaviour
 {
     [Tooltip("This is for stop vehicle")]
@@ -82,7 +80,6 @@ public class Mover : MonoBehaviour
     private Vector3 desiredDirection;
     private Quaternion reset;
     private bool _isJumping , _isJumpingSecond;
-    private ResetAnimation resetScript;
     private bool ranOnce;
     [HideInInspector]
     public Car myCar = null;
@@ -165,6 +162,8 @@ public class Mover : MonoBehaviour
         MoveOrNotMove();
         myCar.CloneJumpNow();
         myCar.GetZMax();
+        myCar.UpdateFirstBoom();
+        myCar.UpdateSecondBoom();
     }
 
     public void MoveOrNotMove()
@@ -335,6 +334,40 @@ public class Mover : MonoBehaviour
                     if (i == (carConfig.NumOfBlink - 1))
                     {
                         myCar.respawnStatusSecond = false;
+                    }
+                }
+            }
+
+            if (myCar.UpdateFirstBoom())
+            {
+                myCar.StopFirst();
+                myCar.ReturnFirstSpawnPosition();
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.Moving();
+                    }
+                }
+            }
+
+            if (myCar.UpdateSecondBoom())
+            {
+                myCar.StopSecond();
+                myCar.ReturnSecondSpawnPosition();
+                for (int i = 0; i < carConfig.NumOfBlink; i++)
+                {
+                    myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    if (i == (carConfig.NumOfBlink - 1))
+                    {
+                        myCar.Moving();
                     }
                 }
             }

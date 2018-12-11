@@ -12,8 +12,6 @@ public class Car : MonoBehaviour
     private GameObject assign;
     private Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
     public double Speed , SpeedSecond;
-    public ResetAnimation resetScript;
-    public ResetAnimation resetScriptSecond;
     public bool isGrounded , isBaseGrounded , isGroundedSecond , isBaseGroundedSecond;
     public DetectGround baseGrounded;
     public DetectGround baseGroundedSecond;
@@ -33,6 +31,7 @@ public class Car : MonoBehaviour
 
     public int firstPlayerCoin;
     public int secondPlayerCoin;
+
 
     public Car(GameObject gameObject)
     {
@@ -155,7 +154,6 @@ public class Car : MonoBehaviour
                 tyreObject = carObject.transform.Find("wheels").gameObject;
                 rb = tyreObject.GetComponent<Rigidbody>();
                 rigidBase = carObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
-                resetScript = carObject.GetComponent<ResetAnimation>();
                 detectGround = carObject.transform.Find("wheels").GetComponent<DetectGround>();
                 if (!detectGround)
                 {
@@ -178,9 +176,9 @@ public class Car : MonoBehaviour
                         baseGrounded.groundTagName = detectGround.groundTagName;
                     }
                 }
-                if (!baseObject.GetComponent<CarCollider>())
+                if (!tyreObject.GetComponent<CarCollider>())
                 {
-                    baseObject.AddComponent<CarCollider>();
+                    tyreObject.AddComponent<CarCollider>();
                 }
 
                 // Second Player
@@ -188,7 +186,6 @@ public class Car : MonoBehaviour
                 tyreObjectSecond = carObjectSecond.transform.Find("wheels").gameObject;
                 rbSecond = tyreObjectSecond.GetComponent<Rigidbody>();
                 rigidBaseSecond = carObjectSecond.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
-                resetScriptSecond = carObjectSecond.GetComponent<ResetAnimation>();
                 detectGroundSecond = carObjectSecond.transform.Find("wheels").GetComponent<DetectGround>();
                 if (!detectGroundSecond)
                 {
@@ -215,9 +212,9 @@ public class Car : MonoBehaviour
                         baseGroundedSecond.groundTagName = detectGroundSecond.groundTagName;
                     }
                 }
-                if (!baseObjectSecond.GetComponent<CarCollider>())
+                if (!tyreObjectSecond.GetComponent<CarCollider>())
                 {
-                    baseObjectSecond.AddComponent<CarCollider>();
+                    tyreObjectSecond.AddComponent<CarCollider>();
                 }
                 ReadAngles();
                 break;
@@ -228,7 +225,6 @@ public class Car : MonoBehaviour
                 tyreObject = carObject.transform.Find("wheels").gameObject;
                 rb = tyreObject.GetComponent<Rigidbody>();
                 rigidBase = carObject.transform.Find("Base").gameObject.GetComponent<Rigidbody>();
-                resetScript = carObject.GetComponent<ResetAnimation>();
                 detectGround = carObject.transform.Find("wheels").GetComponent<DetectGround>();
                 if (!detectGround)
                 {
@@ -251,9 +247,9 @@ public class Car : MonoBehaviour
                         baseGrounded.groundTagName = detectGround.groundTagName;
                     }
                 }
-                if (!baseObject.GetComponent<CarCollider>())
+                if (!tyreObject.GetComponent<CarCollider>())
                 {
-                    baseObject.AddComponent<CarCollider>();
+                    tyreObject.AddComponent<CarCollider>();
                 }
                 ReadAngles();
                 break;
@@ -369,6 +365,42 @@ public class Car : MonoBehaviour
                 break;
         }
         return;
+    }
+
+    public void ReturnFirstSpawnPosition()
+    {
+        carObject.transform.position = carObject.transform.Find("RespawnPlayer").transform.position;
+        return;
+    }
+
+    public void ReturnSecondSpawnPosition()
+    {
+        carObjectSecond.transform.position = carObjectSecond.transform.Find("RespawnPlayer").transform.position;
+        return;
+    }
+
+    public bool UpdateFirstBoom()
+    {
+        if (carObject.CompareTag("ParentPlayer"))
+        {
+            return tyreObject.GetComponent<CarCollider>().boomFirst;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public bool UpdateSecondBoom()
+    {
+        if (carObject.CompareTag("SecondParentPlayer"))
+        {
+            return tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public bool CloneJumpNow()
@@ -509,7 +541,7 @@ public class Car : MonoBehaviour
         }
     }
 
-    void StopFirst()
+    public void StopFirst()
     {
         rb.AddForce(Vector3.zero, ForceMode.Impulse);
         rb.angularVelocity = Vector3.zero;
@@ -517,7 +549,7 @@ public class Car : MonoBehaviour
         return;
     }
 
-    void StopSecond()
+    public void StopSecond()
     {
         // Second Player
         rbSecond.AddForce(Vector3.zero, ForceMode.Impulse);
@@ -653,6 +685,152 @@ public class Car : MonoBehaviour
         }
     }
 
+
+    void ConditionFirstBlink()
+    {
+        if (!baseObject.GetComponent<Renderer>().enabled && tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObject.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndBlinkChildren(baseObject.transform.GetChild(i).transform);
+            }
+            CountAndBlinkChildren(tyreObject.transform);
+            return;
+        }
+        else if (baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            CountAndBlinkChildren(baseObject.transform);
+            CountAndBlinkChildren(tyreObject.transform.GetChild(4));
+            return;
+        }
+        else if (!baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObject.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndBlinkChildren(baseObject.transform.GetChild(i).transform);
+            }
+            CountAndBlinkChildren(tyreObject.transform.GetChild(4));
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("Default Blink");
+            CountAndBlinkChildren(carObject.transform);
+            return;
+        }
+    }
+
+    void ConditionFirstUnBlink()
+    {
+        if (!baseObject.GetComponent<Renderer>().enabled && tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObject.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndUnblinkChildren(baseObject.transform.GetChild(i).transform);
+            }
+            CountAndUnblinkChildren(tyreObject.transform);
+            return;
+        }
+        else if (baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            CountAndUnblinkChildren(baseObject.transform);
+            CountAndUnblinkChildren(tyreObject.transform.GetChild(4));
+            return;
+        }
+        else if (!baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for(int i = 0; i < baseObject.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndUnblinkChildren(baseObject.transform.GetChild(i).transform);
+            }
+            CountAndUnblinkChildren(tyreObject.transform.GetChild(4));
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("Default Blink");
+            CountAndUnblinkChildren(carObject.transform);
+            return;
+        }
+    }
+
+    void ConditionSecondUnBlink()
+    {
+        if (!baseObjectSecond.GetComponent<Renderer>().enabled && tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndUnblinkChildren(baseObjectSecond.transform.GetChild(i).transform);
+            }
+            CountAndUnblinkChildren(tyreObjectSecond.transform);
+            return;
+        }
+        else if (baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            CountAndUnblinkChildren(baseObjectSecond.transform);
+            CountAndUnblinkChildren(tyreObjectSecond.transform.GetChild(4));
+            return;
+        }
+        else if (!baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndUnblinkChildren(baseObjectSecond.transform.GetChild(i).transform);
+            }
+            CountAndUnblinkChildren(tyreObjectSecond.transform.GetChild(4));
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("Default Blink");
+            CountAndUnblinkChildren(carObjectSecond.transform);
+            return;
+        }
+    }
+
+    void ConditionSecondBlink()
+    {
+        if (!baseObjectSecond.GetComponent<Renderer>().enabled && tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndBlinkChildren(baseObjectSecond.transform.GetChild(i).transform);
+            }
+            CountAndBlinkChildren(tyreObjectSecond.transform);
+            return;
+        }
+        else if (baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            CountAndBlinkChildren(baseObjectSecond.transform);
+            CountAndBlinkChildren(tyreObjectSecond.transform.GetChild(4));
+            return;
+        }
+        else if (!baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        {
+            for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
+            {
+                if (i == 0) continue;
+                CountAndBlinkChildren(baseObjectSecond.transform.GetChild(i).transform);
+            }
+            CountAndBlinkChildren(tyreObjectSecond.transform.GetChild(4));
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("Default Blink");
+            CountAndBlinkChildren(carObjectSecond.transform);
+            return;
+        }
+    }
+
+
     /// <summary>
     /// This is for enable blinking effects
     /// </summary>
@@ -664,8 +842,12 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 if (respawnStatusFirst)
                 {
-                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
-                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                    ConditionFirstBlink();
+                    
+                }
+                if (UpdateFirstBoom())
+                {
+                    ConditionFirstBlink();
                 }
                 break;
 
@@ -673,14 +855,24 @@ public class Car : MonoBehaviour
                 if (respawnStatusFirst)
                 {
                     // First Player
-                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
-                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                    ConditionFirstBlink();
                 }
                 if (respawnStatusSecond)
                 {
                     // Second Player
-                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = false;
-                    CountAndBlinkChildren(carObjectSecond.transform.Find("wheels"));
+                    ConditionSecondBlink();
+                }
+
+                if (UpdateFirstBoom())
+                {
+                    // First Player
+                    ConditionFirstBlink();
+                }
+
+                if (UpdateSecondBoom())
+                {
+                    // First Player
+                    ConditionSecondBlink();
                 }
                 break;
         }
@@ -694,8 +886,13 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 if (respawnStatusFirst)
                 {
-                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = true;
-                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                    ConditionFirstUnBlink();
+                }
+
+                if (UpdateFirstBoom())
+                {
+                    // First Player
+                    ConditionFirstUnBlink();
                 }
                 break;
 
@@ -703,71 +900,69 @@ public class Car : MonoBehaviour
                 if (respawnStatusFirst)
                 {
                     // First Player
-                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = true;
-                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                    ConditionFirstUnBlink();
                 }
                 if (respawnStatusSecond)
                 {
                     // Second Player
-                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = true;
-                    CountAndUnblinkChildren(carObjectSecond.transform.Find("wheels"));
+                    ConditionSecondBlink();
+                }
+
+                if (UpdateFirstBoom())
+                {
+                    // First Player
+                    ConditionFirstUnBlink();
+                }
+
+                if (UpdateSecondBoom())
+                {
+                    // First Player
+                    ConditionSecondBlink();
                 }
                 break;
         }
     }
 
+    // Source : https://forum.unity.com/threads/mesh-renderer-disabled-for-all-children.64720/
+    // Method for Finding nested children and push back to the object
     void CountAndBlinkChildren(Transform child)
     {
-        foreach(Transform children in child)
+        Stack<Transform> children = new Stack<Transform>();
+        children.Push(child);
+        while (children.Count > 0)
         {
-            if (children.gameObject.GetComponent<Renderer>().enabled)
+            Transform current = children.Pop();
+            Renderer renderer = current.GetComponent<Renderer>();
+            if(renderer != null)
             {
-                children.gameObject.GetComponent<Renderer>().enabled = false;
+                renderer.enabled = false;
+            }
+            foreach(Transform childPush in current.transform)
+            {
+                children.Push(childPush);
             }
         }
     }
 
+    // Source : https://forum.unity.com/threads/mesh-renderer-disabled-for-all-children.64720/
+    // Method for Finding nested children and push back to the object
     void CountAndUnblinkChildren(Transform child)
     {
-        foreach(Transform children in child)
+        Stack<Transform> children = new Stack<Transform>();
+        children.Push(child);
+        while (children.Count > 0)
         {
-            if (!children.gameObject.GetComponent<Renderer>().enabled)
+            Transform current = children.Pop();
+            Renderer renderer = current.GetComponent<Renderer>();
+            if (renderer != null && !renderer.enabled)
             {
-                children.gameObject.GetComponent<Renderer>().enabled = true;
+                renderer.enabled = true;
+            }
+            foreach (Transform childPush in current.transform)
+            {
+                children.Push(childPush);
             }
         }
-    }
-
-    /// <summary>
-    /// This is for checking whether the object is active in Hierarchy or not. 
-    /// If not , It will automatically set it as true in hierarchy
-    /// </summary>
-    public void checkActive()
-    {
-        switch (playerDouble)
-        {
-            case SingleOrMultiple.SINGLE:
-                if (!tyreObject.activeInHierarchy)
-                {
-                    tyreObject.SetActive(true);
-                }
-                break;
-
-            case SingleOrMultiple.MULTIPLE:
-                // First Player
-                if (!tyreObject.activeInHierarchy)
-                {
-                    tyreObject.SetActive(true);
-                }
-
-                // Second Player
-                if (!tyreObjectSecond.activeInHierarchy)
-                {
-                    tyreObjectSecond.SetActive(true);
-                }
-                break;
-        }
-        return;
     }
 
     public void RunGround()
