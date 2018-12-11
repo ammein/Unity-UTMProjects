@@ -5,7 +5,9 @@ using UnityEngine;
 public class CarCollider : MonoBehaviour {
 
     [HideInInspector]
-    public bool boom = false;
+    public bool boomFirst = false;
+    [HideInInspector]
+    public bool boomSecond = false;
 
     private GameObject destroyObject;
     private GameController gameController;
@@ -22,9 +24,14 @@ public class CarCollider : MonoBehaviour {
     {
         foreach(string detect in gameController.destroy.detectTagToDestroy)
         {
-            if (collision.gameObject.CompareTag(detect))
+            if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("ParentPlayer"))
             {
-                boom = true;
+                boomFirst = true;
+            }
+
+            if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("SecondParentPlayer"))
+            {
+                boomSecond = true;
             }
         }
     }
@@ -33,10 +40,33 @@ public class CarCollider : MonoBehaviour {
     {
         while (true)
         {
-            Debug.Log("Boom = " + boom);
-            if (boom)
+            Debug.Log("Boom = " + boomFirst);
+            if (boomFirst)
             {
                 Debug.Log("Run Boom !");
+                GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
+                foreach (Transform destroyChild in destroy.transform)
+                {
+                    Debug.Log("Got Destroy Instantiate ? " + destroy);
+                    Debug.Log("Destroy Object " + destroyObject);
+                    if (destroy != null)
+                    {
+                        destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                yield return null;
+            }
+
+            if (boomSecond)
+            {
+                Debug.Log("Run Boom Second!");
                 GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
                 foreach (Transform destroyChild in destroy.transform)
                 {
@@ -44,8 +74,11 @@ public class CarCollider : MonoBehaviour {
                     {
                         destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
-                yield return new WaitForSeconds(2);
             }
             else
             {

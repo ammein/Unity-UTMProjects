@@ -344,6 +344,7 @@ public class Mover : MonoBehaviour
             if (myCar.UpdateFirstBoom())
             {
                 myCar.StopFirst();
+                myCar.ReturnFirstSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
                     myCar.Blink();
@@ -352,8 +353,7 @@ public class Mover : MonoBehaviour
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
-                        myCar.ReturnFirstSpawnPosition();
-                        myCar.tyreObject.GetComponent<CarCollider>().boom = false;
+                        myCar.tyreObject.GetComponent<CarCollider>().boomFirst = false;
                         myCar.Moving();
                     }
                 }
@@ -362,6 +362,7 @@ public class Mover : MonoBehaviour
             if (myCar.UpdateSecondBoom())
             {
                 myCar.StopSecond();
+                myCar.ReturnSecondSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
                     myCar.Blink();
@@ -370,8 +371,7 @@ public class Mover : MonoBehaviour
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
-                        myCar.ReturnFirstSpawnPosition();
-                        myCar.tyreObjectSecond.GetComponent<CarCollider>().boom = false;
+                        myCar.tyreObjectSecond.GetComponent<CarCollider>().boomSecond = false;
                         myCar.Moving();
                     }
                 }

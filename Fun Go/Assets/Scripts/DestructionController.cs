@@ -8,6 +8,10 @@ public class DestructionController : MonoBehaviour {
     private GameObject clone;
 
     // Source : https://gamedevelopment.tutsplus.com/tutorials/how-to-make-an-object-shatter-into-smaller-fragments-in-unity--gamedev-11795
+    private void Start()
+    {
+        Physics.IgnoreLayerCollision(10, 9);
+    }
 
     void Update()
     {

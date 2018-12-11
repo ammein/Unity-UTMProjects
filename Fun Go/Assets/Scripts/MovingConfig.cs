@@ -387,7 +387,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("ParentPlayer"))
         {
-            return tyreObject.GetComponent<CarCollider>().boom;
+            return tyreObject.GetComponent<CarCollider>().boomFirst;
         }
         else
         {
@@ -399,7 +399,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("SecondParentPlayer"))
         {
-            return tyreObjectSecond.GetComponent<CarCollider>().boom;
+            return tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
         }
         else
         {
