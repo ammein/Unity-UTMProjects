@@ -54,8 +54,6 @@ public class CarConfigurations
     public float blinkWait;
 }
 
-
-[RequireComponent(typeof(ResetAnimation))]
 public class Mover : MonoBehaviour
 {
     [Tooltip("This is for stop vehicle")]
@@ -82,7 +80,6 @@ public class Mover : MonoBehaviour
     private Vector3 desiredDirection;
     private Quaternion reset;
     private bool _isJumping , _isJumpingSecond;
-    private ResetAnimation resetScript;
     private bool ranOnce;
     [HideInInspector]
     public Car myCar = null;

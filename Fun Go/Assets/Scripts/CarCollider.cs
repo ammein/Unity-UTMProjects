@@ -18,6 +18,25 @@ public class CarCollider : MonoBehaviour {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
     }
 
+    void BoomEffect()
+    {
+        Debug.Log("Run Boom !");
+        GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
+        foreach (Transform destroyChild in destroy.transform)
+        {
+            Debug.Log("Got Destroy Instantiate ? " + destroy);
+            Debug.Log("Destroy Object " + destroyObject);
+            if (destroy != null && destroyChild != null)
+            {
+                destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         foreach(string detect in gameController.destroy.detectTagToDestroy)
@@ -25,39 +44,13 @@ public class CarCollider : MonoBehaviour {
             if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("ParentPlayer"))
             {
                 boomFirst = true;
-                Debug.Log("Run Boom !");
-                GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
-                foreach (Transform destroyChild in destroy.transform)
-                {
-                    Debug.Log("Got Destroy Instantiate ? " + destroy);
-                    Debug.Log("Destroy Object " + destroyObject);
-                    if (destroy != null)
-                    {
-                        destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                BoomEffect();
             }
 
             if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("SecondParentPlayer"))
             {
                 boomSecond = true;
-                Debug.Log("Run Boom Second!");
-                GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
-                foreach (Transform destroyChild in destroy.transform)
-                {
-                    if (destroy != null)
-                    {
-                        destroyChild.GetComponent<DestructionController>().objectToDestroy = destroyObject;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                BoomEffect();
             }
         }
     }
