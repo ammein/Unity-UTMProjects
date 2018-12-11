@@ -302,41 +302,54 @@ public class GameController : MonoBehaviour {
     // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
     IEnumerator AsyncLoadScene(string scene)
     {
-        //// deactivate scene
-        //async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-        //async.allowSceneActivation = false;
-        //loadingScene = true;
-        //while (!async.isDone)
-        //{
-        //    Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
-        //    countScene = SceneManager.sceneCount;
-        //    Debug.Log((double)async.progress);
-        //    if(async.progress >= 0.9f)
-        //    {
-        //        if(countScene == 1)
-        //        {
-        //            async.allowSceneActivation = true;
-        //        }
-        //        Scene nextScene = SceneManager.GetSceneByName(scene);
-        //        SceneManager.SetActiveScene(nextScene);
-        //    }
-        //    yield return null;
-        //}
-
         // deactivate scene
-        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
-        // this value stops the scene from displaying when it's finished loading
+        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
         loadingScene = true;
+        Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
+        async.allowSceneActivation = false;
         while (!async.isDone)
         {
             countScene = SceneManager.sceneCount;
-            loadingText.text = async.progress.ToString();
-            Debug.Log("Count Scene = " + countScene);
-            if (countScene == 1)
+            Debug.Log("Count Scene " + countScene);
+            Debug.Log((double)async.progress);
+            if (async.progress >= 0.9f)
             {
-                loadingScene = false;
+                async.allowSceneActivation = true;
+                SceneManager.UnloadSceneAsync(0);
+                Debug.Log("Async allow ?" + async.allowSceneActivation);
+                if (countScene == 1)
+                {
+                    Debug.Log("Running Count Scene 1");
+                    Scene nextScene = SceneManager.GetSceneByName(scene);
+                    SceneManager.SetActiveScene(nextScene);
+                }
+                //else
+                //{
+                //    for (int i = 0; i <= countScene; i++)
+                //    {
+                //        Debug.Log("Running UnloadAsync = " + i);
+                //        SceneManager.UnloadSceneAsync(1);
+                //    }
+                //    //Debug.Log("Name = " + SceneManager.GetActiveScene().name);
+                //}
             }
+            yield return null;
         }
+
+        //// deactivate scene
+        //async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+        //// this value stops the scene from displaying when it's finished loading
+        //loadingScene = true;
+        //while (!async.isDone)
+        //{
+        //    countScene = SceneManager.sceneCount;
+        //    loadingText.text = async.progress.ToString();
+        //    Debug.Log("Count Scene = " + countScene);
+        //    if (countScene == 1)
+        //    {
+        //        loadingScene = false;
+        //    }
+        //}
         yield return null;
     }
 

@@ -17,7 +17,6 @@ public class DestructionController : MonoBehaviour {
     {
         if (objectToDestroy != null)
         {
-            Debug.Log("Objects " + objectToDestroy);
             Instantiate(objectToDestroy, transform.position, transform.rotation);
             Destroy(gameObject);
             return;
