@@ -353,7 +353,6 @@ public class Mover : MonoBehaviour
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
-                        myCar.tyreObject.GetComponent<CarCollider>().boomFirst = false;
                         myCar.Moving();
                     }
                 }
@@ -371,7 +370,6 @@ public class Mover : MonoBehaviour
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
-                        myCar.tyreObjectSecond.GetComponent<CarCollider>().boomSecond = false;
                         myCar.Moving();
                     }
                 }

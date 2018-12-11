@@ -12,12 +12,10 @@ public class CarCollider : MonoBehaviour {
     private GameObject destroyObject;
     private GameController gameController;
 
-
     private void Start()
     {
         destroyObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().destroy.destroyObject;
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        StartCoroutine(RunBoom());
     }
 
     void OnCollisionEnter(Collision collision)
@@ -27,22 +25,6 @@ public class CarCollider : MonoBehaviour {
             if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("ParentPlayer"))
             {
                 boomFirst = true;
-            }
-
-            if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("SecondParentPlayer"))
-            {
-                boomSecond = true;
-            }
-        }
-    }
-
-    IEnumerator RunBoom()
-    {
-        while (true)
-        {
-            Debug.Log("Boom = " + boomFirst);
-            if (boomFirst)
-            {
                 Debug.Log("Run Boom !");
                 GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
                 foreach (Transform destroyChild in destroy.transform)
@@ -59,13 +41,10 @@ public class CarCollider : MonoBehaviour {
                     }
                 }
             }
-            else
-            {
-                yield return null;
-            }
 
-            if (boomSecond)
+            if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("SecondParentPlayer"))
             {
+                boomSecond = true;
                 Debug.Log("Run Boom Second!");
                 GameObject destroy = Instantiate(destroyObject, transform.position, transform.rotation);
                 foreach (Transform destroyChild in destroy.transform)
@@ -80,13 +59,15 @@ public class CarCollider : MonoBehaviour {
                     }
                 }
             }
-            else
-            {
-                yield return null;
-            }
-            yield return null;
         }
     }
+
+    private void Update()
+    {
+        destroyObject = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().destroy.destroyObject;
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+    }
+
 
     // Debug Only
     //private void Update()

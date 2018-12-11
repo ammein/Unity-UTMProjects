@@ -703,6 +703,11 @@ public class Car : MonoBehaviour
                     carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
                     CountAndBlinkChildren(carObject.transform.Find("wheels"));
                 }
+                if (UpdateFirstBoom())
+                {
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                }
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -715,6 +720,20 @@ public class Car : MonoBehaviour
                 if (respawnStatusSecond)
                 {
                     // Second Player
+                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObjectSecond.transform.Find("wheels"));
+                }
+
+                if (UpdateFirstBoom())
+                {
+                    // First Player
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndBlinkChildren(carObject.transform.Find("wheels"));
+                }
+
+                if (UpdateSecondBoom())
+                {
+                    // First Player
                     carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = false;
                     CountAndBlinkChildren(carObjectSecond.transform.Find("wheels"));
                 }
@@ -733,6 +752,12 @@ public class Car : MonoBehaviour
                     carObject.transform.Find("Base").GetComponent<Renderer>().enabled = true;
                     CountAndUnblinkChildren(carObject.transform.Find("wheels"));
                 }
+
+                if (UpdateFirstBoom())
+                {
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                }
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -746,6 +771,20 @@ public class Car : MonoBehaviour
                 {
                     // Second Player
                     carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = true;
+                    CountAndUnblinkChildren(carObjectSecond.transform.Find("wheels"));
+                }
+
+                if (UpdateFirstBoom())
+                {
+                    // First Player
+                    carObject.transform.Find("Base").GetComponent<Renderer>().enabled = false;
+                    CountAndUnblinkChildren(carObject.transform.Find("wheels"));
+                }
+
+                if (UpdateSecondBoom())
+                {
+                    // First Player
+                    carObjectSecond.transform.Find("Base").GetComponent<Renderer>().enabled = false;
                     CountAndUnblinkChildren(carObjectSecond.transform.Find("wheels"));
                 }
                 break;
