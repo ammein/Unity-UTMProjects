@@ -51,7 +51,7 @@ public class CarConfigurations
     public float turnRate;
     [Header("Respawn Settings")]
     public int NumOfBlink;
-    public float blinkWait;
+    public float blinkWait , delayBlink;
 }
 
 public class Mover : MonoBehaviour
@@ -91,6 +91,8 @@ public class Mover : MonoBehaviour
 
     private GameController gameController;
 
+    private UIController uiControl;
+
     [Header("Player Coin")]
     private int firstPlayerCoin = 0;
     private int secondPlayerCoin = 0;
@@ -99,6 +101,7 @@ public class Mover : MonoBehaviour
     void Start()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        uiControl = GameObject.Find("UICar").GetComponent<UIController>();
         Initialize();
         InitCoroutine();
         Physics.IgnoreLayerCollision(10, 10);
@@ -122,10 +125,19 @@ public class Mover : MonoBehaviour
         secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
         firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        myCar = new Car(gameObject, secondGameObject, play);
-        myCar.InitStart();
-        myCar.AssignTyreAccesories(gameController.accessory.tyre[2] , firstGameObject.tag , new Color(1,1,1,1));
-        myCar.AssignFullBody(gameController.accessory.body[0], firstGameObject.tag, new Color(0.5f, 0.25f, 0.60f, 1.0f));
+        if(myCar == null)
+            myCar = new Car(gameObject, secondGameObject, play); myCar.InitStart();
+        // Assign Tyre
+        myCar.AssignTyreAccesories(gameController.accessory.tyre[2], 
+            firstGameObject.tag, 
+            new Color(1,1,1,1));
+
+        // Assign Body
+        myCar.AssignFullBody(gameController.accessory.body[0], 
+            firstGameObject.tag, 
+            new Color(0.5f, 0.25f, 0.60f, 1.0f));
+
+        // If clone enable , run random accessories clone
         if (gameController.accessory.clone.enableClone)
         {
             myCar.AssignRandomAccessoriesClone(gameController.accessory);
@@ -168,7 +180,7 @@ public class Mover : MonoBehaviour
 
     public void MoveOrNotMove()
     {
-        if (!UpdatePauseCar())
+        if (!UpdatePauseCar() && !uiControl.counting)
         {
             myCar.EnableGravity();
             myCar.Moving();
@@ -176,6 +188,7 @@ public class Mover : MonoBehaviour
         else
         {
             myCar.Stop();
+            myCar.RotationControlCheck();
             myCar.DisableGravity();
         }
     }
@@ -340,16 +353,22 @@ public class Mover : MonoBehaviour
 
             if (myCar.UpdateFirstBoom())
             {
+                myCar.rigidBase.mass = carConfig.jumpWeight;
                 myCar.StopFirst();
+                myCar.Blink();
+                yield return new WaitForSeconds(carConfig.delayBlink);
                 myCar.ReturnFirstSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
-                    myCar.Blink();
-                    yield return new WaitForSeconds(carConfig.blinkWait);
                     myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.Blink();
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
+                        myCar.rigidBase.mass = 1;
+                        myCar.getFirstBoom = false;
+                        myCar.UnBlink();
                         myCar.Moving();
                     }
                 }
@@ -357,16 +376,22 @@ public class Mover : MonoBehaviour
 
             if (myCar.UpdateSecondBoom())
             {
+                myCar.rigidBaseSecond.mass = carConfig.jumpWeight;
                 myCar.StopSecond();
+                myCar.Blink();
+                yield return new WaitForSeconds(carConfig.delayBlink);
                 myCar.ReturnSecondSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
-                    myCar.Blink();
-                    yield return new WaitForSeconds(carConfig.blinkWait);
                     myCar.UnBlink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.Blink();
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
+                        myCar.rigidBaseSecond.mass = 1;
+                        myCar.getSecondBoom = false;
+                        myCar.UnBlink();
                         myCar.Moving();
                     }
                 }

@@ -10,7 +10,7 @@ public class Car : MonoBehaviour
     private float finish;
     public GameObject carObject, baseObject, tyreObject , carObjectSecond , baseObjectSecond , tyreObjectSecond;
     private GameObject assign;
-    private Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
+    public Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
     public double Speed , SpeedSecond;
     public bool isGrounded , isBaseGrounded , isGroundedSecond , isBaseGroundedSecond;
     public DetectGround baseGrounded;
@@ -31,6 +31,9 @@ public class Car : MonoBehaviour
 
     public int firstPlayerCoin;
     public int secondPlayerCoin;
+
+    public bool getFirstBoom;
+    public bool getSecondBoom;
 
 
     public Car(GameObject gameObject)
@@ -383,7 +386,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("ParentPlayer"))
         {
-            return tyreObject.GetComponent<CarCollider>().boomFirst;
+            return getFirstBoom = tyreObject.GetComponent<CarCollider>().boomFirst;
         }
         else
         {
@@ -395,7 +398,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("SecondParentPlayer"))
         {
-            return tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
+            return getSecondBoom = tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
         }
         else
         {
@@ -485,6 +488,7 @@ public class Car : MonoBehaviour
                 rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
                 DetectGround();
                 GetSpeed();
+                UpdateFirstBoom();
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -495,6 +499,7 @@ public class Car : MonoBehaviour
                     Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGround();
+                UpdateFirstBoom();
                 // Second Player
                 rbSecond.position = new Vector3(
                     0.0f,
@@ -502,6 +507,7 @@ public class Car : MonoBehaviour
                     Mathf.Clamp(rbSecond.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGroundSecond();
+                UpdateSecondBoom();
                 // For Max Speed in Km/Hr
                 rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
                 rbSecond.velocity = Vector3.ClampMagnitude(rbSecond.velocity, maxSpeedSecond / 3.6f);
@@ -973,14 +979,14 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 if (DetectGround())
                 {
-                    //Debug.Log("Move " + carObject.name);
+                    Debug.Log("Move " + carObject.name);
                     rb.AddForce(movement * speedForce, ForceMode.Acceleration);
                     rigidBase.mass = 1;
                     return;
                 }
                 else if (!DetectGround())
                 {
-                    //Debug.Log("UnMoved " + carObject.name + " ID : " + carObject.GetInstanceID());
+                    Debug.Log("UnMoved " + carObject.name + " ID : " + carObject.GetInstanceID());
                     rigidBase.mass = jumpWeight;
                     rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
                     return;

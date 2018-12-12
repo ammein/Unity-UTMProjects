@@ -74,7 +74,16 @@ public enum SingleOrMultiple
 [System.Serializable]
 public class CameraSettings
 {
-    public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , orthoBeginSplit , orthoEndsSplit , rotationX , rotationY, rotationZ;
+    public float xMoveCameraMin, 
+        xMoveCameraMax, 
+        easing, 
+        orthoBegin, 
+        orthoEnds , 
+        orthoBeginSplit , 
+        orthoEndsSplit , 
+        rotationX , 
+        rotationY, 
+        rotationZ;
 }
 
 [System.Serializable]
@@ -101,6 +110,24 @@ public class Accessories
 
     [Header("Enable/Disable Random Accessories")]
     public CloneAccessoriesController clone;
+}
+
+[System.Serializable]
+public class AudioSourceFile
+{
+    [Header("Button")]
+    public AudioClip buttonClicked;
+    public AudioClip buttonBack;
+    public AudioClip buttonGet;
+
+    [Header("Car")]
+    public AudioClip carExplode;
+    public AudioClip carShoot;
+
+    [Header("Game")]
+    public AudioClip gameMusicMain;
+    public AudioClip gameMusic;
+    public AudioClip gameWin;
 }
 
 [System.Serializable]
@@ -150,6 +177,9 @@ public class GameController : MonoBehaviour {
     [Range(1.0f, 10.0f)]
     public int numberSpawn;
 
+    [Header("Audio File Upload")]
+    public AudioSourceFile allAudio;
+
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
 
@@ -196,6 +226,8 @@ public class GameController : MonoBehaviour {
     public bool loadingScene = true;
     [Header("Loading Text UI Object")]
     public Text loadingText;
+    [HideInInspector]
+    public AudioSource gameControllerAudioSource;
 
 
     // TODO : Load Coin with scene changes
@@ -246,12 +278,40 @@ public class GameController : MonoBehaviour {
         InitCoroutine();
     }
 
+    void GameControllerAudio()
+    {
+        if (currentScene.name == "Game" && async.isDone)
+        {
+            if(GameObject.Find("GameMain") == null)
+            {
+                new GameObject("GameMain").AddComponent<AudioSource>();
+                gameControllerAudioSource = GameObject.Find("GameMain").GetComponent<AudioSource>();
+                gameControllerAudioSource.PlayOneShot(allAudio.gameMusic);
+            }
+        }
+        else if(currentScene.name == "MainMenu")
+        {
+            if(GameObject.Find("AudioMain") == null)
+            {
+                new GameObject("AudioMain").AddComponent<AudioSource>();
+                gameControllerAudioSource = GameObject.Find("AudioMain").GetComponent<AudioSource>();
+                gameControllerAudioSource.PlayOneShot(allAudio.gameMusicMain);
+            }
+
+            if(singlePlayerButton.GetComponent<AudioSource>().clip == null)
+                singlePlayerButton.GetComponent<AudioSource>().clip = allAudio.buttonClicked;
+
+            if(multiPlayerButton.GetComponent<AudioSource>().clip == null)
+                multiPlayerButton.GetComponent<AudioSource>().clip = allAudio.buttonClicked;
+        }
+    }
+
 
     void LateUpdate()
     {
         // Everything for all camera to move
         // Only move when all physics calculation rendered
-        if (sceneGame)
+        if (sceneGame && async.isDone)
         {
             cameraObject.UpdateOnMove(cameraSettings);
             cameraObject.StartMoveCamera();
@@ -267,7 +327,8 @@ public class GameController : MonoBehaviour {
         GetScene();
         CurrentActiveScene();
         UpdateLoadingScene();
-        if (sceneGame)
+        GameControllerAudio();
+        if (sceneGame && async.isDone)
         {
             // Update each frame for get All Map Length Value
             GetAllMapLength();
@@ -303,10 +364,10 @@ public class GameController : MonoBehaviour {
     IEnumerator AsyncLoadScene(string scene)
     {
         // deactivate scene
-        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
         loadingScene = true;
         Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
-        async.allowSceneActivation = false;
+        //async.allowSceneActivation = false;
         while (!async.isDone)
         {
             countScene = SceneManager.sceneCount;
@@ -314,12 +375,12 @@ public class GameController : MonoBehaviour {
             Debug.Log((double)async.progress);
             if (async.progress >= 0.9f)
             {
-                async.allowSceneActivation = true;
-                SceneManager.UnloadSceneAsync(0);
-                Debug.Log("Async allow ?" + async.allowSceneActivation);
-                if (countScene == 1)
+                //async.allowSceneActivation = true;
+                loadingScene = false;
+                //Debug.Log("Async allow ?" + async.allowSceneActivation);
+                if (countScene == 2)
                 {
-                    Debug.Log("Running Count Scene 1");
+                    Debug.Log("Running Count Scene 2");
                     Scene nextScene = SceneManager.GetSceneByName(scene);
                     SceneManager.SetActiveScene(nextScene);
                 }
@@ -332,6 +393,10 @@ public class GameController : MonoBehaviour {
                 //    }
                 //    //Debug.Log("Name = " + SceneManager.GetActiveScene().name);
                 //}
+            }
+            if (async.isDone)
+            {
+                loadingScene = false;
             }
             yield return null;
         }
@@ -382,7 +447,7 @@ public class GameController : MonoBehaviour {
 
     void CurrentActiveScene()
     {
-        if(currentScene.name == "Game")
+        if(currentScene.name == "Game" && async.isDone)
         {
             // Initialize and start all
             AllOffset();
@@ -398,15 +463,17 @@ public class GameController : MonoBehaviour {
             multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
             singlePlayerButton.onClick.AddListener(delegate
             {
+                singlePlayerButton.GetComponent<AudioSource>().Play();
                 StartPlay(SingleOrMultiple.SINGLE);
-                StartCoroutine(SyncLoadScene("Game"));
+                StartCoroutine(AsyncLoadScene("Game"));
 
             });
 
             multiPlayerButton.onClick.AddListener(delegate
             {
+                multiPlayerButton.GetComponent<AudioSource>().Play();
                 StartPlay(SingleOrMultiple.MULTIPLE);
-                StartCoroutine(SyncLoadScene("Game"));
+                StartCoroutine(AsyncLoadScene("Game"));
             });
             sceneGame = false;
             GetSecondCoin();
@@ -498,7 +565,7 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
                 for (int i = 0; i < Maps.Length; i++)
                 {
@@ -523,9 +590,10 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
-                cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+                if(cameraObject == null)
+                    cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
                 yield break;
             }
             yield return null;
@@ -542,9 +610,14 @@ public class GameController : MonoBehaviour {
         Debug.Log("Running Clone Car");
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
-                spawn = GameObject.Find("SpawnPlayer").gameObject;
+                if (GameObject.Find("SpawnPlayer") != null)
+                    spawn = GameObject.Find("SpawnPlayer").gameObject;
+                else
+                    Debug.LogError("Your Game do not have 'SpawnPlayer' gameObject. Please add the game object to spawn player position");
+
+
                 for (int i = 0; i < numberSpawn; i++)
                 {
                     yield return new WaitForSeconds(delaySpawnCar);
