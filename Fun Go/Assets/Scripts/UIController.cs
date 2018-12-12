@@ -79,11 +79,20 @@ public class UIController : MonoBehaviour
 
     void InstanceUI()
     {
-        uiPlaySpeed = new UIPlayer(SpeedUI, play);
-        uiPlayCountdown = new UIPlayer(CountdownUI, play);
-        uiSliderTracking = new UIPlayer(sliderTracking, play, thumbSlider, backgroundSlider);
-        uiCoinDisplay = new UIPlayer(CoinUI , play);
-        uiRankDisplay = new UIPlayer(RankUI, play);
+        if(uiPlaySpeed == null && !counting && CheckGameStatus())
+            uiPlaySpeed = new UIPlayer(SpeedUI, play);
+
+        if(uiPlayCountdown == null && !counting && CheckGameStatus())
+            uiPlayCountdown = new UIPlayer(CountdownUI, play);
+
+        if(uiSliderTracking == null && !counting && CheckGameStatus())
+            uiSliderTracking = new UIPlayer(sliderTracking, play, thumbSlider, backgroundSlider);
+
+        if(uiCoinDisplay == null && !counting && CheckGameStatus())
+            uiCoinDisplay = new UIPlayer(CoinUI , play);
+
+        if(uiRankDisplay == null && !counting && CheckGameStatus())
+            uiRankDisplay = new UIPlayer(RankUI, play);
     }
 
     void BoundaryUpdate()
@@ -119,12 +128,14 @@ public class UIController : MonoBehaviour
         GetSpeedValue();
         InitiateCaller();
         GetCoinValue();
-        uiRankDisplay.NumberPosition();
+        if(uiRankDisplay != null && CheckGameStatus())
+            uiRankDisplay.NumberPosition();
     }
 
     private void FixedUpdate()
     {
-        uiRankDisplay.NumberPosition();
+        if(uiRankDisplay != null && CheckGameStatus())
+            uiRankDisplay.NumberPosition();
     }
 
     void GetSpeedValue()
@@ -160,31 +171,40 @@ public class UIController : MonoBehaviour
     public void InitiateCaller()
     {
         allInstantiatePlayer = GameObject.FindGameObjectsWithTag("ClonePlayer");
-        playerCar = GameObject.FindGameObjectWithTag("ParentPlayer");
-        playerCarSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer");
-        gameController = GameObject.FindGameObjectWithTag("GameController");
+
+        if(playerCar == null)
+            playerCar = GameObject.FindGameObjectWithTag("ParentPlayer");
+
+        if(playerCarSecond == null)
+            playerCarSecond = GameObject.FindGameObjectWithTag("SecondParentPlayer");
+
+        if(gameController == null)
+            gameController = GameObject.FindGameObjectWithTag("GameController");
         return;
     }
 
     IEnumerator Count(int value)
     {
-        for (int i = value; i > 0; i--)
+        if (CheckGameStatus())
         {
-            counting = true;
-            StopOrRun(true);
-            enableCount = true;
-            count = i.ToString();
-            yield return new WaitForSeconds(1);
-            enableCount = false;
-            if(i == 1)
+            for (int i = value; i > 0; i--)
             {
+                counting = true;
+                StopOrRun(true);
                 enableCount = true;
-                count = "Go";
-                StopOrRun(false);
+                count = i.ToString();
                 yield return new WaitForSeconds(1);
                 enableCount = false;
-                counting = false;
-                yield break;
+                if (i == 1)
+                {
+                    enableCount = true;
+                    count = "Go";
+                    StopOrRun(false);
+                    yield return new WaitForSeconds(1);
+                    enableCount = false;
+                    counting = false;
+                    yield break;
+                }
             }
         }
         yield return null;
@@ -213,6 +233,11 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public bool CheckGameStatus()
+    {
+        return gameController.GetComponent<GameController>().sceneGame && gameController.GetComponent<GameController>().async.isDone;
+    }
+
     void CountDown()
     {
         uiPlayCountdown.CountTextArea(count);
@@ -221,13 +246,27 @@ public class UIController : MonoBehaviour
 
     private void OnGUI()
     {
-        uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
-        uiPlaySpeed.DisplayArea(splitCam);
-        uiCoinDisplay.DisplayArea(splitCam);
-        uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
-        uiRankDisplay.DisplayRankArea(splitCam);
-        uiRankDisplay.DisplayRank();
-        uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+        if(uiSliderTracking != null && CheckGameStatus())
+            uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
+
+        if(uiPlaySpeed != null && CheckGameStatus())
+        {
+            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+            uiPlaySpeed.DisplayArea(splitCam);
+        }
+
+        if (uiCoinDisplay != null && CheckGameStatus())
+        {
+            uiCoinDisplay.DisplayArea(splitCam);
+            uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+        }
+
+        if(uiRankDisplay != null && CheckGameStatus())
+        {
+            uiRankDisplay.DisplayRankArea(splitCam);
+            uiRankDisplay.DisplayRank();
+        }
+
         if (enableCount)
         {
             CountDown();

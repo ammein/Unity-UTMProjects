@@ -74,7 +74,16 @@ public enum SingleOrMultiple
 [System.Serializable]
 public class CameraSettings
 {
-    public float xMoveCameraMin, xMoveCameraMax, easing, orthoBegin, orthoEnds , orthoBeginSplit , orthoEndsSplit , rotationX , rotationY, rotationZ;
+    public float xMoveCameraMin, 
+        xMoveCameraMax, 
+        easing, 
+        orthoBegin, 
+        orthoEnds , 
+        orthoBeginSplit , 
+        orthoEndsSplit , 
+        rotationX , 
+        rotationY, 
+        rotationZ;
 }
 
 [System.Serializable]
@@ -101,6 +110,24 @@ public class Accessories
 
     [Header("Enable/Disable Random Accessories")]
     public CloneAccessoriesController clone;
+}
+
+[System.Serializable]
+public class AudioSourceFile
+{
+    [Header("Button")]
+    public AudioClip buttonClicked;
+    public AudioClip buttonBack;
+    public AudioClip buttonGet;
+
+    [Header("Car")]
+    public AudioClip carExplode;
+    public AudioClip carShoot;
+
+    [Header("Game")]
+    public AudioClip gameMusicMain;
+    public AudioClip gameMusic;
+    public AudioClip gameWin;
 }
 
 [System.Serializable]
@@ -150,6 +177,9 @@ public class GameController : MonoBehaviour {
     [Range(1.0f, 10.0f)]
     public int numberSpawn;
 
+    [Header("Audio File Upload")]
+    public AudioSourceFile allAudio;
+
     [Header("Get All Map Prefabs")]
     public GameObject[] Maps;
 
@@ -191,11 +221,16 @@ public class GameController : MonoBehaviour {
 
     public AsyncOperation async;
 
-    private bool sceneGame = false;
+    [HideInInspector]
+    public bool sceneGame = false;
     [HideInInspector]
     public bool loadingScene = true;
     [Header("Loading Text UI Object")]
     public Text loadingText;
+    [HideInInspector]
+    public AudioSource gameControllerAudioSource;
+
+    private int holdCountScene;
 
 
     // TODO : Load Coin with scene changes
@@ -220,12 +255,21 @@ public class GameController : MonoBehaviour {
     {
         Debug.Log("On Enable called");
         SceneManager.sceneLoaded += OnSceneLoaded;
+        loadingScene = true;
     }
 
     public void OnSceneLoaded(Scene scene , LoadSceneMode mode)
     {
         Debug.Log("On Scene Loaded " + scene.name);
-        loadingScene = true;
+        if(scene.name == "Game")
+        {
+            sceneGame = true;
+        }
+        else
+        {
+            sceneGame = false;
+        }
+        loadingScene = false;
         Debug.Log(mode);
     }
 
@@ -246,12 +290,40 @@ public class GameController : MonoBehaviour {
         InitCoroutine();
     }
 
+    void GameControllerAudio()
+    {
+        if (currentScene.name == "Game" && async.isDone)
+        {
+            if(GameObject.Find("GameMain") == null)
+            {
+                new GameObject("GameMain").AddComponent<AudioSource>();
+                gameControllerAudioSource = GameObject.Find("GameMain").GetComponent<AudioSource>();
+                gameControllerAudioSource.PlayOneShot(allAudio.gameMusic);
+            }
+        }
+        else if(currentScene.name == "MainMenu")
+        {
+            if(GameObject.Find("AudioMain") == null)
+            {
+                new GameObject("AudioMain").AddComponent<AudioSource>();
+                gameControllerAudioSource = GameObject.Find("AudioMain").GetComponent<AudioSource>();
+                gameControllerAudioSource.PlayOneShot(allAudio.gameMusicMain);
+            }
+
+            if(singlePlayerButton.GetComponent<AudioSource>().clip == null)
+                singlePlayerButton.GetComponent<AudioSource>().clip = allAudio.buttonClicked;
+
+            if(multiPlayerButton.GetComponent<AudioSource>().clip == null)
+                multiPlayerButton.GetComponent<AudioSource>().clip = allAudio.buttonClicked;
+        }
+    }
+
 
     void LateUpdate()
     {
         // Everything for all camera to move
         // Only move when all physics calculation rendered
-        if (sceneGame)
+        if (sceneGame && async.isDone)
         {
             cameraObject.UpdateOnMove(cameraSettings);
             cameraObject.StartMoveCamera();
@@ -267,7 +339,8 @@ public class GameController : MonoBehaviour {
         GetScene();
         CurrentActiveScene();
         UpdateLoadingScene();
-        if (sceneGame)
+        GameControllerAudio();
+        if (sceneGame && async.isDone)
         {
             // Update each frame for get All Map Length Value
             GetAllMapLength();
@@ -302,54 +375,38 @@ public class GameController : MonoBehaviour {
     // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
     IEnumerator AsyncLoadScene(string scene)
     {
+        loadingText.gameObject.SetActive(true);
         // deactivate scene
-        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-        loadingScene = true;
-        Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
-        async.allowSceneActivation = false;
+        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+        //Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
+        //async.allowSceneActivation = false;
         while (!async.isDone)
         {
             countScene = SceneManager.sceneCount;
+
+            if (holdCountScene == 0)
+                holdCountScene = countScene;
             Debug.Log("Count Scene " + countScene);
-            Debug.Log((double)async.progress);
+            Debug.Log("Progress " + (double)(holdCountScene--/ countScene * 100));
+            loadingText.text = "Loading : "+Mathf.CeilToInt(async.progress * 100).ToString() + "%";
+            SceneManager.UnloadSceneAsync(1);
             if (async.progress >= 0.9f)
             {
-                async.allowSceneActivation = true;
-                SceneManager.UnloadSceneAsync(0);
-                Debug.Log("Async allow ?" + async.allowSceneActivation);
-                if (countScene == 1)
+                //async.allowSceneActivation = true;
+                //Debug.Log("Async allow ?" + async.allowSceneActivation);
+                if (countScene == 2)
                 {
-                    Debug.Log("Running Count Scene 1");
-                    Scene nextScene = SceneManager.GetSceneByName(scene);
-                    SceneManager.SetActiveScene(nextScene);
+                    loadingText.gameObject.SetActive(false);
+                    Debug.Log("Running Count Scene 2");
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        Scene nextScene = SceneManager.GetSceneByName(scene);
+                        SceneManager.SetActiveScene(nextScene);
+                    }
                 }
-                //else
-                //{
-                //    for (int i = 0; i <= countScene; i++)
-                //    {
-                //        Debug.Log("Running UnloadAsync = " + i);
-                //        SceneManager.UnloadSceneAsync(1);
-                //    }
-                //    //Debug.Log("Name = " + SceneManager.GetActiveScene().name);
-                //}
             }
             yield return null;
         }
-
-        //// deactivate scene
-        //async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
-        //// this value stops the scene from displaying when it's finished loading
-        //loadingScene = true;
-        //while (!async.isDone)
-        //{
-        //    countScene = SceneManager.sceneCount;
-        //    loadingText.text = async.progress.ToString();
-        //    Debug.Log("Count Scene = " + countScene);
-        //    if (countScene == 1)
-        //    {
-        //        loadingScene = false;
-        //    }
-        //}
         yield return null;
     }
 
@@ -382,13 +439,13 @@ public class GameController : MonoBehaviour {
 
     void CurrentActiveScene()
     {
-        if(currentScene.name == "Game")
+        if(currentScene.name == "Game" && async.isDone)
         {
             // Initialize and start all
             AllOffset();
             // Make New Camera based on Player Options
             SplitUpdate();
-            sceneGame = true;
+            //sceneGame = true;
             homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
             return;
         }
@@ -398,17 +455,19 @@ public class GameController : MonoBehaviour {
             multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
             singlePlayerButton.onClick.AddListener(delegate
             {
+                singlePlayerButton.GetComponent<AudioSource>().Play();
                 StartPlay(SingleOrMultiple.SINGLE);
-                StartCoroutine(SyncLoadScene("Game"));
+                StartCoroutine(AsyncLoadScene("Game"));
 
             });
 
             multiPlayerButton.onClick.AddListener(delegate
             {
+                multiPlayerButton.GetComponent<AudioSource>().Play();
                 StartPlay(SingleOrMultiple.MULTIPLE);
-                StartCoroutine(SyncLoadScene("Game"));
+                StartCoroutine(AsyncLoadScene("Game"));
             });
-            sceneGame = false;
+            //sceneGame = false;
             GetSecondCoin();
             GetFirstCoin();
             return;
@@ -498,7 +557,7 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
                 for (int i = 0; i < Maps.Length; i++)
                 {
@@ -523,9 +582,10 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
-                cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
+                if(cameraObject == null)
+                    cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
                 yield break;
             }
             yield return null;
@@ -542,9 +602,14 @@ public class GameController : MonoBehaviour {
         Debug.Log("Running Clone Car");
         while (true)
         {
-            if (currentScene.name == "Game")
+            if (currentScene.name == "Game" && async.isDone)
             {
-                spawn = GameObject.Find("SpawnPlayer").gameObject;
+                if (GameObject.Find("SpawnPlayer") != null)
+                    spawn = GameObject.Find("SpawnPlayer").gameObject;
+                else
+                    Debug.LogError("Your Game do not have 'SpawnPlayer' gameObject. Please add the game object to spawn player position");
+
+
                 for (int i = 0; i < numberSpawn; i++)
                 {
                     yield return new WaitForSeconds(delaySpawnCar);

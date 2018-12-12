@@ -10,7 +10,7 @@ public class Car : MonoBehaviour
     private float finish;
     public GameObject carObject, baseObject, tyreObject , carObjectSecond , baseObjectSecond , tyreObjectSecond;
     private GameObject assign;
-    private Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
+    public Rigidbody rb , rigidBase , rbSecond , rigidBaseSecond;
     public double Speed , SpeedSecond;
     public bool isGrounded , isBaseGrounded , isGroundedSecond , isBaseGroundedSecond;
     public DetectGround baseGrounded;
@@ -31,6 +31,9 @@ public class Car : MonoBehaviour
 
     public int firstPlayerCoin;
     public int secondPlayerCoin;
+
+    public bool getFirstBoom;
+    public bool getSecondBoom;
 
 
     public Car(GameObject gameObject)
@@ -383,7 +386,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("ParentPlayer"))
         {
-            return tyreObject.GetComponent<CarCollider>().boomFirst;
+            return getFirstBoom;
         }
         else
         {
@@ -395,7 +398,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("SecondParentPlayer"))
         {
-            return tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
+            return getSecondBoom;
         }
         else
         {
@@ -485,6 +488,7 @@ public class Car : MonoBehaviour
                 rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
                 DetectGround();
                 GetSpeed();
+                UpdateFirstBoom();
                 break;
 
             case SingleOrMultiple.MULTIPLE:
@@ -495,6 +499,7 @@ public class Car : MonoBehaviour
                     Mathf.Clamp(rb.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGround();
+                UpdateFirstBoom();
                 // Second Player
                 rbSecond.position = new Vector3(
                     0.0f,
@@ -502,6 +507,7 @@ public class Car : MonoBehaviour
                     Mathf.Clamp(rbSecond.position.z, boundary.zMin, boundary.zMax)
                     );
                 DetectGroundSecond();
+                UpdateSecondBoom();
                 // For Max Speed in Km/Hr
                 rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed / 3.6f);
                 rbSecond.velocity = Vector3.ClampMagnitude(rbSecond.velocity, maxSpeedSecond / 3.6f);
@@ -543,6 +549,7 @@ public class Car : MonoBehaviour
 
     public void StopFirst()
     {
+        rb.isKinematic = true;
         rb.AddForce(Vector3.zero, ForceMode.Impulse);
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
@@ -552,6 +559,7 @@ public class Car : MonoBehaviour
     public void StopSecond()
     {
         // Second Player
+        rbSecond.isKinematic = true;
         rbSecond.AddForce(Vector3.zero, ForceMode.Impulse);
         rbSecond.angularVelocity = Vector3.zero;
         rbSecond.velocity = Vector3.zero;
@@ -620,16 +628,22 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 rigidBase.useGravity = false;
                 rb.useGravity = false;
+                rigidBase.isKinematic = true;
+                rb.isKinematic = true;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 // First PLayer
                 rigidBase.useGravity = false;
                 rb.useGravity = false;
+                rigidBase.isKinematic = true;
+                rb.isKinematic = true;
 
                 // Second Player
                 rigidBaseSecond.useGravity = false;
                 rbSecond.useGravity = false;
+                rigidBaseSecond.isKinematic = true;
+                rbSecond.isKinematic = true;
                 break;
         }
         return;
@@ -642,16 +656,22 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 rigidBase.useGravity = true;
                 rb.useGravity = true;
+                rigidBase.isKinematic = false;
+                rb.isKinematic = false;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 // First Player
                 rigidBase.useGravity = true;
                 rb.useGravity = true;
+                rigidBase.isKinematic = false;
+                rb.isKinematic = false;
 
                 // Second Player
                 rigidBaseSecond.useGravity = true;
                 rbSecond.useGravity = true;
+                rigidBaseSecond.isKinematic = false;
+                rbSecond.isKinematic = false;
                 break;
         }
         return;

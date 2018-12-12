@@ -82,7 +82,7 @@ public class CameraControl
     void CameraPlayerOne(GameObject gameObject)
     {
         cameraSingle = gameObject.AddComponent<Camera>();
-        gameObject.AddComponent<AudioListener>();
+        gameObject.AddComponent<AudioListener>().enabled = true;
         gameObject.transform.rotation = defaultRotation;
         // Enable Current Camera
         cameraSingle.enabled = true;
@@ -96,7 +96,7 @@ public class CameraControl
     void CameraPlayerTwo(GameObject gameObject)
     {
         cameraDouble = gameObject.AddComponent<Camera>();
-        gameObject.AddComponent<AudioListener>();
+        gameObject.AddComponent<AudioListener>().enabled = true;
         gameObject.transform.rotation = defaultRotation;
         // Enable Current Camera
         cameraDouble.enabled = true;
