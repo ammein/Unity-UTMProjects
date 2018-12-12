@@ -97,6 +97,9 @@ public class Mover : MonoBehaviour
     private int firstPlayerCoin = 0;
     private int secondPlayerCoin = 0;
 
+    [HideInInspector]
+    public AudioSource firstAudio, secondAudio;
+
     // Use this for initialization
     void Start()
     {
@@ -136,6 +139,18 @@ public class Mover : MonoBehaviour
         myCar.AssignFullBody(gameController.accessory.body[0], 
             firstGameObject.tag, 
             new Color(0.5f, 0.25f, 0.60f, 1.0f));
+
+        if (firstAudio == null)
+        {
+            firstAudio = gameObject.GetComponent<AudioSource>();
+            firstAudio.clip = gameController.allAudio.carExplode;
+        }
+
+        if(secondAudio == null && secondGameObject)
+        {
+            secondAudio = secondGameObject.GetComponent<AudioSource>();
+            secondAudio.clip = gameController.allAudio.carExplode;
+        }
 
         // If clone enable , run random accessories clone
         if (gameController.accessory.clone.enableClone)
@@ -353,6 +368,7 @@ public class Mover : MonoBehaviour
 
             if (myCar.UpdateFirstBoom())
             {
+                firstAudio.Play();
                 myCar.rigidBase.mass = carConfig.jumpWeight;
                 myCar.StopFirst();
                 myCar.Blink();
@@ -360,15 +376,14 @@ public class Mover : MonoBehaviour
                 myCar.ReturnFirstSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
-                    myCar.UnBlink();
-                    yield return new WaitForSeconds(carConfig.blinkWait);
                     myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
                         myCar.rigidBase.mass = 1;
                         myCar.getFirstBoom = false;
-                        myCar.UnBlink();
                         myCar.Moving();
                     }
                 }
@@ -376,6 +391,7 @@ public class Mover : MonoBehaviour
 
             if (myCar.UpdateSecondBoom())
             {
+                secondAudio.Play();
                 myCar.rigidBaseSecond.mass = carConfig.jumpWeight;
                 myCar.StopSecond();
                 myCar.Blink();
@@ -391,7 +407,6 @@ public class Mover : MonoBehaviour
                     {
                         myCar.rigidBaseSecond.mass = 1;
                         myCar.getSecondBoom = false;
-                        myCar.UnBlink();
                         myCar.Moving();
                     }
                 }

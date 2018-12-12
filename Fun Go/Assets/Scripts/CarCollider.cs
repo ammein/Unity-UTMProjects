@@ -43,13 +43,13 @@ public class CarCollider : MonoBehaviour {
         {
             if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("ParentPlayer"))
             {
-                boomFirst = true;
+                gameObject.transform.parent.GetComponent<Mover>().myCar.getFirstBoom = true;
                 BoomEffect();
             }
 
             if (collision.gameObject.CompareTag(detect) && gameObject.transform.parent.CompareTag("SecondParentPlayer"))
             {
-                boomSecond = true;
+                gameObject.transform.parent.GetComponent<Mover>().myCar.getSecondBoom = true;
                 BoomEffect();
             }
         }

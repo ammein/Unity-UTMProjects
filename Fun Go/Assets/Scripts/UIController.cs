@@ -79,19 +79,19 @@ public class UIController : MonoBehaviour
 
     void InstanceUI()
     {
-        if(uiPlaySpeed == null && !counting)
+        if(uiPlaySpeed == null && !counting && CheckGameStatus())
             uiPlaySpeed = new UIPlayer(SpeedUI, play);
 
-        if(uiPlayCountdown == null && !counting)
+        if(uiPlayCountdown == null && !counting && CheckGameStatus())
             uiPlayCountdown = new UIPlayer(CountdownUI, play);
 
-        if(uiSliderTracking == null && !counting)
+        if(uiSliderTracking == null && !counting && CheckGameStatus())
             uiSliderTracking = new UIPlayer(sliderTracking, play, thumbSlider, backgroundSlider);
 
-        if(uiCoinDisplay == null && !counting)
+        if(uiCoinDisplay == null && !counting && CheckGameStatus())
             uiCoinDisplay = new UIPlayer(CoinUI , play);
 
-        if(uiRankDisplay == null && !counting)
+        if(uiRankDisplay == null && !counting && CheckGameStatus())
             uiRankDisplay = new UIPlayer(RankUI, play);
     }
 
@@ -128,13 +128,13 @@ public class UIController : MonoBehaviour
         GetSpeedValue();
         InitiateCaller();
         GetCoinValue();
-        if(uiRankDisplay != null)
+        if(uiRankDisplay != null && CheckGameStatus())
             uiRankDisplay.NumberPosition();
     }
 
     private void FixedUpdate()
     {
-        if(uiRankDisplay != null)
+        if(uiRankDisplay != null && CheckGameStatus())
             uiRankDisplay.NumberPosition();
     }
 
@@ -185,7 +185,7 @@ public class UIController : MonoBehaviour
 
     IEnumerator Count(int value)
     {
-        if (gameController.GetComponent<GameController>().async.isDone)
+        if (CheckGameStatus())
         {
             for (int i = value; i > 0; i--)
             {
@@ -233,6 +233,11 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public bool CheckGameStatus()
+    {
+        return gameController.GetComponent<GameController>().sceneGame && gameController.GetComponent<GameController>().async.isDone;
+    }
+
     void CountDown()
     {
         uiPlayCountdown.CountTextArea(count);
@@ -241,17 +246,26 @@ public class UIController : MonoBehaviour
 
     private void OnGUI()
     {
-        if(uiSliderTracking != null)
+        if(uiSliderTracking != null && CheckGameStatus())
             uiSliderTracking.SliderTracking(GetZFirst, GetZSecond, splitCam, getBoundary);
 
-        if(uiPlaySpeed != null)
-            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond); uiPlaySpeed.DisplayArea(splitCam);
+        if(uiPlaySpeed != null && CheckGameStatus())
+        {
+            uiPlaySpeed.UpdateSpeed(speedInit, speedInitSecond);
+            uiPlaySpeed.DisplayArea(splitCam);
+        }
 
-        if(uiCoinDisplay != null)
-            uiCoinDisplay.DisplayArea(splitCam); uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+        if (uiCoinDisplay != null && CheckGameStatus())
+        {
+            uiCoinDisplay.DisplayArea(splitCam);
+            uiCoinDisplay.UpdateCoinValue(getFirstCoin, getSecondCoin);
+        }
 
-        if(uiRankDisplay != null)
-            uiRankDisplay.DisplayRankArea(splitCam); uiRankDisplay.DisplayRank();
+        if(uiRankDisplay != null && CheckGameStatus())
+        {
+            uiRankDisplay.DisplayRankArea(splitCam);
+            uiRankDisplay.DisplayRank();
+        }
 
         if (enableCount)
         {

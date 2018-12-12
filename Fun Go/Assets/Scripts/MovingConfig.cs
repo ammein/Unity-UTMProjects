@@ -386,7 +386,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("ParentPlayer"))
         {
-            return getFirstBoom = tyreObject.GetComponent<CarCollider>().boomFirst;
+            return getFirstBoom;
         }
         else
         {
@@ -398,7 +398,7 @@ public class Car : MonoBehaviour
     {
         if (carObject.CompareTag("SecondParentPlayer"))
         {
-            return getSecondBoom = tyreObjectSecond.GetComponent<CarCollider>().boomSecond;
+            return getSecondBoom;
         }
         else
         {
@@ -549,6 +549,7 @@ public class Car : MonoBehaviour
 
     public void StopFirst()
     {
+        rb.isKinematic = true;
         rb.AddForce(Vector3.zero, ForceMode.Impulse);
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
@@ -558,6 +559,7 @@ public class Car : MonoBehaviour
     public void StopSecond()
     {
         // Second Player
+        rbSecond.isKinematic = true;
         rbSecond.AddForce(Vector3.zero, ForceMode.Impulse);
         rbSecond.angularVelocity = Vector3.zero;
         rbSecond.velocity = Vector3.zero;
@@ -626,16 +628,22 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 rigidBase.useGravity = false;
                 rb.useGravity = false;
+                rigidBase.isKinematic = true;
+                rb.isKinematic = true;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 // First PLayer
                 rigidBase.useGravity = false;
                 rb.useGravity = false;
+                rigidBase.isKinematic = true;
+                rb.isKinematic = true;
 
                 // Second Player
                 rigidBaseSecond.useGravity = false;
                 rbSecond.useGravity = false;
+                rigidBaseSecond.isKinematic = true;
+                rbSecond.isKinematic = true;
                 break;
         }
         return;
@@ -648,16 +656,22 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 rigidBase.useGravity = true;
                 rb.useGravity = true;
+                rigidBase.isKinematic = false;
+                rb.isKinematic = false;
                 break;
 
             case SingleOrMultiple.MULTIPLE:
                 // First Player
                 rigidBase.useGravity = true;
                 rb.useGravity = true;
+                rigidBase.isKinematic = false;
+                rb.isKinematic = false;
 
                 // Second Player
                 rigidBaseSecond.useGravity = true;
                 rbSecond.useGravity = true;
+                rigidBaseSecond.isKinematic = false;
+                rbSecond.isKinematic = false;
                 break;
         }
         return;
@@ -979,14 +993,14 @@ public class Car : MonoBehaviour
             case SingleOrMultiple.SINGLE:
                 if (DetectGround())
                 {
-                    Debug.Log("Move " + carObject.name);
+                    //Debug.Log("Move " + carObject.name);
                     rb.AddForce(movement * speedForce, ForceMode.Acceleration);
                     rigidBase.mass = 1;
                     return;
                 }
                 else if (!DetectGround())
                 {
-                    Debug.Log("UnMoved " + carObject.name + " ID : " + carObject.GetInstanceID());
+                    //Debug.Log("UnMoved " + carObject.name + " ID : " + carObject.GetInstanceID());
                     rigidBase.mass = jumpWeight;
                     rb.AddForce(movement * 0.0f, ForceMode.Acceleration);
                     return;
