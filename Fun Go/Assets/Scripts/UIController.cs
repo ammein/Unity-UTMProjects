@@ -62,12 +62,15 @@ public class UIController : MonoBehaviour
     void Start()
     {
         InitiateCaller();
-        GetSpeedValue();
-        FetchGameController();
-        BoundaryUpdate();
-        InstanceUI();
-        UpdateCameraSplit();
-        StopOrRun(true);
+        if (CheckGameStatus())
+        {
+            GetSpeedValue();
+            FetchGameController();
+            BoundaryUpdate();
+            InstanceUI();
+            UpdateCameraSplit();
+            StopOrRun(true);
+        }
         StartCoroutine(Count(getCount));
     }
 
