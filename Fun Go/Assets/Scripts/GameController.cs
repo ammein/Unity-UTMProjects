@@ -5,66 +5,6 @@ using UnityEngine.UI;
 using UnityEngine;
 using ExtensionMethods;
 
-public static class CoroutineExtensions
-{
-    /// <summary>
-    /// Tries to stop a coroutine based on a Coroutine Handle.
-    /// will only stop the Coroutine if the handle is not null
-    /// </summary>
-    /// <returns>the Monobehaviour script running the coroutine, allowing chained commands</returns>
-    /// <param name="handle">Handle.</param>
-    public static MonoBehaviour TryStopCoroutine(this MonoBehaviour script, ref Coroutine handle)
-    {
-        if (!script) return null;
-        if (handle != null) script.StopCoroutine(handle);
-        handle = null;
-        return script;
-    }
-
-    /// <summary>
-    /// Starts the coroutine and sets the routine to a Coroutine handle.
-    /// </summary>
-    /// <returns>the Monobehaviour script running the coroutine, allowing chained commands</returns>
-    /// <param name="routine">Routine.</param>
-    /// <param name="handle">Handle.</param>
-    public static MonoBehaviour StartCoroutine(this MonoBehaviour script, IEnumerator routine, ref Coroutine handle)
-    {
-        if (!script)
-        {
-#if UNITY_EDITOR
-            Debug.LogWarning("A coroutine cannot run while it is null or being destroyed");
-#endif
-            return null;
-        }
-
-        if (!script.enabled || !script.gameObject.activeInHierarchy)
-        {
-#if UNITY_EDITOR
-            Debug.LogWarningFormat(script, "The Script {0} is currently disabled and cannot start coroutines", script);
-#endif
-            return script;
-        }
-
-        handle = script.StartCoroutine(routine);
-
-        return script;
-    }
-
-
-    /// <summary>
-    /// Stops any possible coroutine running on the specified handle and runs a new routine in its place
-    /// </summary>
-    /// <returns>the Monobehaviour script running the coroutine, allowing chained commands</returns>
-    /// <param name="script">Script.</param>
-    /// <param name="routine">Routine.</param>
-    /// <param name="handle">Handle.</param>
-    public static MonoBehaviour RestartCoroutine(this MonoBehaviour script, IEnumerator routine, ref Coroutine handle)
-    {
-        return script.TryStopCoroutine(ref handle)
-            .StartCoroutine(routine, ref handle);
-    }
-}
-
 public enum SingleOrMultiple
 {
     SINGLE,
@@ -225,12 +165,18 @@ public class GameController : MonoBehaviour {
     public bool sceneGame = false;
     [HideInInspector]
     public bool loadingScene = true;
-    [Header("Loading Text UI Object")]
+    [Header("Loading Settings :")]
     public Text loadingText;
+    public Slider slider;
     [HideInInspector]
     public AudioSource gameControllerAudioSource;
 
     private int holdCountScene;
+
+    private Vector3 cameraPos;
+    private Quaternion cameraRot;
+    private GameObject cameraTemp;
+
 
 
     // TODO : Load Coin with scene changes
@@ -247,8 +193,6 @@ public class GameController : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-
-        loadingText.gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -286,13 +230,15 @@ public class GameController : MonoBehaviour {
     {
         spawnPosition = transform.position.z + offsetXMap;
         spawnRotation = transform.rotation;
+        cameraPos = Camera.main.transform.position;
+        cameraRot = Camera.main.transform.rotation;
         CurrentActiveScene();
         InitCoroutine();
     }
 
     void GameControllerAudio()
     {
-        if (currentScene.name == "Game" && async.isDone)
+        if (CheckGameStatus())
         {
             if(GameObject.Find("GameMain") == null)
             {
@@ -301,7 +247,7 @@ public class GameController : MonoBehaviour {
                 gameControllerAudioSource.PlayOneShot(allAudio.gameMusic);
             }
         }
-        else if(currentScene.name == "MainMenu")
+        else
         {
             if(GameObject.Find("AudioMain") == null)
             {
@@ -323,7 +269,7 @@ public class GameController : MonoBehaviour {
     {
         // Everything for all camera to move
         // Only move when all physics calculation rendered
-        if (sceneGame && async.isDone)
+        if (CheckGameStatus())
         {
             cameraObject.UpdateOnMove(cameraSettings);
             cameraObject.StartMoveCamera();
@@ -340,7 +286,7 @@ public class GameController : MonoBehaviour {
         CurrentActiveScene();
         UpdateLoadingScene();
         GameControllerAudio();
-        if (sceneGame && async.isDone)
+        if (CheckGameStatus())
         {
             // Update each frame for get All Map Length Value
             GetAllMapLength();
@@ -375,39 +321,44 @@ public class GameController : MonoBehaviour {
     // Source : http://myriadgamesstudio.com/how-to-use-the-unity-scenemanager/
     IEnumerator AsyncLoadScene(string scene)
     {
-        loadingText.gameObject.SetActive(true);
+        // Activate Tips&Trick
+        GameObject allObject = GameObject.Find("Canvas");
+        allObject.FindObject("TipsTrick").SetActive(true);
+        if (GameObject.Find("AsyncCamera") == null)
+        {
+            cameraTemp = new GameObject("AsyncCamera");
+            cameraTemp.AddComponent<Camera>();
+            cameraTemp.transform.position = cameraPos;
+            cameraTemp.transform.rotation = cameraRot;
+        }
         // deactivate scene
-        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+        async = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
         //Debug.Log("Build Index = " + SceneManager.GetActiveScene().buildIndex);
         //async.allowSceneActivation = false;
         while (!async.isDone)
         {
             countScene = SceneManager.sceneCount;
-
-            if (holdCountScene == 0)
-                holdCountScene = countScene;
-            Debug.Log("Count Scene " + countScene);
-            Debug.Log("Progress " + (double)(holdCountScene--/ countScene * 100));
             loadingText.text = "Loading : "+Mathf.CeilToInt(async.progress * 100).ToString() + "%";
-            SceneManager.UnloadSceneAsync(1);
-            if (async.progress >= 0.9f)
-            {
-                //async.allowSceneActivation = true;
-                //Debug.Log("Async allow ?" + async.allowSceneActivation);
-                if (countScene == 2)
-                {
-                    loadingText.gameObject.SetActive(false);
-                    Debug.Log("Running Count Scene 2");
-                    if (Input.GetKeyDown(KeyCode.Space))
-                    {
-                        Scene nextScene = SceneManager.GetSceneByName(scene);
-                        SceneManager.SetActiveScene(nextScene);
-                    }
-                }
-            }
+            SceneManager.UnloadSceneAsync(currentScene.name);
+
+            slider.value = async.progress;
+            yield return null;
+
+        }
+
+        if (async.isDone)
+        {
+            Debug.LogWarning("Done Load");
+            slider.value = 1;
+            loadingText.text = "Game Loaded. Starting Up ...";
+            Scene sceneToLoad = SceneManager.GetSceneByBuildIndex(1);
+            SceneManager.SetActiveScene(sceneToLoad);
+            yield return new WaitForSeconds(2);
+            Destroy(GameObject.Find("Canvas"));
+            Destroy(GameObject.Find("AudioMain"));
+            Destroy(cameraTemp);
             yield return null;
         }
-        yield return null;
     }
 
     IEnumerator SyncLoadScene(string scene)
@@ -437,19 +388,25 @@ public class GameController : MonoBehaviour {
         return loadingScene;
     }
 
+    public bool CheckGameStatus()
+    {
+        return sceneGame && async.isDone;
+    }
+
     void CurrentActiveScene()
     {
-        if(currentScene.name == "Game" && async.isDone)
+        if(CheckGameStatus())
         {
             // Initialize and start all
             AllOffset();
             // Make New Camera based on Player Options
             SplitUpdate();
             //sceneGame = true;
-            homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
+            if(GameObject.FindGameObjectWithTag("HomeButton"))
+                homeButton = GameObject.FindGameObjectWithTag("HomeButton").GetComponent<Button>();
             return;
         }
-        if(currentScene.name == "MainMenu")
+        else if(currentScene.name == "MainMenu")
         {
             singlePlayerButton = GameObject.FindGameObjectWithTag("SinglePlayerButton").GetComponent<Button>();
             multiPlayerButton = GameObject.FindGameObjectWithTag("MultiPlayerButton").GetComponent<Button>();
@@ -458,6 +415,7 @@ public class GameController : MonoBehaviour {
                 singlePlayerButton.GetComponent<AudioSource>().Play();
                 StartPlay(SingleOrMultiple.SINGLE);
                 StartCoroutine(AsyncLoadScene("Game"));
+                //StartCoroutine(load.LoadAsync(1));
 
             });
 
@@ -557,7 +515,7 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game" && async.isDone)
+            if (CheckGameStatus())
             {
                 for (int i = 0; i < Maps.Length; i++)
                 {
@@ -582,7 +540,7 @@ public class GameController : MonoBehaviour {
     {
         while (true)
         {
-            if (currentScene.name == "Game" && async.isDone)
+            if (CheckGameStatus())
             {
                 if(cameraObject == null)
                     cameraObject = new CameraControl(play, offsetX, offsetY, offsetZ);
@@ -602,7 +560,7 @@ public class GameController : MonoBehaviour {
         Debug.Log("Running Clone Car");
         while (true)
         {
-            if (currentScene.name == "Game" && async.isDone)
+            if (CheckGameStatus())
             {
                 if (GameObject.Find("SpawnPlayer") != null)
                     spawn = GameObject.Find("SpawnPlayer").gameObject;

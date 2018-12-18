@@ -35,6 +35,9 @@ public class Car : MonoBehaviour
     public bool getFirstBoom;
     public bool getSecondBoom;
 
+    private bool firstTypeOneBlink, firstTypeTwoBlink, firstTypeThreeBlink;
+    private bool secondTypeOneBlink, secondTypeTwoBlink, secondTypeThreeBlink;
+
 
     public Car(GameObject gameObject)
     {
@@ -716,12 +719,16 @@ public class Car : MonoBehaviour
                 CountAndBlinkChildren(baseObject.transform.GetChild(i).transform);
             }
             CountAndBlinkChildren(tyreObject.transform);
+
+            firstTypeOneBlink = true;
             return;
         }
         else if (baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
         {
             CountAndBlinkChildren(baseObject.transform);
             CountAndBlinkChildren(tyreObject.transform.GetChild(4));
+
+            firstTypeTwoBlink = true;
             return;
         }
         else if (!baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
@@ -732,19 +739,22 @@ public class Car : MonoBehaviour
                 CountAndBlinkChildren(baseObject.transform.GetChild(i).transform);
             }
             CountAndBlinkChildren(tyreObject.transform.GetChild(4));
+
+            firstTypeThreeBlink = true;
             return;
         }
         else
         {
             Debug.LogWarning("Default Blink");
-            CountAndBlinkChildren(carObject.transform);
+            CountAndBlinkChildren(baseObject.transform);
+            CountAndBlinkChildren(tyreObject.transform);
             return;
         }
     }
 
     void ConditionFirstUnBlink()
     {
-        if (!baseObject.GetComponent<Renderer>().enabled && tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        if (firstTypeOneBlink)
         {
             for (int i = 0; i < baseObject.transform.childCount; i++)
             {
@@ -752,15 +762,19 @@ public class Car : MonoBehaviour
                 CountAndUnblinkChildren(baseObject.transform.GetChild(i).transform);
             }
             CountAndUnblinkChildren(tyreObject.transform);
+
+            firstTypeOneBlink = false;
             return;
         }
-        else if (baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        else if (firstTypeTwoBlink)
         {
             CountAndUnblinkChildren(baseObject.transform);
             CountAndUnblinkChildren(tyreObject.transform.GetChild(4));
+
+            firstTypeTwoBlink = false;
             return;
         }
-        else if (!baseObject.GetComponent<Renderer>().enabled && !tyreObject.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        else if (firstTypeThreeBlink)
         {
             for(int i = 0; i < baseObject.transform.childCount; i++)
             {
@@ -768,19 +782,23 @@ public class Car : MonoBehaviour
                 CountAndUnblinkChildren(baseObject.transform.GetChild(i).transform);
             }
             CountAndUnblinkChildren(tyreObject.transform.GetChild(4));
+
+            firstTypeThreeBlink = false;
             return;
         }
         else
         {
             Debug.LogWarning("Default Blink");
-            CountAndUnblinkChildren(carObject.transform);
+            CountAndUnblinkChildren(baseObject.transform);
+            CountAndUnblinkChildren(tyreObject.transform);
             return;
         }
     }
 
     void ConditionSecondUnBlink()
     {
-        if (!baseObjectSecond.GetComponent<Renderer>().enabled && tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        Debug.LogWarning("Unblink Enter");
+        if (secondTypeOneBlink)
         {
             for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
             {
@@ -788,15 +806,19 @@ public class Car : MonoBehaviour
                 CountAndUnblinkChildren(baseObjectSecond.transform.GetChild(i).transform);
             }
             CountAndUnblinkChildren(tyreObjectSecond.transform);
+
+            secondTypeOneBlink = false;
             return;
         }
-        else if (baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        else if (secondTypeTwoBlink)
         {
             CountAndUnblinkChildren(baseObjectSecond.transform);
             CountAndUnblinkChildren(tyreObjectSecond.transform.GetChild(4));
+
+            secondTypeTwoBlink = false;
             return;
         }
-        else if (!baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
+        else if (secondTypeThreeBlink)
         {
             for (int i = 0; i < baseObjectSecond.transform.childCount; i++)
             {
@@ -804,12 +826,15 @@ public class Car : MonoBehaviour
                 CountAndUnblinkChildren(baseObjectSecond.transform.GetChild(i).transform);
             }
             CountAndUnblinkChildren(tyreObjectSecond.transform.GetChild(4));
+
+            secondTypeThreeBlink = false;
             return;
         }
         else
         {
-            Debug.LogWarning("Default Blink");
-            CountAndUnblinkChildren(carObjectSecond.transform);
+            Debug.LogWarning("Default Second UnBlink");
+            CountAndUnblinkChildren(baseObjectSecond.transform);
+            CountAndUnblinkChildren(tyreObjectSecond.transform);
             return;
         }
     }
@@ -824,12 +849,16 @@ public class Car : MonoBehaviour
                 CountAndBlinkChildren(baseObjectSecond.transform.GetChild(i).transform);
             }
             CountAndBlinkChildren(tyreObjectSecond.transform);
+
+            secondTypeOneBlink = true;
             return;
         }
         else if (baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
         {
             CountAndBlinkChildren(baseObjectSecond.transform);
             CountAndBlinkChildren(tyreObjectSecond.transform.GetChild(4));
+
+            secondTypeTwoBlink = true;
             return;
         }
         else if (!baseObjectSecond.GetComponent<Renderer>().enabled && !tyreObjectSecond.transform.GetChild(0).GetComponent<Renderer>().enabled)
@@ -840,12 +869,15 @@ public class Car : MonoBehaviour
                 CountAndBlinkChildren(baseObjectSecond.transform.GetChild(i).transform);
             }
             CountAndBlinkChildren(tyreObjectSecond.transform.GetChild(4));
+
+            secondTypeThreeBlink = true;
             return;
         }
         else
         {
-            Debug.LogWarning("Default Blink");
-            CountAndBlinkChildren(carObjectSecond.transform);
+            Debug.LogWarning("Default Second Blink");
+            CountAndBlinkChildren(baseObjectSecond.transform);
+            CountAndBlinkChildren(tyreObjectSecond.transform);
             return;
         }
     }
@@ -925,7 +957,7 @@ public class Car : MonoBehaviour
                 if (respawnStatusSecond)
                 {
                     // Second Player
-                    ConditionSecondBlink();
+                    ConditionSecondUnBlink();
                 }
 
                 if (UpdateFirstBoom())
@@ -937,7 +969,7 @@ public class Car : MonoBehaviour
                 if (UpdateSecondBoom())
                 {
                     // First Player
-                    ConditionSecondBlink();
+                    ConditionSecondUnBlink();
                 }
                 break;
         }

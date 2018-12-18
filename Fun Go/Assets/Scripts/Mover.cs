@@ -128,34 +128,46 @@ public class Mover : MonoBehaviour
         secondGameObject = GameObject.FindGameObjectWithTag("SecondParentPlayer");
         firstGameObject = GameObject.FindGameObjectWithTag("ParentPlayer");
         play = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>().play;
-        if(myCar == null)
-            myCar = new Car(gameObject, secondGameObject, play); myCar.InitStart();
-        // Assign Tyre
-        myCar.AssignTyreAccesories(gameController.accessory.tyre[2], 
-            firstGameObject.tag, 
-            new Color(1,1,1,1));
-
-        // Assign Body
-        myCar.AssignFullBody(gameController.accessory.body[0], 
-            firstGameObject.tag, 
-            new Color(0.5f, 0.25f, 0.60f, 1.0f));
-
-        if (firstAudio == null)
+        if (myCar == null && CheckGameStatus())
         {
-            firstAudio = gameObject.GetComponent<AudioSource>();
-            firstAudio.clip = gameController.allAudio.carExplode;
+            myCar = new Car(gameObject, secondGameObject, play);
+            myCar.InitStart();
+
+            // Assign Tyre
+            myCar.AssignTyreAccesories(gameController.accessory.tyre[2],
+                firstGameObject.tag,
+                new Color(1, 1, 1, 1));
+
+            // Assign Body
+            myCar.AssignFullBody(gameController.accessory.body[0],
+                firstGameObject.tag,
+                new Color(0.5f, 0.25f, 0.60f, 1.0f));
+
+            if (firstAudio == null)
+            {
+                firstAudio = gameObject.GetComponent<AudioSource>();
+                firstAudio.clip = gameController.allAudio.carExplode;
+            }
+
+            if (secondAudio == null && secondGameObject)
+            {
+                secondAudio = secondGameObject.GetComponent<AudioSource>();
+                secondAudio.clip = gameController.allAudio.carExplode;
+            }
+
+            // If clone enable , run random accessories clone
+            if (gameController.accessory.clone.enableClone)
+            {
+                myCar.AssignRandomAccessoriesClone(gameController.accessory);
+            }
         }
-
-        if(secondAudio == null && secondGameObject)
+        else
         {
-            secondAudio = secondGameObject.GetComponent<AudioSource>();
-            secondAudio.clip = gameController.allAudio.carExplode;
-        }
-
-        // If clone enable , run random accessories clone
-        if (gameController.accessory.clone.enableClone)
-        {
-            myCar.AssignRandomAccessoriesClone(gameController.accessory);
+            foreach (GameObject o in Object.FindObjectsOfType<GameObject>())
+            {
+                if(o.gameObject.name != "GameController" && o.gameObject.name != "AsyncCamera" && o.gameObject.layer != 5)
+                    Destroy(o);
+            }
         }
         targetObject = GameObject.Find("/EndPosition").transform;
     }
@@ -167,35 +179,39 @@ public class Mover : MonoBehaviour
         StartCoroutine(BlinkRespawn());
     }
 
+    public bool CheckGameStatus()
+    {
+        return gameController.GetComponent<GameController>().sceneGame && gameController.GetComponent<GameController>().async.isDone;
+    }
+
     void Update()
     {
-        myCar.StickBase();
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        firstPlayerCoin = gameController.playerPreferences.firstCoinPlayer;
-        secondPlayerCoin = gameController.playerPreferences.secondCoinPlayer;
-        myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
-        //desiredDirection = transform.position - targetObject.position;
-        //the_return = Vector3.RotateTowards(transform.forward, desiredDirection, carConfig.turnRate * Time.deltaTime, 1);
-        // Initialize and get current gameObject DetectGround script 
-        // (Must onUpdate because it triggers on collision)
-        myCar.RespawnNow();
-        UpdateRespawnFirst();
-        UpdateRespawnSecond();
-        myCar.DetectBaseGround();
-        UpdatePauseCar();
-        eulerAnglesX = WrapAngle(myCar.rotX);
-        eulerAnglesY = WrapAngle(myCar.rotY);
-        eulerAnglesZ = WrapAngle(myCar.rotZ);
-        MoveOrNotMove();
-        myCar.CloneJumpNow();
-        myCar.GetZMax();
-        myCar.UpdateFirstBoom();
-        myCar.UpdateSecondBoom();
+        if (CheckGameStatus())
+        {
+            myCar.StickBase();
+            gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+            firstPlayerCoin = gameController.playerPreferences.firstCoinPlayer;
+            secondPlayerCoin = gameController.playerPreferences.secondCoinPlayer;
+            myCar.SetCoin(firstPlayerCoin, secondPlayerCoin);
+            myCar.RespawnNow();
+            UpdateRespawnFirst();
+            UpdateRespawnSecond();
+            myCar.DetectBaseGround();
+            UpdatePauseCar();
+            eulerAnglesX = WrapAngle(myCar.rotX);
+            eulerAnglesY = WrapAngle(myCar.rotY);
+            eulerAnglesZ = WrapAngle(myCar.rotZ);
+            MoveOrNotMove();
+            myCar.CloneJumpNow();
+            myCar.GetZMax();
+            myCar.UpdateFirstBoom();
+            myCar.UpdateSecondBoom();
+        }
     }
 
     public void MoveOrNotMove()
     {
-        if (!UpdatePauseCar() && !uiControl.counting)
+        if (!UpdatePauseCar() && !uiControl.counting && CheckGameStatus())
         {
             myCar.EnableGravity();
             myCar.Moving();
@@ -399,9 +415,9 @@ public class Mover : MonoBehaviour
                 myCar.ReturnSecondSpawnPosition();
                 for (int i = 0; i < carConfig.NumOfBlink; i++)
                 {
-                    myCar.UnBlink();
-                    yield return new WaitForSeconds(carConfig.blinkWait);
                     myCar.Blink();
+                    yield return new WaitForSeconds(carConfig.blinkWait);
+                    myCar.UnBlink();
                     yield return new WaitForSeconds(carConfig.blinkWait);
                     if (i == (carConfig.NumOfBlink - 1))
                     {
